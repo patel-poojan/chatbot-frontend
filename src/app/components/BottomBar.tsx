@@ -15,6 +15,7 @@ const BottomBar = () => {
             width={30}
             height={30}
             priority
+            quality={100}
           />
           <p className="text-lg md:text-2xl font-medium text-[#1E255E]">
             ChatBot

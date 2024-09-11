@@ -17,7 +17,6 @@ export default function Home() {
     const speed = 1;
 
     function scrollImages() {
-      console.log("scrollAmount", scrollAmount);
       scrollAmount -= speed;
       wrapper.style.transform = `translateX(${scrollAmount}px)`;
 
@@ -69,6 +68,7 @@ export default function Home() {
                 width={130}
                 height={150}
                 priority
+                quality={100}
               />
             </div>
           </div>
@@ -89,6 +89,7 @@ export default function Home() {
                   width={1000}
                   height={500}
                   className="object-contain"
+                  quality={100}
                 />
                 <Image
                   src="/images/company.svg"
@@ -97,6 +98,7 @@ export default function Home() {
                   width={1000}
                   height={500}
                   className="object-contain"
+                  quality={100}
                 />
                 <Image
                   src="/images/company.svg"
@@ -105,6 +107,7 @@ export default function Home() {
                   width={1000}
                   height={500}
                   className="object-contain"
+                  quality={100}
                 />
               </div>
             </div>

@@ -21,6 +21,7 @@ const MarketingTemplate = ({
           width={60}
           height={60}
           className="mx-auto"
+          quality={100}
         />
         <h3 className="text-[#1E255E] font-semibold text-xl sm:text-2xl text-center">
           {title}
