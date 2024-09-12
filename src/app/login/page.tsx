@@ -15,7 +15,7 @@ const Page = () => {
     setPasswordType("password");
   };
   return (
-    <div className="h-screen w-screen flex justify-center items-center ">
+    <div className="h-dvh w-dvw flex justify-center items-center ">
       <div className="flex flex-col gap-5 sm:gap-6 w-full max-w-lg px-4 sm:px-8">
         <div className="flex flex-col gap-2 justify-center items-center">
           <Image
@@ -31,12 +31,12 @@ const Page = () => {
           </p>
         </div>
         <div className="w-full">
-          <label htmlFor="fullName" className="text-black font-normal text-lg">
+          <label htmlFor="fullName" className="text-black font-normal text-lg ">
             Full Name
           </label>
           <Input
             id="fullName"
-            className="px-4 py-3 rounded placeholder:text-[#6F7288B2] focus-visible:ring-0 placeholder:text-sm  placeholder:sm:text-lg placeholder:font-light w-full"
+            className="px-4 py-3 rounded mt-1 placeholder:text-[#6F7288B2] focus-visible:ring-0 placeholder:text-sm  placeholder:sm:text-lg placeholder:font-light w-full"
             placeholder="Enter Your Full Name"
           />
         </div>
@@ -44,11 +44,11 @@ const Page = () => {
           <label htmlFor="password" className="text-black font-normal text-lg">
             Password
           </label>
-          <div className="flex items-center pe-4 border w-full">
+          <div className="flex items-center pe-4 border w-full rounded mt-1">
             <Input
               id="password"
               type={passwordType}
-              className="px-4 py-3 flex-1 !border-none rounded focus-visible:ring-0 placeholder:text-[#6F7288B2] placeholder:text-sm  placeholder:sm:text-lg placeholder:font-light w-full"
+              className="px-4 py-3 flex-1 !border-none rounded  focus-visible:ring-0 placeholder:text-[#6F7288B2] placeholder:text-sm  placeholder:sm:text-lg placeholder:font-light w-full"
               placeholder="Enter Your Password"
             />
             <div className="cursor-pointer" onClick={togglePassword}>

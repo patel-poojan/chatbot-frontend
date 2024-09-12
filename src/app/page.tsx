@@ -1,14 +1,16 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import TopBar from "./components/TopBar";
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import MarketingTemplate from "./components/MarketingTemplate";
 import CommentCard from "./components/CommentCard";
 import BottomBar from "./components/BottomBar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
+  const [emailId, setEmailId] = useState<string>("");
+
   useEffect(() => {
     const wrapper = document.querySelector(".image-wrapper") as HTMLElement;
     if (!wrapper) return;
@@ -24,13 +26,21 @@ export default function Home() {
         scrollAmount = 0;
       }
 
-      requestAnimationFrame(scrollImages); // Keep the scroll going
+      requestAnimationFrame(scrollImages);
     }
 
-    // Start the scrolling
     scrollImages();
   }, []);
-
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (emailId) {
+      const params = new URLSearchParams(window.location.search);
+      params.set("mailId", emailId);
+      const newUrl = `/signup?${params.toString()}`;
+      window.location.href = newUrl;
+      setEmailId("");
+    }
+  };
   return (
     <div>
       <TopBar />
@@ -48,15 +58,26 @@ export default function Home() {
                 maecenas dis ac aenean. At aliquet proin. Sollicitudin odio
                 morbi facilisis in.
               </p>
-              <div className="flex flex-col gap-4 md:flex-row md:gap-6 items-center justify-center">
-                <Input
-                  className="w-full md:w-2/3 lg:w-3/4 rounded-full p-5 border border-[#1E255E] placeholder:text-[#1E255E] placeholder:text-sm"
-                  placeholder="Enter your business email "
-                />
-                <Button className="bg-[#57C0DD] text-white text-sm py-5 px-8 rounded-full hover:bg-[#4cb9d1] mt-1 md:mt-0">
-                  Sign up free
-                </Button>
-              </div>
+              <form
+                onSubmit={(e) => {
+                  handleSubmit(e);
+                }}
+                className="w-full"
+              >
+                <div className="flex flex-col gap-4 md:flex-row md:gap-6 items-center justify-center">
+                  <Input
+                    type="email"
+                    required
+                    value={emailId}
+                    onChange={(e) => setEmailId(e.target.value)}
+                    className="w-full md:w-2/3 lg:w-3/4 rounded-full p-5 border border-[#1E255E] placeholder:text-[#1E255E] placeholder:text-sm"
+                    placeholder="Enter your business email "
+                  />
+                  <Button className="bg-[#57C0DD] text-white text-sm py-5 px-8 rounded-full hover:bg-[#4cb9d1] mt-1 md:mt-0">
+                    Sign up free
+                  </Button>
+                </div>
+              </form>
               <div className="text-black font-light">Free 14-Day Trial</div>
             </div>
             <div className="relative flex flex-col items-center gap-4 mt-8 lg:mt-12">
