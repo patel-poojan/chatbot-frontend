@@ -10,30 +10,33 @@ import { Button } from "@/components/ui/button";
 
 export default function Home() {
   const [emailId, setEmailId] = useState<string>("");
-
+  const [emailIdForTopBar, setEmailIdForTopBar] = useState<string>("");
   useEffect(() => {
     const wrapper = document.querySelector(".image-wrapper") as HTMLElement;
     if (!wrapper) return;
-
     let scrollAmount = 0;
     const speed = 1;
-
     function scrollImages() {
       scrollAmount -= speed;
       wrapper.style.transform = `translateX(${scrollAmount}px)`;
-
       if (Math.abs(scrollAmount) >= wrapper.scrollWidth) {
         scrollAmount = 0;
       }
-
       requestAnimationFrame(scrollImages);
     }
 
     scrollImages();
   }, []);
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>, key: string) => {
     e.preventDefault();
-    if (emailId) {
+    if (emailIdForTopBar && key === "topBar") {
+      const params = new URLSearchParams(window.location.search);
+      params.set("mailId", emailIdForTopBar);
+      const newUrl = `/signup?${params.toString()}`;
+      window.location.href = newUrl;
+      setEmailIdForTopBar("");
+    }
+    if (emailId && key === "template-1") {
       const params = new URLSearchParams(window.location.search);
       params.set("mailId", emailId);
       const newUrl = `/signup?${params.toString()}`;
@@ -43,7 +46,60 @@ export default function Home() {
   };
   return (
     <div>
-      <TopBar />
+      <TopBar
+        content={
+          <div className="h-full flex flex-col w-full bg-white">
+            <div className="w-full text-left flex-1">
+              <p className="text-sm border-b border-[#F3F3F3] py-4 font-semibold text-[#1E255E]">
+                Product
+              </p>
+              <p className="text-sm border-b border-[#F3F3F3] py-4 font-semibold text-[#1E255E]">
+                Pricing
+              </p>
+              <p className="text-sm border-b border-[#F3F3F3] py-4 font-semibold text-[#1E255E]">
+                Integration
+              </p>
+              <p className="text-sm border-b border-[#F3F3F3] py-4 font-semibold text-[#1E255E]">
+                Resources
+              </p>
+            </div>
+            <form
+              onSubmit={(e) => {
+                handleSubmit(e, "topBar");
+              }}
+              className="w-full"
+            >
+              <div className="mt-8 w-full">
+                <Input
+                  type="email"
+                  required
+                  value={emailIdForTopBar}
+                  onChange={(e) => {
+                    setEmailIdForTopBar(e.target.value);
+                  }}
+                  placeholder="Enter your business email"
+                  className="w-full px-6 py-3 border rounded-full focus:outline-none focus:ring-0 border-[#1E255E] text-[#1E255EB2] font-medium text-sm"
+                />
+                <Button
+                  type="submit"
+                  className="mt-2 w-full px-6 py-3 bg-gradient-to-r from-[#58C8DD] to-[#53A7DD] text-white text-sm font-medium rounded-full"
+                >
+                  Sign up free
+                </Button>
+              </div>
+            </form>
+            {/* Footer text */}
+            <div className="my-4 text-center">
+              <p className="text-gray-500">
+                Already have an account?{" "}
+                <a href="/login" className="text-cyan-500 hover:underline">
+                  Log in
+                </a>
+              </p>
+            </div>
+          </div>
+        }
+      />
       <div className="flex flex-col space-y-10 md:space-y-12">
         {/* template-1 */}
         <div className="px-4 sm:px-8 lg:px-12 bg-[url('/images/temp-1-bg.svg')] bg-contain bg-no-repeat">
@@ -60,7 +116,7 @@ export default function Home() {
               </p>
               <form
                 onSubmit={(e) => {
-                  handleSubmit(e);
+                  handleSubmit(e, "template-1");
                 }}
                 className="w-full"
               >
