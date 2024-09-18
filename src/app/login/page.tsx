@@ -2,10 +2,12 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 
 const Page = () => {
+  const router = useRouter();
   const [passwordType, setPasswordType] = useState<string>("password");
   const togglePassword = () => {
     if (passwordType === "password") {
@@ -65,7 +67,10 @@ const Page = () => {
             Forgot Password?
           </a>
         </div>
-        <Button className="w-full text-white bg-gradient-to-r from-[#58C8DD] to-[#53A7DD] py-3 rounded">
+        <Button
+          className="w-full text-white bg-gradient-to-r from-[#58C8DD] to-[#53A7DD] py-3 rounded"
+          onClick={() => router.push("/chatbotlist")}
+        >
           Log in
         </Button>
         <div className="text-center text-[#1E255EB2] font-normal text-sm sm:text-lg">

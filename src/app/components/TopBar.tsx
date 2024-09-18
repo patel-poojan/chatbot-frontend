@@ -30,7 +30,7 @@ const TopBar = ({ content }: { content: React.ReactNode }) => {
 
   return (
     <div className="flex sticky backdrop-blur-xl z-10 top-0 items-center justify-between px-6 py-4 bg-[#ffffff7a] shadow-lg md:px-10 lg:px-20">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2" onClick={() => router.push("/")}>
         <Image
           src="/images/bot-icon.svg"
           alt="chatbot logo"
