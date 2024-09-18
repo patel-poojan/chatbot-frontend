@@ -152,7 +152,7 @@ export default function Home() {
         </div>
         {/* template-2 */}
         <div className="bg-white  py-5  lg:py-12">
-          <div className="text-[#1E255E] text-xl md:text-4xl font-bold flex flex-col space-y-1 mx-auto text-center max-w-4xl px-4">
+          <div className="text-[#1E255E] text-xl md:text-4xl font-bold flex flex-col space-y-1 mx-auto text-center max-w-5xl px-4">
             <span>Empowering companies</span>
             <span>to stand out with customer experience</span>
           </div>
@@ -195,7 +195,7 @@ export default function Home() {
           <h2 className="text-[#1E255E] text-2xl md:text-4xl font-bold text-center px-4">
             Cover all customer journey touchpoint automatically
           </h2>
-          <p className="text-lg font-normal text-[#1e255eb3] text-center px-4 mt-6 mb-8 md:mb-12 max-w-2xl mx-auto">
+          <p className="text-lg font-normal text-[#1e255eb3] text-center px-4 mt-6 mb-8 md:mb-12 max-w-3xl mx-auto">
             Now your customer relations can focus on optimization, scale up
             through automation, and manage top-tier clients.
           </p>
@@ -218,7 +218,7 @@ export default function Home() {
           </div>
         </div>
         {/* template-5 */}
-        <div className="max-w-6xl gap-5 sm:gap-7 grid grid-cols-1 sm:grid-cols-2 mx-auto px-4">
+        <div className="max-w-7xl gap-5 sm:gap-7 grid grid-cols-1 sm:grid-cols-2 mx-auto px-4">
           <CommentCard
             imgSrc="/images/person.svg"
             message="Lorem ipsum dolor sit amet consectetur. Nullam fames laoreet porttitor diam elementum pharetra aliquam et. Semper maecenas gravida semper morbi. Vel mattis a scelerisque leo nisl vitae lacus turpis. Vitae non malesuada mauris gravida feugiat sit habitant id vitae. Sed sed sit mi in."

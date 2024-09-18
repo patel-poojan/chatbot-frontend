@@ -6,7 +6,7 @@ const OuterTemplate = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="flex  py-4 justify-center bg-[#ffffff7a] shadow-lg">
-        <Link href="/" className="flex gap-2 items-center">
+        <Link href="/chatbotlist" className="flex gap-2 items-center">
           <Image
             src="/images/bot-icon.svg"
             alt="chatbot logo"
