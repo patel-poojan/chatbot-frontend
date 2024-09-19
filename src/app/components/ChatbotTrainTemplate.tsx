@@ -51,14 +51,14 @@ const ChatbotTrainTemplate = ({ type }: { type: string }) => {
               <ChooseDocumentTemplate
                 optional={true}
                 stepHandler={stepHandler}
-                websiteStepHandler={websiteStepHandler}
+                // websiteStepHandler={websiteStepHandler}
               />
             )
           ) : (
             <ChooseDocumentTemplate
               optional={false}
               stepHandler={stepHandler}
-              websiteStepHandler={websiteStepHandler}
+              // websiteStepHandler={websiteStepHandler}
             />
           )
         ) : (

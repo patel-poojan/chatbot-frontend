@@ -6,17 +6,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { IoIosArrowDown, IoMdCheckmark } from "react-icons/io";
 import { TfiWorld } from "react-icons/tfi";
+import AlertDialog from "./AlertDialog";
 
 const ChooseWebsiteTemplate = ({
   websiteStepHandler,
 }: {
   websiteStepHandler: (type: "up" | "down") => void;
 }) => {
-  const router = useRouter();
   const [page, setPage] = useState("Scan a full page");
 
   return (
@@ -90,12 +89,17 @@ const ChooseWebsiteTemplate = ({
 
       {/* Bottom Section */}
       <div className="mt-6 sm:mt-0  sm:ms-auto flex  items-center gap-4">
-        <Button
-          className="w-full sm:w-auto px-8 py-2 sm:px-11 border border-[#57C0DD] bg-transparent text-[#57C0DD] hover:bg-transparent"
-          onClick={() => router.back()}
-        >
-          Go Back
-        </Button>
+        <AlertDialog
+          trigger={
+            <Button
+              className="w-full sm:w-auto px-8 py-2 sm:px-11 border border-[#57C0DD] bg-transparent text-[#57C0DD] hover:bg-transparent"
+              // onClick={() => router.back()}
+            >
+              Go Back
+            </Button>
+          }
+        />
+
         <Button
           className="w-full sm:w-auto px-8 py-2 sm:px-11 border blue-gradient hover:bg-transparent"
           onClick={() => websiteStepHandler("up")}

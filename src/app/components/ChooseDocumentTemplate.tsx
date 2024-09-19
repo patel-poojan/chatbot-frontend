@@ -1,21 +1,20 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { CgNotes } from "react-icons/cg";
 import { FaArrowRightLong } from "react-icons/fa6";
+import AlertDialog from "./AlertDialog";
 
 const ChooseDocumentTemplate = ({
   optional,
   stepHandler,
-  websiteStepHandler,
-}: {
+}: // websiteStepHandler,
+{
   optional: boolean;
   stepHandler: () => void;
-  websiteStepHandler: (type: "up" | "down") => void;
+  // websiteStepHandler: (type: "up" | "down") => void;
 }) => {
-  const router = useRouter();
   const [fileName, setFileName] = useState<string | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,14 +88,21 @@ const ChooseDocumentTemplate = ({
         </div>
       </div>
       <div className="mt-6 sm:mt-0  sm:ms-auto flex  items-center gap-4">
-        <Button
+        {/* <Button
           className="w-full sm:w-auto px-8 py-2 sm:px-11 border border-[#57C0DD] bg-transparent text-[#57C0DD] hover:bg-transparent"
           onClick={() => {
             optional ? websiteStepHandler("down") : router.back();
           }}
         >
           Go Back
-        </Button>
+        </Button> */}
+        <AlertDialog
+          trigger={
+            <Button className="w-full sm:w-auto px-8 py-2 sm:px-11 border border-[#57C0DD] bg-transparent text-[#57C0DD] hover:bg-transparent">
+              Go Back
+            </Button>
+          }
+        />
         <Button
           className="w-full sm:w-auto px-8 py-2 sm:px-11 border blue-gradient hover:bg-transparent"
           onClick={() => stepHandler()}
