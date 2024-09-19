@@ -18,12 +18,8 @@ const Page = () => {
               {chatbotCards.map((_, index) => (
                 <div
                   key={index}
-                  className="h-32 sm:h-40 flex flex-col items-center justify-center rounded-3xl p-3 sm:p-4 cursor-pointer "
+                  className="h-32 blue-gradient sm:h-40 flex flex-col items-center justify-center rounded-3xl p-3 sm:p-4 cursor-pointer "
                   onClick={() => router.push("/create")}
-                  style={{
-                    background:
-                      "linear-gradient(90deg, #58C8DD 0%, #53A7DD 100%)",
-                  }}
                 >
                   <div className="bg-white rounded-full p-1 sm:p-2">
                     <MdAdd className="text-xl sm:text-2xl text-[#58C8DD]" />

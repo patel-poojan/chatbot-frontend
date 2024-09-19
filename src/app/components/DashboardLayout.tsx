@@ -120,15 +120,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     <div
                       className={`flex gap-3 items-center  rounded-lg py-3 ${
                         pathName === "/chatbotlist" || pathName === "/create"
-                          ? "px-3"
+                          ? "px-3 blue-gradient"
                           : ""
                       }`}
-                      style={{
-                        background:
-                          pathName === "/chatbotlist" || pathName === "/create"
-                            ? "linear-gradient(90deg, #58C8DD 0%, #53A7DD 100%)"
-                            : undefined,
-                      }}
                     >
                       <div
                         className={
@@ -159,20 +153,14 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                   </Link>
                   <Link href={"/users"}>
                     <div
-                      className={`flex gap-3 items-center  rounded-lg py-3 ${
-                        pathName === "/users" ? "px-3" : ""
+                      className={`flex gap-3 items-center   rounded-lg py-3 ${
+                        pathName === "/users" ? "px-3 blue-gradient" : ""
                       }`}
-                      style={{
-                        background:
-                          pathName === "/users"
-                            ? "linear-gradient(90deg, #58C8DD 0%, #53A7DD 100%)"
-                            : undefined,
-                      }}
                     >
                       <div
                         className={
                           pathName === "/users"
-                            ? "p-2 rounded-md bg-[#3D3D4A33]"
+                            ? "p-2 rounded-md bg-[#3D3D4A33] "
                             : ""
                         }
                       >
@@ -198,14 +186,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                   <Link href={"/training"}>
                     <div
                       className={`flex gap-3 items-center  rounded-lg py-3 ${
-                        pathName === "/training" ? "px-3" : ""
+                        pathName === "/training" ? "px-3 blue-gradient" : ""
                       }`}
-                      style={{
-                        background:
-                          pathName === "/training"
-                            ? "linear-gradient(90deg, #58C8DD 0%, #53A7DD 100%)"
-                            : undefined,
-                      }}
                     >
                       <div
                         className={

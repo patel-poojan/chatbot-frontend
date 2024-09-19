@@ -40,7 +40,7 @@ const ChooseIndustryTemplate = ({ up }: { up: () => void }) => {
     },
   ];
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="w-full max-w-7xl flex-1 mx-auto h-auto flex flex-col">
       <div className="flex justify-between items-center gap-3">
         <div className="flex justify-between flex-col">
           <div className="text-lg md:text-2xl font-semibold text-black">
@@ -52,17 +52,14 @@ const ChooseIndustryTemplate = ({ up }: { up: () => void }) => {
         </div>
         <Button
           onClick={up}
-          style={{
-            background: "linear-gradient(90deg, #58C8DD 0%, #53A7DD 100%)",
-          }}
-          className=" text-white flex gap-2 items-center py-0 md:py-4 px-4 md:px-9 text-sm md:text-lg rounded md:my-3"
+          className="blue-gradient text-white flex gap-2 items-center py-0 md:py-4 px-2 md:px-9 text-xs max-[500px]:h-7 md:text-lg rounded md:my-3"
         >
           Continue
           <FaArrowRightLong className="text-base md:text-lg text-white" />
         </Button>
       </div>
       <Popover open={openIndustryPopup} onOpenChange={setOpenIndustryPopup}>
-        <PopoverTrigger asChild className="mt-4 md:mt-2">
+        <PopoverTrigger asChild className="mt-3 md:mt-2">
           <Button
             variant="outline"
             role="combobox"

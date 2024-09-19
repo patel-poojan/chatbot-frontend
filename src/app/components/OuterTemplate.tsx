@@ -4,7 +4,7 @@ import React from "react";
 
 const OuterTemplate = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen flex flex-col ">
       <div className="flex  py-4 justify-center bg-[#ffffff7a] shadow-lg">
         <Link href="/chatbotlist" className="flex gap-2 items-center">
           <Image
@@ -20,7 +20,9 @@ const OuterTemplate = ({ children }: { children: React.ReactNode }) => {
           </div>
         </Link>
       </div>
-      <div className="p-6 sm:p-8 md:p-12 lg:px-24 lg:py-16">{children}</div>
+      <div className="p-6 flex-1 flex flex-col sm:p-8 md:p-12 lg:px-24 lg:py-16">
+        {children}
+      </div>
     </div>
   );
 };

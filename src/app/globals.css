@@ -86,3 +86,7 @@ body,
 *::-webkit-scrollbar {
   display: none;
 }
+
+.blue-gradient {
+  background: linear-gradient(90deg, #58c8dd 0%, #53a7dd 100%);
+}

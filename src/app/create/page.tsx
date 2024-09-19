@@ -14,7 +14,7 @@ const Page = () => {
         <div className="flex   gap-3">
           <FaArrowLeftLong
             onClick={() => router.back()}
-            className="text-4xl md:text-2xl md:mt-1 cursor-pointer text-[#0808089a]"
+            className="text-4xl md:text-2xl md:mt-1 cursor-pointer text-black-500"
           />
           <div className="max-[768px]:mt-1">
             <div className="text-xl sm:text-2xl font-semibold  text-black mb-2">

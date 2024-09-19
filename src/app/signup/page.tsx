@@ -1,13 +1,14 @@
+// app/signup/page.js
 "use client";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import React, { Suspense, useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 
-const Page = () => {
+const SignupForm = () => {
   const [passwordType, setPasswordType] = useState<string>("password");
   const [emailId, setEmailId] = useState<string>("");
 
@@ -51,21 +52,18 @@ const Page = () => {
           />
         </div>
 
-        {/* Suspense boundary around email */}
-        <Suspense fallback={<div>Loading...</div>}>
-          <div className="w-full">
-            <label htmlFor="email" className="text-black font-normal text-lg">
-              Business Email
-            </label>
-            <Input
-              id="email"
-              value={emailId}
-              onChange={(e) => setEmailId(e.target.value)}
-              className="px-4 py-3 mt-1 rounded placeholder:text-[#6F7288B2] focus-visible:ring-0 placeholder:text-sm  placeholder:sm:text-lg placeholder:font-light w-full"
-              placeholder="Enter Your Business Email"
-            />
-          </div>
-        </Suspense>
+        <div className="w-full">
+          <label htmlFor="email" className="text-black font-normal text-lg">
+            Business Email
+          </label>
+          <Input
+            id="email"
+            value={emailId}
+            onChange={(e) => setEmailId(e.target.value)}
+            className="px-4 py-3 mt-1 rounded placeholder:text-[#6F7288B2] focus-visible:ring-0 placeholder:text-sm  placeholder:sm:text-lg placeholder:font-light w-full"
+            placeholder="Enter Your Business Email"
+          />
+        </div>
 
         <div className="w-full">
           <label htmlFor="password" className="text-black font-normal text-lg">
@@ -107,6 +105,14 @@ const Page = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const Page = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SignupForm />
+    </Suspense>
   );
 };
 

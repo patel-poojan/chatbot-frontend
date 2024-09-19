@@ -1,7 +1,8 @@
 "use client";
 import BDAQuestion from "@/app/components/BDAQuestion";
 import ChooseIndustryTemplate from "@/app/components/ChooseIndustryTemplate";
-import OuterTemplate from "@/app/components/OuterTemplete";
+import OuterTemplate from "@/app/components/OuterTemplate";
+
 import React, { useState } from "react";
 
 const Page = () => {
@@ -17,7 +18,7 @@ const Page = () => {
       {step === 0 ? (
         <ChooseIndustryTemplate up={up} />
       ) : (
-        <BDAQuestion up={up} down={down} />
+        <BDAQuestion down={down} type="website" />
       )}
     </OuterTemplate>
   );
