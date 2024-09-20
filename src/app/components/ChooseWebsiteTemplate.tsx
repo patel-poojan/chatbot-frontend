@@ -20,24 +20,20 @@ const ChooseWebsiteTemplate = ({
 
   return (
     <div
-      className="h-full flex-1 flex flex-col justify-between w-full bg-white rounded-3xl p-4 sm:p-10"
+      className="h-full flex-1 flex flex-col justify-between w-full bg-white rounded-3xl p-4 sm:p-6 lg:px-12 lg:py-10 "
       style={{ boxShadow: "0px 0px 12px 4px #00000014" }}
     >
-      {/* Top Section */}
       <div>
-        {/* Header */}
         <div className="flex gap-3 items-center mb-2">
           <TfiWorld className="text-xl sm:text-2xl font-bold text-[#57C0DD]" />
           <p className="font-semibold text-black text-lg sm:text-2xl">
             Website
           </p>
         </div>
-        {/* Subtitle */}
         <p className="font-normal text-black text-sm sm:text-base">
           Scan your website content to generate answers to your customer
           questions.
         </p>
-        {/* URL Input and Dropdown */}
         <div
           className="h-12 border rounded-xl
          mt-4 mb-3 flex items-center bg-[#F2F2F2]"
@@ -87,7 +83,6 @@ const ChooseWebsiteTemplate = ({
         </p>
       </div>
 
-      {/* Bottom Section */}
       <div className="mt-6 sm:mt-0  sm:ms-auto flex  items-center gap-4">
         <AlertDialog
           trigger={

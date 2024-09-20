@@ -25,7 +25,7 @@ const ChooseDocumentTemplate = ({
   };
   return (
     <div
-      className="h-full flex-1 flex flex-col justify-between w-full bg-white rounded-3xl p-4 sm:p-10"
+      className="h-full flex-1 flex flex-col justify-between w-full bg-white rounded-3xl p-4 sm:p-6 md:p-8 lg:px-12 lg:py-10 "
       style={{ boxShadow: "0px 0px 12px 4px #00000014" }}
     >
       <div>

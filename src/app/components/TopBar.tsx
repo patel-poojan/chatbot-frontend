@@ -7,8 +7,7 @@ import React, { useEffect, useState } from "react";
 import { FiAlignJustify } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
 import { RiArrowDropDownLine } from "react-icons/ri";
-import { motion } from "framer-motion"; // Import motion
-
+import { motion } from "framer-motion";
 const TopBar = ({ content }: { content: React.ReactNode }) => {
   const router = useRouter();
 

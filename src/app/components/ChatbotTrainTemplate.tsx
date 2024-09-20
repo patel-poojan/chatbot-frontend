@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import ChooseWebsiteTemplate from "./ChooseWebsiteTemplate";
 import ChooseDocumentTemplate from "./ChooseDocumentTemplate";
+import TuneChatbot from "./TuneChatbot";
 
 const ChatbotTrainTemplate = ({ type }: { type: string }) => {
   const [step, setStep] = useState(0);
@@ -17,7 +18,7 @@ const ChatbotTrainTemplate = ({ type }: { type: string }) => {
     }
   };
   return (
-    <div className="w-full  max-w-7xl flex-1 mx-auto h-auto flex flex-col gap-4 md:gap-6 lg:gap-8 sm:gap-11 ">
+    <div className="w-full  max-w-7xl flex-1 mx-auto h-auto flex flex-col gap-4 md:gap-6">
       <div className="w-fit md:mx-5 mx-auto">
         <div className="flex items-center gap-1 px-9">
           <div className="rounded-full p-2 w-8 h-8 flex items-center justify-center blue-gradient text-white">
@@ -62,7 +63,7 @@ const ChatbotTrainTemplate = ({ type }: { type: string }) => {
             />
           )
         ) : (
-          <></>
+          <TuneChatbot />
         )}
       </div>
     </div>
