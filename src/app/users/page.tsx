@@ -49,7 +49,7 @@ const Page = () => {
           </div>
         </div>
         <div className="flex-1 flex flex-col overflow-auto">
-          <Table className="min-w-full">
+          <Table className="min-w-full table-fixed">
             <TableHeader className="bg-[#57C0DD1A] backdrop-blur-3xl sticky top-0">
               <TableRow>
                 <TableHead className="py-2 text-start">

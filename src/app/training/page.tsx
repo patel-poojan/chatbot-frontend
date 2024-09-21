@@ -82,7 +82,7 @@ export const TrainingTable = ({ type }: { type: string }) => {
   ];
 
   return (
-    <Table className="min-w-full">
+    <Table className="min-w-full table-fixed">
       <TableHeader className="bg-[#57C0DD1A] backdrop-blur-3xl sticky top-0">
         <TableRow>
           <TableHead>
