@@ -17,11 +17,12 @@ const BDAQuestion = ({ down, type }: { down: () => void; type: string }) => {
           Your selected industry is
           <span className="text-[#57C0DD] ">Real Estate</span>
         </div>
-
-        <Button className="text-xs blue-gradient max-[500px]:h-8 md:text-lg text-white flex gap-2 items-center py-2 px-4 md:py-4 md:px-9 rounded my-1 md:my-3">
-          Continue
-          <FaArrowRightLong className="text-base md:text-lg text-white" />
-        </Button>
+        <Link href={`${type}/train`}>
+          <Button className="text-xs blue-gradient max-[500px]:h-8 md:text-lg text-white flex gap-2 items-center py-2 px-4 md:py-4 md:px-9 rounded my-1 md:my-3">
+            Continue
+            <FaArrowRightLong className="text-base md:text-lg text-white" />
+          </Button>
+        </Link>
       </div>
       <div className="text-black text-lg md:text-xl font-normal my-4">
         Answer the following questions
