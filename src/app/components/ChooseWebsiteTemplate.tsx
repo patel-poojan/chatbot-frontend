@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import React, { useState } from "react";
-import { IoIosArrowDown, IoMdCheckmark } from "react-icons/io";
+import { IoIosArrowDown, IoIosArrowUp, IoMdCheckmark } from "react-icons/io";
 import { TfiWorld } from "react-icons/tfi";
 import AlertDialog from "./AlertDialog";
 
@@ -17,6 +17,7 @@ const ChooseWebsiteTemplate = ({
   websiteStepHandler: (type: "up" | "down") => void;
 }) => {
   const [page, setPage] = useState("Scan a full page");
+  const [dropDown, setDropDown] = useState(false);
 
   return (
     <div
@@ -43,10 +44,10 @@ const ChooseWebsiteTemplate = ({
             placeholder="Enter a URL address"
           ></Input>
           <div className="mx-2 sm:mx-3 md:mx-5">
-            <DropdownMenu>
+            <DropdownMenu onOpenChange={() => setDropDown(!dropDown)}>
               <DropdownMenuTrigger className="focus-visible:!outline-none w-full md:w-auto text-sm sm:text-base md:text-lg font-normal text-black flex items-center justify-between gap-2">
                 {page}
-                <IoIosArrowDown />
+                {dropDown ? <IoIosArrowUp /> : <IoIosArrowDown />}
               </DropdownMenuTrigger>
               <DropdownMenuContent className="p-2 md:p-3 rounded-xl mt-3  me-12 sm:me-20 md:me-28 w-auto">
                 <DropdownMenuItem

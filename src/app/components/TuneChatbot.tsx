@@ -53,7 +53,7 @@ const TuneChatbot = () => {
 
           <div className="flex-1 flex flex-col gap-3">
             <p className="text-black font-normal text-lg">Set up attributes</p>
-            <div className=" max-h-[20vh]  flex flex-col h-full overflow-y-auto gap-3">
+            <div className="h-[20dvh]  flex flex-col  overflow-y-auto gap-3">
               <>
                 <div
                   className="p-3 rounded-xl text-[#1E255EB2] bg-[#FAFAFA]"

@@ -5,6 +5,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import React from "react";
 import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
@@ -41,7 +42,7 @@ const BDAQuestion = ({ down, type }: { down: () => void; type: string }) => {
                   <div>Question - {index + 1}</div>
                 </AccordionTrigger>
                 <AccordionContent>
-                  Yes. It adheres to the WAI-ARIA design pattern.
+                  <Input className="focus-visible:ring-0"></Input>
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
