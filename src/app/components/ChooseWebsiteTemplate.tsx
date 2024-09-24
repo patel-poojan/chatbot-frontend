@@ -40,12 +40,12 @@ const ChooseWebsiteTemplate = ({
          mt-4 mb-3 flex items-center bg-[#F2F2F2]"
         >
           <Input
-            className="flex-1 border-none shadow-none bg-transparent placeholder:text-[#989898] focus-visible:ring-0 text-sm sm:text-base placeholder:text-sm sm:placeholder:text-base placeholder:font-light "
+            className="flex-1 border-none shadow-none pe-[2px] sm:pe-1 bg-transparent placeholder:text-[#989898] focus-visible:ring-0 text-sm sm:text-base placeholder:text-sm sm:placeholder:text-base placeholder:font-light "
             placeholder="Enter a URL address"
           ></Input>
           <div className="mx-2 sm:mx-3 md:mx-5">
             <DropdownMenu onOpenChange={() => setDropDown(!dropDown)}>
-              <DropdownMenuTrigger className="focus-visible:!outline-none w-full md:w-auto text-sm sm:text-base md:text-lg font-normal text-black flex items-center justify-between gap-2">
+              <DropdownMenuTrigger className="focus-visible:!outline-none w-full md:w-auto text-sm sm:text-base md:text-lg font-normal text-black flex items-center justify-between gap-1 sm:gap-2">
                 {page}
                 {dropDown ? <IoIosArrowUp /> : <IoIosArrowDown />}
               </DropdownMenuTrigger>

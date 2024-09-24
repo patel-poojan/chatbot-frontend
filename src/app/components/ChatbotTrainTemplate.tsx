@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import ChooseWebsiteTemplate from "./ChooseWebsiteTemplate";
 import ChooseDocumentTemplate from "./ChooseDocumentTemplate";
 import TuneChatbot from "./TuneChatbot";
+// import { useRouter } from "next/navigation";
 
 const ChatbotTrainTemplate = ({ type }: { type: string }) => {
   const [step, setStep] = useState(0);
@@ -17,6 +18,22 @@ const ChatbotTrainTemplate = ({ type }: { type: string }) => {
       setWebsiteStep(websiteStep - 1);
     }
   };
+
+  // const router = useRouter();
+
+  // useEffect(() => {
+  //   const handleUnload = (event: BeforeUnloadEvent) => {
+  //     event.preventDefault();
+  //     // Displaying a default message (custom messages are not allowed)
+  //     event.returnValue = "Are you sure you want to leave?";
+  //   };
+
+  //   window.addEventListener("beforeunload", handleUnload);
+
+  //   return () => {
+  //     window.removeEventListener("beforeunload", handleUnload);
+  //   };
+  // }, []);
   return (
     <div className="w-full  max-w-7xl flex-1 mx-auto h-auto flex flex-col gap-4 md:gap-6">
       <div className="w-fit md:mx-5 mx-auto">
