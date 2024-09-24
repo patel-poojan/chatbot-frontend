@@ -8,7 +8,7 @@ import React, { useState, useCallback } from "react";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import { toast } from "sonner";
 import { Loader } from "../components/Loader";
-import { AxiosError } from "axios";
+import { axiosError } from "../../types/axiosTypes";
 
 const Page = () => {
   const router = useRouter();
@@ -30,10 +30,10 @@ const Page = () => {
       });
     },
 
-    onError(error: AxiosError) {
+    onError(error: axiosError) {
       const errorMessage =
-        //   error?.response?.data?.errors?.message ||
-        //   error?.response?.data?.message ||
+        error?.response?.data?.errors?.message ||
+        error?.response?.data?.message ||
         "Login failed";
       toast.error(errorMessage, {
         duration: 5000,

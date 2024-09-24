@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { axiosInstance } from "../utils/axiosInstance";
-import { AxiosError } from "axios";
+import { axiosError } from "@/types/axiosTypes";
 
 type LoginResponse = {
   success: boolean;
@@ -60,7 +60,7 @@ export const useLogin = ({
   onError,
 }: {
   onSuccess: (data: LoginResponse) => void;
-  onError: (error: AxiosError) => void;
+  onError: (error: axiosError) => void;
 }) =>
   useMutation({
     mutationKey: ["auth", "login"],
