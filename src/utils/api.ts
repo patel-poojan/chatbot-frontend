@@ -61,7 +61,14 @@ export const useSignup = ({
   });
 
 type VerifyResponse = {
-  data: null;
+  data: {
+    accessToken: string;
+    user: {
+      id: string;
+      username: string;
+      email: string;
+    };
+  };
   success: boolean;
   message: string;
 };

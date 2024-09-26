@@ -7,6 +7,7 @@ import { LuBadgeAlert } from "react-icons/lu";
 import { toast } from "sonner";
 import { axiosError } from "@/types/axiosTypes";
 import { Loader } from "../components/Loader";
+import Cookies from "js-cookie";
 
 const Verify = () => {
   const searchParams = useSearchParams();
@@ -15,8 +16,18 @@ const Verify = () => {
   const router = useRouter();
   const { mutate: verify, isPending: isPendingVerifyEmail } = useVerifyEmail({
     onSuccess(data) {
+      const token = data.data.accessToken;
+      if (token) {
+        Cookies.set("authToken", token, {
+          path: "/",
+          sameSite: "Lax",
+          secure: true,
+        });
+        setTimeout(() => {
+          router.push("/chatbotlist");
+        }, 10);
+      }
       toast.success(data?.message);
-      router.push("/login");
     },
     onError(error: axiosError) {
       const errorMessage =
