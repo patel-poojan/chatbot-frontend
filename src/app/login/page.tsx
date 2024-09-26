@@ -25,13 +25,14 @@ const Page = () => {
     onSuccess(data) {
       const token = data.data.accessToken;
       if (token) {
-        router.push("/chatbotlist");
-        localStorage.setItem("authToken", token);
         Cookies.set("authToken", token, {
           path: "/",
           sameSite: "Lax",
           secure: true,
         });
+        setTimeout(() => {
+          router.push("/chatbotlist");
+        }, 10);
       }
       toast.success(data?.message);
     },
