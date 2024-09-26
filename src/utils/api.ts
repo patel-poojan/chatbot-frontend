@@ -5,11 +5,13 @@ import { axiosError } from "@/types/axiosTypes";
 type LoginResponse = {
   success: boolean;
   message: string;
-  accessToken: string;
-  user: {
-    id: string;
-    username: string;
-    email: string;
+  data: {
+    accessToken: string;
+    user: {
+      id: string;
+      username: string;
+      email: string;
+    };
   };
 };
 
@@ -17,44 +19,6 @@ type LoginRequest = {
   email: string;
   password: string;
 };
-// export const useLogin = ({
-//   onSuccess,
-//   onError,
-// }: {
-//   onSuccess: (data: LoginResponse) => void;
-//   onError: (error: AxiosError) => void;
-// }) =>
-//   useMutation({
-//     mutationKey: ["auth", "login"],
-//     mutationFn: (data: LoginRequest): Promise<LoginResponse> => {
-//       const payload: LoginRequest = { ...data };
-//       return axiosInstance.post("/auth/login", payload);
-//     },
-//     onError: async(error: AxiosError) => {
-
-//         try {
-//         console.log(data);
-//         onSuccess(data);
-//       } catch (error) {
-//         console.log(error);
-//       }
-//       // Call the provided onError callback
-//       onError(error);
-
-//       // Prevent default behavior if it's causing a refresh
-//       if (error.response && error.response instanceof Event) {
-//         (error.response as Event).preventDefault();
-//       }
-//     },
-//     onSuccess: async (data) => {
-//       try {
-//         console.log(data);
-//         onSuccess(data);
-//       } catch (error) {
-//         console.log(error);
-//       }
-//     },
-//   });
 export const useLogin = ({
   onSuccess,
   onError,
@@ -66,6 +30,78 @@ export const useLogin = ({
     mutationKey: ["auth", "login"],
     mutationFn: (data: LoginRequest): Promise<LoginResponse> => {
       return axiosInstance.post("/auth/login", data);
+    },
+    onError,
+    onSuccess,
+  });
+type SignupResponse = {
+  data: null;
+  success: boolean;
+  message: string;
+};
+type SignupRequest = {
+  username: string;
+  email: string;
+  password: string;
+};
+export const useSignup = ({
+  onSuccess,
+  onError,
+}: {
+  onSuccess: (data: SignupResponse) => void;
+  onError: (error: axiosError) => void;
+}) =>
+  useMutation({
+    mutationKey: ["auth", "login"],
+    mutationFn: (data: SignupRequest): Promise<SignupResponse> => {
+      return axiosInstance.post("/auth/register", data);
+    },
+    onError,
+    onSuccess,
+  });
+
+type VerifyResponse = {
+  data: null;
+  success: boolean;
+  message: string;
+};
+
+export const useVerifyEmail = ({
+  onSuccess,
+  onError,
+}: {
+  onSuccess: (data: VerifyResponse) => void;
+  onError: (error: axiosError) => void;
+}) =>
+  useMutation({
+    mutationKey: ["auth", "login"],
+    mutationFn: (token: string): Promise<VerifyResponse> => {
+      return axiosInstance.post(`/auth/verify-email?token=${token}`, {});
+    },
+    onError,
+    onSuccess,
+  });
+
+type ResendEmailRequest = {
+  email: string;
+};
+type ResendEmailResponse = {
+  data: null;
+  success: boolean;
+  message: string;
+};
+
+export const useResendEmail = ({
+  onSuccess,
+  onError,
+}: {
+  onSuccess: (data: ResendEmailResponse) => void;
+  onError: (error: axiosError) => void;
+}) =>
+  useMutation({
+    mutationKey: ["auth", "login"],
+    mutationFn: (data: ResendEmailRequest): Promise<ResendEmailResponse> => {
+      return axiosInstance.post(`/auth/resend-verification-email`, data);
     },
     onError,
     onSuccess,

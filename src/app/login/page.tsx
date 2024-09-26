@@ -9,6 +9,7 @@ import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import { toast } from "sonner";
 import { Loader } from "../components/Loader";
 import { axiosError } from "../../types/axiosTypes";
+import Cookies from "js-cookie";
 
 const Page = () => {
   const router = useRouter();
@@ -22,12 +23,17 @@ const Page = () => {
 
   const { mutate: onLogin, isPending } = useLogin({
     onSuccess(data) {
-      console.log("data", data);
-      router.push("/chatbotlist");
-      toast.success(data?.message, {
-        duration: 5000,
-        position: "bottom-right",
-      });
+      const token = data.data.accessToken;
+      if (token) {
+        router.push("/chatbotlist");
+        localStorage.setItem("authToken", token);
+        Cookies.set("authToken", token, {
+          path: "/",
+          sameSite: "Lax",
+          secure: true,
+        });
+      }
+      toast.success(data?.message);
     },
 
     onError(error: axiosError) {
@@ -35,10 +41,7 @@ const Page = () => {
         error?.response?.data?.errors?.message ||
         error?.response?.data?.message ||
         "Login failed";
-      toast.error(errorMessage, {
-        duration: 5000,
-        position: "bottom-right",
-      });
+      toast.error(errorMessage);
     },
   });
 
@@ -47,15 +50,9 @@ const Page = () => {
       e.preventDefault();
 
       if (!email) {
-        toast.error("Please fill in your email", {
-          duration: 5000,
-          position: "bottom-right",
-        });
+        toast.warning("Please fill in your email");
       } else if (!password) {
-        toast.error("Please fill in your password", {
-          duration: 5000,
-          position: "bottom-right",
-        });
+        toast.warning("Please fill in your password");
       } else {
         onLogin({ email, password });
       }
@@ -63,8 +60,15 @@ const Page = () => {
     [email, onLogin, password]
   );
 
+  // useEffect(() => {
+  //   const authToken = Cookies.get("authToken");
+  //   if (authToken) {
+  //     router.push("/chatbotlist");
+  //   }
+  // }, [router]);
+
   return (
-    <div className="h-screen w-screen flex justify-center items-center">
+    <div className="h-dvh w-dvw flex justify-center items-center">
       {isPending && <Loader />}
       <div className="flex flex-col gap-6 w-full max-w-lg px-8">
         <div className="flex flex-col gap-2 justify-center items-center">
@@ -126,7 +130,10 @@ const Page = () => {
         </Button>
         <div className="text-center text-[#1E255EB2] text-sm">
           Don’t have an account?{" "}
-          <a href="signup" className="text-[#57C0DD] hover:underline">
+          <a
+            href="signup"
+            className="text-[#57C0DD] ms-1 hover:text-[#45A9B8] underline-offset-2 hover:underline"
+          >
             Sign up
           </a>
         </div>

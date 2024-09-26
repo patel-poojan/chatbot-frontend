@@ -5,26 +5,38 @@ import Axios, {
   InternalAxiosRequestConfig,
 } from "axios";
 import { toast } from "sonner";
-// import Cookies from "js-cookie";
+import Cookies from "js-cookie";
 
 const authRequestInterceptor = (config: InternalAxiosRequestConfig) => {
-  // const authToken = Cookies.get("authToken"); // Using js-cookie for better cookie handling
-  const authToken = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("authToken="))
-    ?.split("=")[1];
+  // Get the current URL or path
+  const requestUrl = config.url || "";
+
+  // Define the api routes where the token should NOT be passed
+  const noAuthPages = [
+    "/register",
+    "/verify-email",
+    "/resend-verification-email",
+    "/login",
+  ];
+
+  // Check if the request URL matches any of the noAuthPages
+  const shouldSkipAuth = noAuthPages.some((page) => requestUrl.includes(page));
+
   if (!config.headers) {
-    config.headers = config.headers || new AxiosHeaders();
+    config.headers = new AxiosHeaders();
   }
 
-  if (authToken) {
-    config.headers.Authorization = `Bearer ${authToken}`;
+  // Only attach the token if the request is not from signup or verify page
+  if (!shouldSkipAuth) {
+    const authToken = Cookies.get("authToken");
+    if (authToken) {
+      config.headers.Authorization = `Bearer ${authToken}`;
+    }
   }
 
   config.headers.Accept = "application/json";
   return config;
 };
-
 const responseInterceptor = (response: AxiosResponse) => response.data;
 
 const errorInterceptor = (error: AxiosError) => {
@@ -38,10 +50,8 @@ const errorInterceptor = (error: AxiosError) => {
   }
 
   if (error.response.status === 401) {
-    window.location.replace("/login");
-    toast.error("Authentication required, please log in", {
-      duration: 5 * 1000,
-    });
+    // window.location.replace("/login");
+    toast.error("Authentication required, please log in");
   }
 
   return Promise.reject(error);

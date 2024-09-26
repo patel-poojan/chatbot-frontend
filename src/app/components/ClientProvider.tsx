@@ -12,7 +12,7 @@ export default function ClientProvider({
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      <Toaster richColors />
+      <Toaster richColors position="bottom-right" duration={5000} />
     </QueryClientProvider>
   );
 }
