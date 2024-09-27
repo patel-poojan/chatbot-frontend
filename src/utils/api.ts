@@ -1,7 +1,7 @@
-import { useMutation } from "@tanstack/react-query";
+import { MutateOptions, useMutation } from "@tanstack/react-query";
 import { axiosInstance } from "../utils/axiosInstance";
 import { axiosError } from "@/types/axiosTypes";
-
+import Cookies from "js-cookie";
 type LoginResponse = {
   success: boolean;
   message: string;
@@ -33,6 +33,15 @@ export const useLogin = ({
     },
     onError,
     onSuccess,
+  });
+
+export const useLogout = (options: MutateOptions) =>
+  useMutation({
+    mutationKey: ["auth", "logout"],
+    mutationFn: async () => {
+      Cookies.remove("authToken", { path: "/" });
+    },
+    ...options,
   });
 type SignupResponse = {
   data: null;

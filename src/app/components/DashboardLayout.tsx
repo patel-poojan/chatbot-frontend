@@ -11,13 +11,27 @@ import { BsPersonFill } from "react-icons/bs";
 import { IoGrid } from "react-icons/io5";
 import {
   MdKeyboardArrowRight,
+  MdLockReset,
+  MdOutlineLogout,
   MdOutlinePeopleAlt,
   MdOutlineQuickreply,
 } from "react-icons/md";
 import TopBar from "../components/TopBar";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { useLogout } from "@/utils/api";
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const pathName = usePathname();
+  const router = useRouter();
+  const { mutate } = useLogout({
+    onSuccess() {
+      router.push("/");
+    },
+  });
   return (
     <div className="min-[500px]:bg-[#1B1B20] h-dvh  flex  p-0 min-[500px]:p-3">
       <div className="pr-3 hidden min-[500px]:flex flex-col justify-between py-3  lg:items-center">
@@ -108,7 +122,25 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             </Tooltip>
           </TooltipProvider>
         </div>
-        <BsPersonFill className="text-black text-4xl cursor-pointer p-1 rounded-full bg-white" />
+        <Popover>
+          <PopoverTrigger>
+            <BsPersonFill className="text-black text-4xl cursor-pointer p-1 rounded-full bg-white" />
+          </PopoverTrigger>
+          <PopoverContent
+            className="mb-1 ms-3 border border-[#EFEFEF] rounded-xl w-fit p-1"
+            style={{ boxShadow: "0px 0px 12px 4px #00000014" }}
+          >
+            <div className="text-black font-medium text-base flex gap-1 pt-2 px-4 pb-1 hover:bg-[#58C8DD4a] items-center cursor-pointer">
+              <MdLockReset className="text-xl" /> Reset Password
+            </div>
+            <div
+              className="text-black font-medium text-base gap-1 hover:bg-[#58C8DD4a] pb-2 px-4 pt-1 flex items-center cursor-pointer"
+              onClick={() => mutate()}
+            >
+              <MdOutlineLogout className="text-xl" /> Log Out
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
       <div className="flex-1 w-full flex flex-col bg-white max-[500px]:p-0 p-6 lg:p-8 xl:px-16 xl:py-12  min-[500px]:rounded-3xl overflow-hidden h-full">
         <div className="block min-[500px]:hidden">
@@ -216,21 +248,39 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     </div>
                   </Link>
                 </div>
-
-                <div className="flex justify-between items-center border-2 bg-[#e9e9e933] rounded-xl border-[#F3F3F3] p-2">
-                  <div className="flex items-center gap-3">
-                    <BsPersonFill className="text-white text-4xl cursor-pointer p-2 rounded-full bg-black" />
-                    <div>
-                      <p className="text-[#1e255eb2] font-medium text-base">
-                        User Name
-                      </p>
-                      <p className="text-[#1e255eb2] font-light text-base">
-                        useremail123@gmail.com
-                      </p>
+                <Popover>
+                  <PopoverTrigger>
+                    <div className="flex justify-between items-center border-2 bg-[#e9e9e933] rounded-xl border-[#F3F3F3] p-2">
+                      <div className="flex items-center gap-3">
+                        <BsPersonFill className="text-white text-4xl cursor-pointer p-2 rounded-full bg-black" />
+                        <div className="text-start">
+                          <p className="text-[#1e255eb2] font-medium text-base">
+                            User Name
+                          </p>
+                          <p className="text-[#1e255eb2] font-light text-base">
+                            useremail123@gmail.com
+                          </p>
+                        </div>
+                      </div>
+                      <MdKeyboardArrowRight className="text-xl text-[#1E255E]" />
                     </div>
-                  </div>
-                  <MdKeyboardArrowRight className="text-xl text-[#1E255E]" />
-                </div>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="mb-1 border border-[#EFEFEF] rounded-xl w-[95vw]  p-1"
+                    style={{ boxShadow: "0px 0px 12px 4px #00000014" }}
+                  >
+                    <div className="text-black font-medium text-base  flex gap-1 pt-2 px-6  items-center cursor-pointer">
+                      <MdLockReset className="text-xl" /> Reset Password
+                    </div>
+                    <div className="border-b-2 border-[#EFEFEF] my-2 mx-3 "></div>
+                    <div
+                      className="text-[red] font-medium text-base gap-1  pb-2 px-6  flex items-center cursor-pointer"
+                      onClick={() => mutate()}
+                    >
+                      <MdOutlineLogout className="text-xl" /> Log Out
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </div>
             }
           />
