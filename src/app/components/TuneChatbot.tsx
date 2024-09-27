@@ -12,14 +12,26 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Cross2Icon } from "@radix-ui/react-icons";
+import useWindowDimensions from "@/utils/windowsize";
 
 const TuneChatbot = () => {
+  const { width: screenWidth } = useWindowDimensions();
+  console.log("screenWidth", screenWidth);
   return (
     <div
-      className="h-full relative flex-1 flex flex-col justify-between w-full bg-white rounded-3xl p-4 sm:p-6 md:p-8 lg:px-12 lg:py-10"
-      style={{ boxShadow: "0px 0px 12px 4px #00000014" }}
+      className=" relative   flex flex-col justify-between w-full bg-white rounded-3xl p-4 sm:p-6 md:p-8 lg:px-12 lg:py-10"
+      style={{
+        boxShadow: "0px 0px 12px 4px #00000014",
+        height: `${
+          screenWidth > 768
+            ? "calc(100dvh - 248px)"
+            : screenWidth > 640
+            ? "calc(100dvh - 206px)"
+            : "calc(100dvh - 186px)"
+        } `,
+      }}
     >
-      <div className="flex-1 flex flex-col lg:flex-row gap-6 w-full">
+      <div className="flex-1 flex flex-col lg:flex-row gap-6 w-full overflow-hidden">
         <div className="w-full lg:w-3/5 flex-1 flex flex-col gap-6">
           <div>
             <p className="text-black font-semibold text-2xl">
@@ -51,36 +63,21 @@ const TuneChatbot = () => {
             </div>
           </div>
 
-          <div className="flex-1 flex flex-col gap-3">
-            <p className="text-black font-normal text-lg">Set up attributes</p>
-            <div className="h-[20dvh]  flex flex-col  overflow-y-auto gap-3">
-              <>
+          <p className="text-black font-normal text-lg mb-3">
+            Set up attributes
+          </p>
+          <div className=" flex flex-col !overflow-y-auto gap-3 flex-1">
+            {["Company Name", "Company Address", "About us", "LinkedIn"].map(
+              (item, index) => (
                 <div
-                  className="p-3 rounded-xl text-[#1E255EB2] bg-[#FAFAFA]"
+                  key={index}
+                  className="p-3 rounded-xl text-[#1E255EB2] bg-[#FAFAFA] shadow-sm"
                   style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
                 >
-                  Company Name
+                  {item}
                 </div>
-                <div
-                  className="p-3 rounded-xl text-[#1E255EB2] bg-[#FAFAFA]"
-                  style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
-                >
-                  Company Address
-                </div>
-                <div
-                  className="p-3 rounded-xl text-[#1E255EB2] bg-[#FAFAFA]"
-                  style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
-                >
-                  About us
-                </div>
-                <div
-                  className="p-3 rounded-xl text-[#1E255EB2] bg-[#FAFAFA]"
-                  style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
-                >
-                  Linkedin
-                </div>
-              </>
-            </div>
+              )
+            )}
           </div>
         </div>
 

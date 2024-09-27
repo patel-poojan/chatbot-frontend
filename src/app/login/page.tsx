@@ -117,14 +117,17 @@ const Page = () => {
             </div>
           </div>
         </div>
-        <div className="flex justify-end text-sm text-[#57C0DD]">
-          <a href="#" className="hover:underline">
+        <div className="flex justify-end text-sm ">
+          <a
+            href="#"
+            className="hover:underline underline-offset-1 text-[#57C0DD] hover:text-[#45A9B8]"
+          >
             Forgot Password?
           </a>
         </div>
         <Button
           type="button"
-          className="w-full text-white bg-gradient-to-r from-[#58C8DD] to-[#53A7DD] py-3 rounded"
+          className="w-full text-white bg-gradient-to-r  from-[#58C8DD] to-[#53A7DD] py-3 rounded"
           onClick={handleLogin}
         >
           Log in
