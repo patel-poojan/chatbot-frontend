@@ -12,7 +12,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Cross2Icon } from "@radix-ui/react-icons";
-import useWindowDimensions from "@/utils/windowsize";
+import useWindowDimensions from "@/utils/windowSize";
 
 const TuneChatbot = () => {
   const { width: screenWidth } = useWindowDimensions();
