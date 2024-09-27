@@ -17,15 +17,19 @@ const Verify = () => {
   const { mutate: verify, isPending: isPendingVerifyEmail } = useVerifyEmail({
     onSuccess(data) {
       const token = data.data.accessToken;
+
       if (token) {
         Cookies.set("authToken", token, {
           path: "/",
           sameSite: "Lax",
           secure: true,
         });
+
         setTimeout(() => {
           router.push("/chatbotlist");
         }, 10);
+      } else {
+        router.push("/login");
       }
       toast.success(data?.message);
     },

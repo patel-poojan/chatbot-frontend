@@ -129,7 +129,7 @@ const Page = () => {
         >
           Log in
         </Button>
-        <div className="text-center text-[#1E255EB2] text-sm">
+        <div className="text-center text-[#1E255EB2] font-normal text-sm sm:text-lg">
           Don’t have an account?{" "}
           <a
             href="signup"
