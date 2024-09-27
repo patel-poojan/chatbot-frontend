@@ -16,7 +16,6 @@ import useWindowDimensions from "@/utils/windowSize";
 
 const TuneChatbot = () => {
   const { width: screenWidth } = useWindowDimensions();
-  console.log("screenWidth", screenWidth);
   return (
     <div
       className=" relative   flex flex-col justify-between w-full bg-white rounded-3xl p-4 sm:p-6 md:p-8 lg:px-12 lg:py-10"
@@ -32,8 +31,8 @@ const TuneChatbot = () => {
       }}
     >
       <div className="flex-1 flex flex-col lg:flex-row gap-6 w-full overflow-hidden">
-        <div className="w-full lg:w-3/5 flex-1 flex flex-col gap-6">
-          <div>
+        <div className="w-full lg:w-3/5 flex-1 flex flex-col ">
+          <div className="mb-4 sm:mb-6">
             <p className="text-black font-semibold text-2xl">
               Tune your chatbot
             </p>
@@ -42,7 +41,7 @@ const TuneChatbot = () => {
             </p>
           </div>
 
-          <div>
+          <div className="mb-4 sm:mb-6">
             <p className="text-black font-normal text-lg">
               Customise your welcome message
             </p>

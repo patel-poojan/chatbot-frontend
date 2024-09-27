@@ -43,8 +43,7 @@ const errorInterceptor = (error: AxiosError) => {
   if (!error.response) {
     // Handle network/server issues
     if (error.code !== "ERR_CANCELED") {
-      console.error("Server or network error occurred");
-      // toast.error("Something went wrong with server", { duration: 10 * 1000 });
+      toast.error("Server or network error occurred");
     }
     return Promise.reject(error);
   }
