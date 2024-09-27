@@ -31,7 +31,7 @@ const TuneChatbot = () => {
       }}
     >
       <div className="flex-1 flex flex-col lg:flex-row gap-6 w-full overflow-hidden">
-        <div className="w-full lg:w-3/5 flex-1 flex flex-col ">
+        <div className="w-full lg:w-3/5 flex-1 flex flex-col overflow-hidden ">
           <div className="mb-4 sm:mb-6">
             <p className="text-black font-semibold text-2xl">
               Tune your chatbot
@@ -112,7 +112,7 @@ const TuneChatbot = () => {
         </div>
       </div>
 
-      <div className="mt-6  sm:ms-auto flex items-center gap-4">
+      <div className="mt-6   sm:ms-auto flex items-center gap-4">
         <AlertDialog
           trigger={
             <Button className="w-full sm:w-auto px-8 py-2 sm:px-11 border border-[#57C0DD] bg-transparent text-[#57C0DD] hover:bg-transparent">
