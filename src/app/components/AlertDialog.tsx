@@ -1,5 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -11,6 +18,12 @@ const AlertDialog = ({ trigger }: { trigger: React.ReactNode }) => {
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="max-w-[87vw] sm:max-w-[425px] rounded-lg">
+        <DialogHeader>
+          <DialogTitle className="sr-only">Alert</DialogTitle>
+          <DialogDescription id="dialog-description" className="sr-only">
+            Data loss alert
+          </DialogDescription>
+        </DialogHeader>
         <div className="flex items-center justify-between">
           <div className="text-primary  text-base">
             Training {`is't`} finished yet

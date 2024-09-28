@@ -37,7 +37,7 @@ const Verify = () => {
       const errorMessage =
         error?.response?.data?.errors?.message ||
         error?.response?.data?.message ||
-        "Login failed";
+        "Verify email failed";
       toast.error(errorMessage);
     },
   });
@@ -55,7 +55,7 @@ const Verify = () => {
       const errorMessage =
         error?.response?.data?.errors?.message ||
         error?.response?.data?.message ||
-        "Login failed";
+        "resend failed";
       toast.error(errorMessage);
     },
   });

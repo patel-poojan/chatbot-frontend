@@ -24,11 +24,16 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useLogout } from "@/utils/api";
+import ResetPasswordDialog from "./ResetPasswordDialog";
+import { toast } from "sonner";
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const pathName = usePathname();
+  // const [isOpenPopup, setIsOpenPopup] = useState<boolean>(false);
+
   const router = useRouter();
   const { mutate } = useLogout({
-    onSuccess() {
+    onSuccess(data) {
+      toast.success(data?.message);
       router.push("/");
     },
   });
@@ -130,9 +135,14 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             className="mb-1 ms-3 border border-[#EFEFEF] rounded-xl w-fit p-1"
             style={{ boxShadow: "0px 0px 12px 4px #00000014" }}
           >
-            <div className="text-black font-medium text-base flex gap-1 pt-2 px-4 pb-1 hover:bg-[#58C8DD4a] items-center cursor-pointer">
-              <MdLockReset className="text-xl" /> Reset Password
-            </div>
+            <ResetPasswordDialog
+              trigger={
+                <div className="text-black font-medium text-base flex gap-1 pt-2 px-4 pb-1 hover:bg-[#58C8DD4a] items-center cursor-pointer">
+                  <MdLockReset className="text-xl" /> Reset Password
+                </div>
+              }
+            />
+
             <div
               className="text-black font-medium text-base gap-1 hover:bg-[#58C8DD4a] pb-2 px-4 pt-1 flex items-center cursor-pointer"
               onClick={() => mutate()}
@@ -269,9 +279,13 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     className="mb-1 border border-[#EFEFEF] rounded-xl w-[95vw]  p-1"
                     style={{ boxShadow: "0px 0px 12px 4px #00000014" }}
                   >
-                    <div className="text-black font-medium text-base  flex gap-1 pt-2 px-6  items-center cursor-pointer">
-                      <MdLockReset className="text-xl" /> Reset Password
-                    </div>
+                    <ResetPasswordDialog
+                      trigger={
+                        <div className="text-black font-medium text-base  flex gap-1 pt-2 px-6  items-center cursor-pointer">
+                          <MdLockReset className="text-xl" /> Reset Password
+                        </div>
+                      }
+                    />
                     <div className="border-b-2 border-[#EFEFEF] my-2 mx-3 "></div>
                     <div
                       className="text-[red] font-medium text-base gap-1  pb-2 px-6  flex items-center cursor-pointer"

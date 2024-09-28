@@ -1,7 +1,13 @@
-import { MutateOptions, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { axiosInstance } from "../utils/axiosInstance";
 import { axiosError } from "@/types/axiosTypes";
 import Cookies from "js-cookie";
+import { toast } from "sonner";
+type DefaultResponse = {
+  data: null;
+  success: boolean;
+  message: string;
+};
 type LoginResponse = {
   success: boolean;
   message: string;
@@ -34,20 +40,26 @@ export const useLogin = ({
     onError,
     onSuccess,
   });
-
-export const useLogout = (options: MutateOptions) =>
+export const useLogout = ({
+  onSuccess,
+}: {
+  onSuccess: (data: DefaultResponse) => void;
+}) =>
   useMutation({
     mutationKey: ["auth", "logout"],
-    mutationFn: async () => {
-      Cookies.remove("authToken", { path: "/" });
+    mutationFn: (): Promise<DefaultResponse> => {
+      return axiosInstance.delete("/auth/logout");
     },
-    ...options,
+    onSuccess: async (data) => {
+      try {
+        Cookies.remove("authToken");
+        onSuccess(data);
+      } catch (error) {
+        toast.error(error as string);
+      }
+    },
   });
-type SignupResponse = {
-  data: null;
-  success: boolean;
-  message: string;
-};
+
 type SignupRequest = {
   username: string;
   email: string;
@@ -57,12 +69,12 @@ export const useSignup = ({
   onSuccess,
   onError,
 }: {
-  onSuccess: (data: SignupResponse) => void;
+  onSuccess: (data: DefaultResponse) => void;
   onError: (error: axiosError) => void;
 }) =>
   useMutation({
-    mutationKey: ["auth", "login"],
-    mutationFn: (data: SignupRequest): Promise<SignupResponse> => {
+    mutationKey: ["auth", "signup"],
+    mutationFn: (data: SignupRequest): Promise<DefaultResponse> => {
       return axiosInstance.post("/auth/register", data);
     },
     onError,
@@ -90,7 +102,7 @@ export const useVerifyEmail = ({
   onError: (error: axiosError) => void;
 }) =>
   useMutation({
-    mutationKey: ["auth", "login"],
+    mutationKey: ["auth", "verify-email"],
     mutationFn: (token: string): Promise<VerifyResponse> => {
       return axiosInstance.post(`/auth/verify-email?token=${token}`, {});
     },
@@ -101,23 +113,39 @@ export const useVerifyEmail = ({
 type ResendEmailRequest = {
   email: string;
 };
-type ResendEmailResponse = {
-  data: null;
-  success: boolean;
-  message: string;
-};
 
 export const useResendEmail = ({
   onSuccess,
   onError,
 }: {
-  onSuccess: (data: ResendEmailResponse) => void;
+  onSuccess: (data: DefaultResponse) => void;
   onError: (error: axiosError) => void;
 }) =>
   useMutation({
-    mutationKey: ["auth", "login"],
-    mutationFn: (data: ResendEmailRequest): Promise<ResendEmailResponse> => {
+    mutationKey: ["auth", "resend-email"],
+    mutationFn: (data: ResendEmailRequest): Promise<DefaultResponse> => {
       return axiosInstance.post(`/auth/resend-verification-email`, data);
+    },
+    onError,
+    onSuccess,
+  });
+
+type ResetPasswordRequest = {
+  currentPassword: string;
+  newPassword: string;
+};
+
+export const useResetPassword = ({
+  onSuccess,
+  onError,
+}: {
+  onSuccess: (data: DefaultResponse) => void;
+  onError: (error: axiosError) => void;
+}) =>
+  useMutation({
+    mutationKey: ["auth", "reset-password"],
+    mutationFn: (data: ResetPasswordRequest): Promise<DefaultResponse> => {
+      return axiosInstance.post(`/auth/change-password`, data);
     },
     onError,
     onSuccess,

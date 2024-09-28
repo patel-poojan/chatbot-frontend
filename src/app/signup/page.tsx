@@ -39,7 +39,7 @@ const SignupForm = () => {
       const errorMessage =
         error?.response?.data?.errors?.message ||
         error?.response?.data?.message ||
-        "Login failed";
+        "signup failed";
       toast.error(errorMessage);
     },
   });

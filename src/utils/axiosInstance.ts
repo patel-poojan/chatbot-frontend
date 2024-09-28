@@ -26,7 +26,6 @@ const authRequestInterceptor = (config: InternalAxiosRequestConfig) => {
     config.headers = new AxiosHeaders();
   }
 
-  // Only attach the token if the request is not from signup or verify page
   if (!shouldSkipAuth) {
     const authToken = Cookies.get("authToken");
     if (authToken) {
@@ -37,6 +36,18 @@ const authRequestInterceptor = (config: InternalAxiosRequestConfig) => {
   config.headers.Accept = "application/json";
   return config;
 };
+
+// const authRequestInterceptor = (config: InternalAxiosRequestConfig) => {
+//   const authToken = Cookies.get("authToken");
+//   config.headers = config.headers ?? {};
+
+//   if (authToken) {
+//     config.headers.Authorization = `Bearer ${authToken}`;
+//   }
+//   config.headers.Accept = "application/json";
+
+//   return config;
+// };
 const responseInterceptor = (response: AxiosResponse) => response.data;
 
 const errorInterceptor = (error: AxiosError) => {
@@ -49,10 +60,9 @@ const errorInterceptor = (error: AxiosError) => {
   }
 
   if (error.response.status === 401) {
-    // window.location.replace("/login");
+    window.location.replace("/login");
     toast.error("Authentication required, please log in");
   }
-
   return Promise.reject(error);
 };
 
