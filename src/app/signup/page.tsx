@@ -169,7 +169,7 @@ const SignupForm = () => {
 
 const Page = () => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense>
       <SignupForm />
     </Suspense>
   );
