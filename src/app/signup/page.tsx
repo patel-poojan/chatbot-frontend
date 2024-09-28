@@ -74,8 +74,8 @@ const SignupForm = () => {
     <div className="h-dvh w-dvw flex justify-center items-center">
       {isPending && <Loader />}
 
-      <div className="flex flex-col gap-5 sm:gap-6 w-full max-w-lg px-4 sm:px-8">
-        <div className="flex flex-col sm:flex-row gap-2 justify-center items-center">
+      <div className="flex flex-col gap-4 md:gap-6 w-full max-w-lg px-4">
+        <div className="flex flex-col gap-1 md:gap-2 justify-center items-center">
           <Image
             src="/images/bot-icon.svg"
             alt="chatbot logo"
@@ -84,9 +84,9 @@ const SignupForm = () => {
             priority
             quality={100}
           />
-          <div className="text-[#1E255E] font-medium text-3xl sm:text-4xl">
+          <p className="text-black font-medium text-2xl md:text-[32px]">
             ChatBot
-          </div>
+          </p>
         </div>
         <div className="w-full">
           <label htmlFor="fullName" className="text-black font-normal text-lg">

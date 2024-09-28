@@ -71,8 +71,8 @@ const Page = () => {
   return (
     <div className="h-dvh w-dvw flex justify-center items-center">
       {isPending && <Loader />}
-      <div className="flex flex-col gap-6 w-full max-w-lg px-8">
-        <div className="flex flex-col gap-2 justify-center items-center">
+      <div className="flex flex-col gap-4 md:gap-6 w-full max-w-lg px-4">
+        <div className="flex flex-col gap-1 md:gap-2 justify-center items-center">
           <Image
             src="/images/bot-icon.svg"
             alt="chatbot logo"
@@ -81,22 +81,24 @@ const Page = () => {
             priority
             quality={100}
           />
-          <p className="text-black font-semibold text-4xl">Welcome back</p>
+          <p className="text-black font-medium text-2xl md:text-[32px]">
+            Welcome back
+          </p>
         </div>
         <div className="w-full">
-          <label htmlFor="email" className="text-black text-lg">
+          <label htmlFor="email" className="text-black font-normal text-lg">
             Email
           </label>
           <Input
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             id="email"
-            className="px-4 py-3 rounded mt-1 placeholder:text-[#6F7288B2] focus-visible:ring-0 placeholder:text-sm w-full"
+            className="px-4 py-3 mt-1 rounded placeholder:text-[#6F7288B2] focus-visible:ring-0 placeholder:text-sm   placeholder:font-light w-full"
             placeholder="Enter Your Email"
           />
         </div>
         <div className="w-full">
-          <label htmlFor="password" className="text-black text-lg">
+          <label htmlFor="password" className="text-black font-normal text-lg">
             Password
           </label>
           <div className="flex items-center border w-full rounded mt-1">
@@ -117,7 +119,7 @@ const Page = () => {
             </div>
           </div>
         </div>
-        <div className="flex justify-end text-sm ">
+        <div className="flex justify-end font-normal text-sm sm:text-base ">
           <a
             href="#"
             className="hover:underline underline-offset-1 text-[#57C0DD] hover:text-[#45A9B8]"
