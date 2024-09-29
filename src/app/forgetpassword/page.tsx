@@ -195,7 +195,7 @@ const ForgetPassword = () => {
           </div>
           <Button
             type="button"
-            className="w-full py-3 mt-4 rounded-md text-white bg-gradient-to-r from-[#58C8DD] to-[#53A7DD] hover:from-[#53A7DD] hover:to-[#58C8DD] transition-colors"
+            className="w-full py-3 mt-1 rounded-md text-white bg-gradient-to-r from-[#58C8DD] to-[#53A7DD] hover:from-[#53A7DD] hover:to-[#58C8DD] transition-colors"
             onClick={validateEmail}
           >
             Send Reset Link
