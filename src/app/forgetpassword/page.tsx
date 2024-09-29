@@ -9,7 +9,7 @@ import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import { toast } from "sonner";
 import { axiosError } from "@/types/axiosTypes";
 import { Loader } from "../components/Loader";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 const ForgetPassword = () => {
   const router = useRouter();
