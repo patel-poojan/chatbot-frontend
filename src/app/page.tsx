@@ -82,7 +82,7 @@ export default function Home() {
                 />
                 <Button
                   type="submit"
-                  className="mt-2 w-full px-6 py-3 bg-gradient-to-r from-[#58C8DD] to-[#53A7DD] text-white text-sm font-medium rounded-full"
+                  className="mt-2 w-full px-6 py-3 bg-gradient-to-r from-[#58C8DD] to-[#53A7DD] hover:from-[#53A7DD] hover:to-[#58C8DD] text-white text-sm font-medium rounded-full"
                 >
                   Sign up free
                 </Button>

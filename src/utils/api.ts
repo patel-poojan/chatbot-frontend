@@ -150,3 +150,48 @@ export const useResetPassword = ({
     onError,
     onSuccess,
   });
+
+type ForgetPasswordRequest = {
+  email: string;
+};
+
+export const useForgetPassword = ({
+  onSuccess,
+  onError,
+}: {
+  onSuccess: (data: DefaultResponse) => void;
+  onError: (error: axiosError) => void;
+}) =>
+  useMutation({
+    mutationKey: ["auth", "forget-password"],
+    mutationFn: (data: ForgetPasswordRequest): Promise<DefaultResponse> => {
+      return axiosInstance.post(`/auth/forgot-password`, data);
+    },
+    onError,
+    onSuccess,
+  });
+
+type ForgetPasswordResetRequest = {
+  newPassword: string;
+  token: string;
+};
+
+export const useForgetPasswordReset = ({
+  onSuccess,
+  onError,
+}: {
+  onSuccess: (data: DefaultResponse) => void;
+  onError: (error: axiosError) => void;
+}) =>
+  useMutation({
+    mutationKey: ["auth", "forget-password-reset"],
+    mutationFn: (
+      data: ForgetPasswordResetRequest
+    ): Promise<DefaultResponse> => {
+      return axiosInstance.post(`auth/reset-password?token=${data.token}`, {
+        newPassword: data?.newPassword ?? "",
+      });
+    },
+    onError,
+    onSuccess,
+  });

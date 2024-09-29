@@ -61,13 +61,6 @@ const Page = () => {
     [email, onLogin, password]
   );
 
-  // useEffect(() => {
-  //   const authToken = Cookies.get("authToken");
-  //   if (authToken) {
-  //     router.push("/chatbotlist");
-  //   }
-  // }, [router]);
-
   return (
     <div className="h-dvh w-dvw flex justify-center items-center">
       {isPending && <Loader />}
@@ -93,7 +86,7 @@ const Page = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             id="email"
-            className="px-4 py-3 mt-1 rounded placeholder:text-[#6F7288B2] focus-visible:ring-0 placeholder:text-sm   placeholder:font-light w-full"
+            className="px-4 py-3 mt-1 rounded  focus-visible:ring-0 placeholder:text-sm   placeholder:font-light w-full"
             placeholder="Enter Your Email"
           />
         </div>
@@ -107,7 +100,7 @@ const Page = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               type={passwordType}
-              className="px-4 py-3 flex-1 !border-none rounded focus-visible:ring-0 placeholder:text-[#6F7288B2] placeholder:text-sm w-full"
+              className="px-4 py-3 flex-1 !border-none rounded focus-visible:ring-0  placeholder:text-sm w-full"
               placeholder="Enter Your Password"
             />
             <div className="cursor-pointer me-3" onClick={togglePassword}>
@@ -129,7 +122,7 @@ const Page = () => {
         </div>
         <Button
           type="button"
-          className="w-full text-white bg-gradient-to-r  from-[#58C8DD] to-[#53A7DD] py-3 rounded"
+          className="w-full text-white bg-gradient-to-r hover:from-[#53A7DD] hover:to-[#58C8DD]  from-[#58C8DD] to-[#53A7DD] py-3 rounded"
           onClick={handleLogin}
         >
           Log in

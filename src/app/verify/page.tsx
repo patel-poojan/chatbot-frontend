@@ -67,7 +67,7 @@ const Verify = () => {
     }
   };
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white p-4">
+    <div className="min-h-screen flex items-center justify-center  p-4">
       {isPendingResendEmail || (isPendingVerifyEmail && <Loader />)}
       {token ? (
         <div

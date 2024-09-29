@@ -34,13 +34,11 @@ const ResetPasswordDialog = ({ trigger }: { trigger: React.ReactNode }) => {
   };
   const { mutate: onResetPassword, isPending } = useResetPassword({
     onSuccess(data) {
-      console.log("data", data);
       toast.success(data?.message);
       setIsOpen(false);
     },
 
     onError(error: axiosError) {
-      console.log("error", error);
       const errorMessage =
         error?.response?.data?.errors?.message ||
         error?.response?.data?.message ||
@@ -55,13 +53,15 @@ const ResetPasswordDialog = ({ trigger }: { trigger: React.ReactNode }) => {
         toast.warning("Please fill in your current password");
       } else if (!isPasswordValid(currentPassword)) {
         toast.warning(
-          "current Password must be at least 8 characters long and include one uppercase letter, one lowercase letter, one number, and one special character"
+          "current Password must be at least 8 characters long and include one uppercase letter, one lowercase letter, one number, and one special character",
+          { duration: 5000 }
         );
       } else if (!newPassword) {
         toast.warning("Please fill in your new password");
       } else if (!isPasswordValid(newPassword)) {
         toast.warning(
-          "new Password must be at least 8 characters long and include one uppercase letter, one lowercase letter, one number, and one special character"
+          "new Password must be at least 8 characters long and include one uppercase letter, one lowercase letter, one number, and one special character",
+          { duration: 5000 }
         );
       } else {
         onResetPassword({ currentPassword, newPassword });
@@ -69,7 +69,6 @@ const ResetPasswordDialog = ({ trigger }: { trigger: React.ReactNode }) => {
     },
     [currentPassword, newPassword, onResetPassword]
   );
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
@@ -111,7 +110,7 @@ const ResetPasswordDialog = ({ trigger }: { trigger: React.ReactNode }) => {
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 type={currentPasswordType}
-                className="px-4 py-3 flex-1 !border-none rounded focus-visible:ring-0 placeholder:text-[#6F7288B2] placeholder:text-sm placeholder:font-light w-full"
+                className="px-4 py-3 flex-1 !border-none rounded focus-visible:ring-0 placeholder:text-sm placeholder:font-light w-full"
                 placeholder="Enter Current Password"
               />
               <div className="cursor-pointer" onClick={toggleCurrentPassword}>
@@ -137,7 +136,7 @@ const ResetPasswordDialog = ({ trigger }: { trigger: React.ReactNode }) => {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 type={newPasswordType}
-                className="px-4 py-3 flex-1 !border-none rounded focus-visible:ring-0 placeholder:text-[#6F7288B2] placeholder:text-sm placeholder:font-light w-full"
+                className="px-4 py-3 flex-1 !border-none rounded focus-visible:ring-0 placeholder:text-sm placeholder:font-light w-full"
                 placeholder="Enter New Password"
               />
               <div className="cursor-pointer" onClick={toggleNewPassword}>
@@ -153,7 +152,7 @@ const ResetPasswordDialog = ({ trigger }: { trigger: React.ReactNode }) => {
           <Button
             type="button"
             onClick={handleResetPassword}
-            className="w-full text-white bg-gradient-to-r from-[#58C8DD] to-[#53A7DD] py-3 rounded"
+            className="w-full text-white bg-gradient-to-r hover:from-[#53A7DD] hover:to-[#58C8DD] from-[#58C8DD] to-[#53A7DD] py-3 rounded"
           >
             Reset Password
           </Button>

@@ -60,7 +60,8 @@ const SignupForm = () => {
         toast.warning("Please fill in your password");
       } else if (!isPasswordValid(password)) {
         toast.warning(
-          "Password must be at least 8 characters long and include one uppercase letter, one lowercase letter, one number, and one special character"
+          "Password must be at least 8 characters long and include one uppercase letter, one lowercase letter, one number, and one special character",
+          { duration: 5000 }
         );
       } else if (!conditionChecker) {
         toast.warning("Please accept the terms and conditions");
@@ -96,7 +97,7 @@ const SignupForm = () => {
             value={name}
             onChange={(e) => setName(e.target.value)}
             id="fullName"
-            className="px-4 py-3 mt-1 rounded placeholder:text-[#6F7288B2] focus-visible:ring-0 placeholder:text-sm   placeholder:font-light w-full"
+            className="px-4 py-3 mt-1 rounded  focus-visible:ring-0 placeholder:text-sm   placeholder:font-light w-full"
             placeholder="Enter Your Full Name"
           />
         </div>
@@ -108,7 +109,7 @@ const SignupForm = () => {
             id="email"
             value={emailId}
             onChange={(e) => setEmailId(e.target.value)}
-            className="px-4 py-3 mt-1 rounded placeholder:text-[#6F7288B2] focus-visible:ring-0 placeholder:text-sm   placeholder:font-light w-full"
+            className="px-4 py-3 mt-1 rounded  focus-visible:ring-0 placeholder:text-sm   placeholder:font-light w-full"
             placeholder="Enter Your Business Email"
           />
         </div>
@@ -122,7 +123,7 @@ const SignupForm = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               type={passwordType}
-              className="px-4 py-3 flex-1 !border-none rounded focus-visible:ring-0 placeholder:text-[#6F7288B2] placeholder:text-sm   placeholder:font-light w-full"
+              className="px-4 py-3 flex-1 !border-none rounded focus-visible:ring-0  placeholder:text-sm   placeholder:font-light w-full"
               placeholder="Enter Your Password"
             />
             <div className="cursor-pointer" onClick={togglePassword}>
@@ -149,7 +150,7 @@ const SignupForm = () => {
         <Button
           type="button"
           onClick={handleSignup}
-          className="w-full text-white bg-gradient-to-r from-[#58C8DD] to-[#53A7DD] py-3 rounded"
+          className="w-full text-white bg-gradient-to-r hover:from-[#53A7DD] hover:to-[#58C8DD] from-[#58C8DD] to-[#53A7DD] py-3 rounded"
         >
           Sign up
         </Button>
