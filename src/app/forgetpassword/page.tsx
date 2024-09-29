@@ -100,7 +100,7 @@ const ForgetPassword = () => {
     setNewPasswordType((prev) => (prev === "password" ? "text" : "password"));
   };
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 ">
+    <div className="min-h-dvh flex items-center justify-center p-4 ">
       {isForgetPasswordPending || isForgetPasswordResetPending ? (
         <Loader />
       ) : (
