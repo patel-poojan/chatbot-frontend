@@ -101,7 +101,11 @@ const ForgetPassword = () => {
   };
   return (
     <div className="min-h-screen flex items-center justify-center p-4 ">
-      {isForgetPasswordPending || (isForgetPasswordResetPending && <Loader />)}
+      {isForgetPasswordPending || isForgetPasswordResetPending ? (
+        <Loader />
+      ) : (
+        <></>
+      )}
       {token ? (
         <div
           className="flex flex-col items-center  gap-4 sm:gap-6 p-6 sm:p-8 max-w-lg w-full bg-white  rounded-3xl"
