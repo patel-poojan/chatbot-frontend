@@ -26,12 +26,13 @@ import {
 import { useLogout } from "@/utils/api";
 import ResetPasswordDialog from "./ResetPasswordDialog";
 import { toast } from "sonner";
+import { Loader } from "./Loader";
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const pathName = usePathname();
   // const [isOpenPopup, setIsOpenPopup] = useState<boolean>(false);
 
   const router = useRouter();
-  const { mutate } = useLogout({
+  const { mutate, isPending } = useLogout({
     onSuccess(data) {
       toast.success(data?.message);
       router.push("/");
@@ -39,6 +40,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   });
   return (
     <div className="min-[500px]:bg-[#1B1B20] h-dvh  flex  p-0 min-[500px]:p-3">
+      {isPending ? <Loader /> : <></>}
       <div className="pr-3 hidden min-[500px]:flex flex-col justify-between py-3  lg:items-center">
         <div className="flex flex-col gap-3 items-center">
           <Link href={"/"}>
