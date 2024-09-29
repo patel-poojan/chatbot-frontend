@@ -116,6 +116,7 @@ const Page = () => {
           <a
             href="#"
             className="hover:underline underline-offset-1 text-[#57C0DD] hover:text-[#45A9B8]"
+            onClick={() => router.push("/forgetpassword")}
           >
             Forgot Password?
           </a>
