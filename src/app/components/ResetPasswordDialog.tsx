@@ -86,7 +86,7 @@ const ResetPasswordDialog = ({ trigger }: { trigger: React.ReactNode }) => {
             Please enter your current password and a new password to reset it.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4 md:gap-6">
           <div className="flex justify-between items-center">
             <div></div>
             <p className="text-black text-center font-medium text-2xl ">

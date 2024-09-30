@@ -28,7 +28,7 @@ const TopBar = ({ content }: { content: React.ReactNode }) => {
   }, [isOpen]);
 
   return (
-    <div className="flex sticky backdrop-blur-xl z-10 top-0 items-center justify-between px-6 py-4 bg-[#ffffff7a] shadow-lg md:px-10 lg:px-20">
+    <div className="flex sticky backdrop-blur-xl z-20 top-0 items-center justify-between px-6 py-4 bg-[#ffffff7a] shadow-lg md:px-10 lg:px-20">
       <div className="flex items-center gap-2" onClick={() => router.push("/")}>
         <Image
           src="/images/bot-icon.svg"
@@ -71,7 +71,7 @@ const TopBar = ({ content }: { content: React.ReactNode }) => {
 
         {isOpen && (
           <>
-            <div className="fixed inset-0  z-40" onClick={toggleDrawer} />
+            <div className="fixed inset-0  " onClick={toggleDrawer} />
             <motion.div
               initial={{ y: "-calc(100vh - 62px)", opacity: 0 }} // Start hidden off-screen just below 62px
               animate={{ y: 0, opacity: 1 }} // Animate to the visible position

@@ -278,7 +278,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     </div>
                   </PopoverTrigger>
                   <PopoverContent
-                    className="mb-1 border border-[#EFEFEF] rounded-xl w-[95vw]  p-1"
+                    className="mb-1 border  border-[#EFEFEF] rounded-xl w-[95vw]  p-1"
                     style={{ boxShadow: "0px 0px 12px 4px #00000014" }}
                   >
                     <ResetPasswordDialog
