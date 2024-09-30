@@ -94,8 +94,8 @@ const Page = () => {
             onClick={() => setTab(0)}
             className={`cursor-pointer ${
               tab === 0
-                ? "text-lg text-[#1E255E] font-medium underline underline-offset-8 decoration-2 decoration-[#57C0DD]"
-                : "text-base text-black font-light"
+                ? "text-base sm:text-lg text-[#1E255E] font-medium underline underline-offset-8 decoration-2 decoration-[#57C0DD]"
+                : "text-sm sm:text-base text-black font-light"
             }`}
           >
             Unmatched Phrases
@@ -104,8 +104,8 @@ const Page = () => {
             onClick={() => setTab(1)}
             className={`cursor-pointer ${
               tab === 1
-                ? "text-lg text-[#1E255E] font-medium underline underline-offset-8 decoration-2 decoration-[#57C0DD]"
-                : "text-base text-black font-light"
+                ? "text-base sm:text-lg text-[#1E255E] font-medium underline underline-offset-8 decoration-2 decoration-[#57C0DD]"
+                : "text-sm sm:text-base text-black font-light"
             }`}
           >
             Ignored

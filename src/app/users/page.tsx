@@ -45,35 +45,31 @@ const Details = ({ type }: { type: string }) => {
             <TableHead className="py-2 text-start">
               <div className="flex items-center  flex-wrap justify-start gap-1">
                 <FaUser className="text-[#57C0DD] text-base hidden lg:block" />
-                <span className="text-xs md:text-sm lg:text-base">Name</span>
+                <span className="break-all">Name</span>
               </div>
             </TableHead>
             <TableHead className="py-2 text-center">
               <div className="flex items-center  flex-wrap justify-center gap-1">
                 <MdAlternateEmail className="text-[#57C0DD] text-base hidden lg:block" />
-                <span className="text-xs md:text-sm lg:text-base">Email</span>
+                <span className="break-all">Email</span>
               </div>
             </TableHead>
             <TableHead className="py-2 text-center">
               <div className="flex items-center flex-wrap justify-center gap-2 ">
                 <FaRegCalendar className="text-[#57C0DD] text-base hidden lg:block" />
-                <span className="text-xs md:text-sm lg:text-base">
-                  Last Train Bot
-                </span>
+                <span className="break-all">Last Train Bot</span>
               </div>
             </TableHead>
             <TableHead className="py-2 text-center">
               <div className="flex items-center  flex-wrap justify-center gap-1">
                 <MdSmartToy className="text-[#57C0DD] text-base hidden lg:block" />
-                <span className="text-xs md:text-sm lg:text-base">
-                  Total Bots
-                </span>
+                <span className="break-all">Total Bots</span>
               </div>
             </TableHead>
             <TableHead className="py-2 text-center">
               <div className="flex items-center flex-wrap justify-center ">
                 <MdMoreVert className="text-[#57C0DD] text-base hidden lg:block" />
-                <span className="text-xs md:text-sm lg:text-base">Action</span>
+                <span className="break-all">Action</span>
               </div>
             </TableHead>
           </TableRow>
@@ -82,22 +78,22 @@ const Details = ({ type }: { type: string }) => {
           {userDetails.map((detail, index) => (
             <TableRow key={index} className="hover:bg-gray-50">
               <TableCell className="text-left">
-                <div className="flex  break-all items-center justify-start text-xs md:text-sm lg:text-base">
+                <div className="flex  break-all items-center justify-start ">
                   {detail.name}
                 </div>
               </TableCell>
               <TableCell className="text-center">
-                <div className="flex  break-all items-center justify-center text-xs md:text-sm lg:text-base">
+                <div className="flex  break-all items-center justify-center ">
                   {detail.email}
                 </div>
               </TableCell>
               <TableCell className="text-center">
-                <div className="flex  items-center break-all justify-center text-xs md:text-sm lg:text-base">
+                <div className="flex  items-center break-all justify-center ">
                   {detail.lastTrainBot}
                 </div>
               </TableCell>
               <TableCell className="text-center">
-                <div className="flex  items-center break-all justify-center text-xs md:text-sm lg:text-base">
+                <div className="flex  items-center break-all justify-center ">
                   {detail.totalBots}
                 </div>
               </TableCell>
@@ -132,8 +128,8 @@ const Page = () => {
               onClick={() => setTab(0)}
               className={`cursor-pointer ${
                 tab === 0
-                  ? "text-lg text-[#1E255E] font-medium underline underline-offset-8 decoration-2 decoration-[#57C0DD]"
-                  : "text-base text-black font-light"
+                  ? "text-base sm:text-lg text-[#1E255E] font-medium underline underline-offset-8 decoration-2 decoration-[#57C0DD]"
+                  : "text-sm sm:text-base text-black font-light"
               }`}
             >
               Admin
@@ -142,8 +138,8 @@ const Page = () => {
               onClick={() => setTab(1)}
               className={`cursor-pointer ${
                 tab === 1
-                  ? "text-lg text-[#1E255E] font-medium underline underline-offset-8 decoration-2 decoration-[#57C0DD]"
-                  : "text-base text-black font-light"
+                  ? "text-base sm:text-lg text-[#1E255E] font-medium underline underline-offset-8 decoration-2 decoration-[#57C0DD]"
+                  : "text-sm sm:text-base text-black font-light"
               }`}
             >
               User
