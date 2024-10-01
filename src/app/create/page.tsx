@@ -10,7 +10,7 @@ const Page = () => {
   const router = useRouter();
   return (
     <DashboardLayout>
-      <div className="flex-1 flex flex-col  max-[500px]:p-6 overflow-auto">
+      <div className="flex-1 flex flex-col  max-[500px]:p-4 overflow-auto">
         <div className="flex   gap-3">
           <FaArrowLeftLong
             onClick={() => router.back()}

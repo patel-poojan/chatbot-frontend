@@ -9,7 +9,7 @@ const Page = () => {
   return (
     <>
       <DashboardLayout>
-        <div className="flex-1 flex flex-col max-[500px]:p-6 overflow-auto">
+        <div className="flex-1 flex flex-col max-[500px]:p-4 overflow-auto">
           <div className="max-[500px]:text-xl text-2xl font-semibold text-black mb-6 max-[500px]:mb-4  ">
             ChatBots
           </div>

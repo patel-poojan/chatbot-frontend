@@ -75,7 +75,7 @@ const Page = () => {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-1 overflow-hidden flex-col p-4 gap-4 sm:gap-6">
+      <div className="flex flex-1 overflow-hidden flex-col max-[500px]:p-4 gap-4 sm:gap-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <p className="text-xl sm:text-2xl font-semibold text-black">
             Training

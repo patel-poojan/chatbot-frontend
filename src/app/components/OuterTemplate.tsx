@@ -20,7 +20,7 @@ const OuterTemplate = ({ children }: { children: React.ReactNode }) => {
           </div>
         </Link>
       </div>
-      <div className="p-6 flex-1 flex flex-col sm:p-8 md:p-12 lg:px-24 lg:py-12">
+      <div className="p-4 flex-1 flex flex-col sm:p-8 md:p-12 lg:px-24 lg:py-12">
         {children}
       </div>
     </div>
