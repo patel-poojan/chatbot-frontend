@@ -15,7 +15,7 @@ const OuterTemplate = ({ children }: { children: React.ReactNode }) => {
             priority
             quality={100}
           />
-          <div className="text-lg font-medium text-[#1E255E] md:text-xl lg:text-2xl">
+          <div className="text-xl font-medium text-[#1E255E] md:text-2xl ">
             ChatBot
           </div>
         </Link>

@@ -14,7 +14,7 @@ import React, { useCallback, useState } from "react";
 import { IoCloseOutline, IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import { toast } from "sonner";
 import { axiosError } from "@/types/axiosTypes";
-import { useResetPassword } from "@/utils/api";
+import { useResetPassword } from "@/utils/auth-api";
 import { Loader } from "./Loader";
 
 const ResetPasswordDialog = ({ trigger }: { trigger: React.ReactNode }) => {

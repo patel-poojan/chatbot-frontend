@@ -1,7 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useForgetPassword, useForgetPasswordReset } from "@/utils/api";
 import { isEmailValid, isPasswordValid } from "@/utils/validator";
 import { useSearchParams } from "next/navigation";
 import React, { Suspense, useCallback, useState } from "react";
@@ -10,6 +9,7 @@ import { toast } from "sonner";
 import { axiosError } from "@/types/axiosTypes";
 import { Loader } from "../components/Loader";
 import { useRouter } from "next/navigation";
+import { useForgetPassword, useForgetPasswordReset } from "@/utils/auth-api";
 
 const ForgetPassword = () => {
   const router = useRouter();

@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { useSignup } from "@/utils/api";
+import { useSignup } from "@/utils/auth-api";
 import { isEmailValid, isPasswordValid } from "@/utils/validator";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
@@ -91,14 +91,14 @@ const SignupForm = () => {
         </div>
         <div className="w-full">
           <label htmlFor="fullName" className="text-black font-normal text-lg">
-            Full Name
+            Name
           </label>
           <Input
             value={name}
             onChange={(e) => setName(e.target.value)}
             id="fullName"
             className="px-4 py-3 mt-1 rounded  focus-visible:ring-0 placeholder:text-sm   placeholder:font-light w-full"
-            placeholder="Enter Your Full Name"
+            placeholder="Enter Your Name"
           />
         </div>
         <div className="w-full">

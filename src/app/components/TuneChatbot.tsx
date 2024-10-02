@@ -26,7 +26,7 @@ const TuneChatbot = () => {
             ? "calc(100dvh - 248px)"
             : screenWidth > 640
             ? "calc(100dvh - 206px)"
-            : "calc(100dvh - 186px)"
+            : "calc(100dvh - 170px)"
         } `,
       }}
     >
@@ -46,7 +46,7 @@ const TuneChatbot = () => {
               Customise your welcome message
             </p>
             <div
-              className="my-3 bg-[#FAFAFA] text-black font-light text-base w-full p-4 md:p-6"
+              className="my-3 bg-[#FAFAFA] text-black font-light text-base w-full p-3 sm:p-4 md:p-6"
               style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
             >
               👋 Welcome to Chatbot! I’m ChatBot, your AI assistant 🤖. What can

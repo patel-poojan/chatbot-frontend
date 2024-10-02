@@ -1,5 +1,5 @@
 "use client";
-import { useResendEmail, useVerifyEmail } from "@/utils/api";
+import { useResendEmail, useVerifyEmail } from "@/utils/auth-api";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { Suspense, useEffect } from "react";
 import { FaRegCircleCheck } from "react-icons/fa6";
@@ -25,9 +25,7 @@ const Verify = () => {
           secure: true,
         });
 
-        setTimeout(() => {
-          router.push("/chatbotlist");
-        }, 10);
+        router.push("/chatbotlist");
       } else {
         router.push("/login");
       }

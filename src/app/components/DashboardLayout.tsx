@@ -23,7 +23,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useLogout } from "@/utils/api";
+import { useLogout } from "@/utils/auth-api";
 import ResetPasswordDialog from "./ResetPasswordDialog";
 import { toast } from "sonner";
 import { Loader } from "./Loader";

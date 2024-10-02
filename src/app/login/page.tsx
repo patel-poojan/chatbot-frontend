@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useLogin } from "@/utils/api";
+import { useLogin } from "@/utils/auth-api";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useState, useCallback } from "react";
@@ -30,9 +30,8 @@ const Page = () => {
           sameSite: "Lax",
           secure: true,
         });
-        setTimeout(() => {
-          router.push("/chatbotlist");
-        }, 10);
+
+        router.push("/chatbotlist");
       }
       toast.success(data?.message);
     },
@@ -86,7 +85,7 @@ const Page = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             id="email"
-            className="px-4 py-3 mt-1 rounded  focus-visible:ring-0 placeholder:text-sm   placeholder:font-light w-full"
+            className="px-4 py-3 mt-1 rounded  focus-visible:ring-0 placeholder:text-sm placeholder:font-light w-full"
             placeholder="Enter Your Email"
           />
         </div>

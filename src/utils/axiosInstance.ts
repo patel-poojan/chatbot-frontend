@@ -75,7 +75,7 @@ const paramsSerializer = (params: { [key: string]: string }) => {
 };
 
 export const axiosInstance = Axios.create({
-  baseURL: process.env.NEXT_PUBLIC_LOCAL_SERVER_URL, // No need for extra slashes here
+  baseURL: process.env.NEXT_PUBLIC_LOCAL_SERVER_URL,
 });
 
 axiosInstance.defaults.paramsSerializer = paramsSerializer;
