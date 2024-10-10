@@ -66,8 +66,8 @@ const Verify = () => {
   };
   return (
     <div className="min-h-dvh flex items-center justify-center  p-4">
-      {isPendingResendEmail || (isPendingVerifyEmail && <Loader />)}
-      {token ? (
+      {isPendingResendEmail || isPendingVerifyEmail ? <Loader /> : <></>}
+      {token && !isPendingVerifyEmail ? (
         <div
           className="flex flex-col items-center justify-center gap-4 sm:gap-6 p-6 sm:p-8 max-w-2xl w-full bg-white  rounded-3xl text-center"
           style={{ boxShadow: "0px 0px 12px 4px #00000014" }}
