@@ -90,3 +90,33 @@ body,
 .blue-gradient {
   background: linear-gradient(90deg, #58c8dd 0%, #53a7dd 100%);
 }
+
+/* playground */
+.playground-node {
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  padding: 7px 15px;
+  border-radius: 30px;
+  min-width: 142px;
+}
+
+.shape_highlight .triangle_highlight {
+  box-shadow: 0 0 20px #2e7d32 !important;
+  border-radius: 10px;
+}
+
+.shape_non-highlight .triangle_highlight {
+  box-shadow: 0 0 20px red !important;
+  border-radius: 5px;
+}
+
+.highlight {
+  box-shadow: 0 0 20px #2e7d32 !important;
+  border-radius: 30px;
+}
+
+.non-highlight {
+  box-shadow: 0 0 20px red !important;
+  border-radius: 30px;
+}

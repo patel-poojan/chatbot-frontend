@@ -263,7 +263,6 @@ const Page = () => {
   useEffect(() => {
     if (debouncedSearch.length > 2) {
       if (tab === 0) {
-        console.log("debounce", debouncedSearch);
         refetchSubAdmins();
       } else {
         refetchUsers();

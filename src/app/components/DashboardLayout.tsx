@@ -61,7 +61,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                 <Link href={"/chatbotlist"}>
                   <div
                     className={`${
-                      pathName === "/chatbotlist" || pathName === "/create"
+                      pathName === "/chatbotlist" ||
+                      pathName === "/create" ||
+                      pathName === "/dashboard"
                         ? "bg-[#3D3D4A]"
                         : "bg-transparent"
                     } hover:bg-[#3D3D4A] h-11 w-11 flex items-center justify-center rounded-md cursor-pointer`}
@@ -154,7 +156,13 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           </PopoverContent>
         </Popover>
       </div>
-      <div className="flex-1 w-full flex flex-col bg-white max-[500px]:p-0 p-6 lg:p-8 xl:px-16 xl:py-12  min-[500px]:rounded-3xl overflow-hidden h-full">
+      <div
+        className={`flex-1 w-full flex flex-col bg-white ${
+          pathName === "/dashboard"
+            ? "p-0"
+            : "max-[500px]:p-0 p-6 lg:p-8 xl:px-16 xl:py-12"
+        }   min-[500px]:rounded-3xl overflow-hidden h-full`}
+      >
         <div className="block min-[500px]:hidden">
           <TopBar
             content={
@@ -163,14 +171,18 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                   <Link href={"/chatbotlist"}>
                     <div
                       className={`flex gap-3 items-center  rounded-lg py-3 ${
-                        pathName === "/chatbotlist" || pathName === "/create"
+                        pathName === "/chatbotlist" ||
+                        pathName === "/create" ||
+                        pathName === "/dashboard"
                           ? "px-3 blue-gradient"
                           : ""
                       }`}
                     >
                       <div
                         className={
-                          pathName === "/chatbotlist" || pathName === "/create"
+                          pathName === "/chatbotlist" ||
+                          pathName === "/create" ||
+                          pathName === "/dashboard"
                             ? "p-2 rounded-md bg-[#3D3D4A33]"
                             : ""
                         }
@@ -178,7 +190,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                         <IoGrid
                           className={
                             pathName === "/chatbotlist" ||
-                            pathName === "/create"
+                            pathName === "/create" ||
+                            pathName === "/dashboard"
                               ? "text-white text-xl"
                               : "text-lg text-[#1e255eb2]"
                           }
@@ -186,7 +199,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                       </div>
                       <p
                         className={`text-base  ${
-                          pathName === "/chatbotlist" || pathName === "/create"
+                          pathName === "/chatbotlist" ||
+                          pathName === "/create" ||
+                          pathName === "/dashboard"
                             ? "text-white"
                             : "text-[#1e255eb2]"
                         }  font-medium`}
