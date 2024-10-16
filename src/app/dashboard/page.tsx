@@ -44,11 +44,13 @@ import {
   PlaygroundProvider,
   usePlayground,
 } from "../components/playground/PlaygroundContext";
+import useWindowDimensions from "@/utils/windowSize";
 
 const ReactFlow = dynamic(
   () => import("@xyflow/react").then((mod) => mod.ReactFlow),
   { ssr: false }
 );
+
 const initialNodes: Node[] = [
   {
     id: "1",
@@ -90,7 +92,7 @@ const MainComponent = () => {
   const { actionDialog, actionHandler, setActionDialog } = usePlayground();
   const { screenToFlowPosition } = useReactFlow();
   const { type, label } = usePlayground();
-  // Use memo to avoid recreating node and edge types
+  const { width: screenWidth } = useWindowDimensions();
   const nodeTypes = useMemo(
     () => ({
       startNode: StartNode,
@@ -178,94 +180,11 @@ const MainComponent = () => {
       "goToStepNode",
       "faqNode",
       "closeChatNode",
+      "successNode",
+      "failureNode",
     ],
     []
   );
-
-  // const onDragOver = useCallback(
-  //   (event: React.DragEvent): void => {
-  //     setActionDialog(false);
-  //     event.preventDefault();
-  //     event.dataTransfer.dropEffect = "move";
-
-  //     const position = screenToFlowPosition({
-  //       x: event.clientX,
-  //       y: event.clientY,
-  //     });
-
-  //     nodes.forEach((existingNode) => {
-  //       // Log existingNode for debugging
-  //       console.log("Existing Node:", existingNode);
-
-  //       // Ensure existingNode is defined and has a type property
-  //       if (!existingNode || typeof existingNode.type === "undefined") {
-  //         console.warn("Invalid existingNode:", existingNode); // Log a warning for invalid nodes
-  //         return; // Skip this iteration if existingNode is not valid
-  //       }
-
-  //       const isNear = isNearRightEdge(position, existingNode);
-  //       const hasSourceHandle = !notConnectableNode.includes(
-  //         existingNode.type || ""
-  //       );
-
-  //       // Log computed values for debugging
-  //       console.log(
-  //         "Position:",
-  //         position,
-  //         "Is Near:",
-  //         isNear,
-  //         "Has Source Handle:",
-  //         hasSourceHandle
-  //       );
-
-  //       if (hasSourceHandle) {
-  //         const isDroppable =
-  //           (type === "goToStepNode" ||
-  //             type === "faqNode" ||
-  //             type === "closeChatNode") &&
-  //           existingNode.type !== "userResponseNode";
-
-  //         // Call highlight or non-highlight only if there's a change
-  //         if (isNear) {
-  //           if (isDroppable) {
-  //             nonHighlightDroppableArea(
-  //               existingNode.id || "",
-  //               isNear,
-  //               existingNode.type || ""
-  //             );
-  //           } else {
-  //             highlightDroppableArea(
-  //               existingNode.id || "",
-  //               true,
-  //               existingNode.type || ""
-  //             );
-  //           }
-  //         } else {
-  //           nonHighlightDroppableArea(
-  //             existingNode.id || "",
-  //             isNear,
-  //             existingNode.type || ""
-  //           );
-  //         }
-  //       } else {
-  //         nonHighlightDroppableArea(
-  //           existingNode.id || "",
-  //           isNear,
-  //           existingNode.type || ""
-  //         );
-  //       }
-  //     });
-  //   },
-  //   [
-  //     setActionDialog,
-  //     screenToFlowPosition,
-  //     nodes,
-  //     isNearRightEdge,
-  //     notConnectableNode,
-  //     highlightDroppableArea,
-  //     nonHighlightDroppableArea,
-  //   ]
-  // );
 
   const onDragOver = useCallback(
     (event: React.DragEvent): void => {
@@ -285,11 +204,41 @@ const MainComponent = () => {
         );
 
         if (hasSourceHandle) {
-          highlightDroppableArea(
-            existingNode.id || "",
-            isNear && hasSourceHandle,
-            existingNode.type || ""
-          );
+          console.log("1");
+          if (
+            existingNode &&
+            existingNode !== null &&
+            existingNode!.type &&
+            (type === "goToStepNode" ||
+              type === "faqNode" ||
+              type === "closeChatNode" ||
+              type === "userInputNode") &&
+            existingNode!.type !== "botResponseNode"
+          ) {
+            nonHighlightDroppableArea(
+              existingNode.id || "",
+              isNear,
+              existingNode.type || ""
+            );
+          } else if (
+            existingNode &&
+            existingNode !== null &&
+            type === "questionNode" &&
+            existingNode!.type !== "botResponseNode" &&
+            existingNode!.type !== "userInputNode"
+          ) {
+            nonHighlightDroppableArea(
+              existingNode.id || "",
+              isNear,
+              existingNode.type || ""
+            );
+          } else {
+            highlightDroppableArea(
+              existingNode.id || "",
+              isNear && hasSourceHandle,
+              existingNode.type || ""
+            );
+          }
         } else {
           nonHighlightDroppableArea(
             existingNode.id || "",
@@ -305,11 +254,11 @@ const MainComponent = () => {
       nodes,
       isNearRightEdge,
       notConnectableNode,
+      type,
       highlightDroppableArea,
       nonHighlightDroppableArea,
     ]
   );
-
   const onDrop = useCallback(
     (event: React.DragEvent): void => {
       setActionDialog(true);
@@ -321,14 +270,7 @@ const MainComponent = () => {
         y: event.clientY,
       });
 
-      const newNode: Node = {
-        id: getId(),
-        type,
-        position: { x: position.x + 40, y: position.y },
-        data: { label: label, message: "" },
-      };
-
-      let connectedNode: Node | null = null;
+      let connectedNode: Node;
 
       nodes.forEach((existingNode) => {
         const isNear = isNearRightEdge(position, existingNode);
@@ -340,31 +282,59 @@ const MainComponent = () => {
           connectedNode = existingNode;
         }
       });
-
       if (
-        (type === "goToStepNode" ||
+        connectedNode! &&
+        connectedNode !== null &&
+        connectedNode!.type &&
+        (((type === "goToStepNode" ||
           type === "faqNode" ||
-          type === "closeChatNode") &&
-        connectedNode!.type !== "userResponseNode"
+          type === "closeChatNode" ||
+          type === "userInputNode") &&
+          connectedNode!.type !== "botResponseNode") ||
+          (type === "questionNode" &&
+            connectedNode!.type !== "botResponseNode" &&
+            connectedNode!.type !== "userInputNode"))
       ) {
+        nodes.forEach((node) => highlightDroppableArea(node.id, false, ""));
         return;
       }
 
-      if (connectedNode) {
+      if (connectedNode!) {
+        const positionY = connectedNode.position.y ?? position.y;
+
+        const newNode: Node = {
+          id: getId(),
+          type,
+          position: {
+            x: position.x + 40,
+            y: positionY,
+          },
+          data: { label: label, message: "" },
+        };
+        const overlappingNode = nodes.find((node) => {
+          const distance = Math.sqrt(
+            Math.pow(node.position.x - newNode?.position.x, 2) +
+              Math.pow(node.position.y - newNode?.position.y, 2)
+          );
+          return distance < 200;
+        });
+        if (overlappingNode) {
+          newNode.position.x += 200;
+        }
         setNodes((nds) => [...nds, newNode]);
 
         if (type === "questionNode") {
           const successNode: Node = {
             id: getId(),
             type: "successNode",
-            position: { x: position.x + 250, y: position.y - 100 },
+            position: { x: position.x + 250, y: positionY - 100 },
             data: { label: "Success", message: "" },
           };
 
           const failureNode: Node = {
             id: getId(),
             type: "failureNode",
-            position: { x: position.x + 250, y: position.y + 100 },
+            position: { x: position.x + 250, y: positionY + 100 },
             data: { label: "Failure", message: "" },
           };
 
@@ -389,8 +359,8 @@ const MainComponent = () => {
           const botResponseNode: Node = {
             id: getId(),
             type: "botResponseNode",
-            position: { x: position.x + 180, y: position.y },
-            data: { label: "Bot Response", message: "Auto-generated response" },
+            position: { x: position.x + 180, y: positionY },
+            data: { label: "Bot Response", message: "" },
           };
 
           setNodes((nds) => [...nds, botResponseNode]);
@@ -525,7 +495,7 @@ const MainComponent = () => {
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
           // nodesDraggable={false}
-          fitView
+          fitView={screenWidth < 768 ? true : false}
           defaultViewport={{ x: 0, y: 200, zoom: 1 }}
           className="bg-[#F6F6F6]"
         >
@@ -545,38 +515,3 @@ export default function Main() {
     </ReactFlowProvider>
   );
 }
-
-// const initialNodes: Node[] = [
-//   {
-//     id: "1",
-//     type: "startNode",
-//     data: { label: "Start Point", type: "startNode", message: "" },
-//     position: { x: 10, y: 200 },
-//   },
-//   {
-//     id: "2",
-//     type: "defaultNode",
-//     data: { label: "Default Response", type: "defaultNode", message: "" },
-//     position: { x: 230, y: 390 },
-//   },
-//   {
-//     id: "3",
-//     type: "botResponseNode",
-//     data: {
-//       label: "Bot Response",
-//       message: "Welcome message",
-//       type: "botResponseNode",
-//     },
-//     position: { x: 230, y: 10 },
-//   },
-//   {
-//     id: "4",
-//     type: "aiAssistNode",
-//     data: {
-//       label: "AI Assist",
-//       message: "Welcome message",
-//       type: "aiAssistNode",
-//     },
-//     position: { x: 230, y: 200 },
-//   },
-// ];
