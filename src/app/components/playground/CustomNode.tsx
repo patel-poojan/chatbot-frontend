@@ -148,15 +148,11 @@ export const BotResponseNode = ({
     },
     [getEdges, setEdges, setNodes]
   );
+  const edges = getEdges();
+  const incomingEdge = edges.find((edge) => edge.target === id);
+  const outgoingEdge = edges.find((edge) => edge.source === id);
   const deleteNodeAndReconnect = useCallback(
     (nodeId: string) => {
-      const edges = getEdges();
-
-      // Find the incoming and outgoing edges for the center node (nodeId)
-      const incomingEdge = edges.find((edge) => edge.target === nodeId);
-      const outgoingEdge = edges.find((edge) => edge.source === nodeId);
-
-      // If both edges exist (incoming and outgoing), connect their source and target
       if (incomingEdge && outgoingEdge) {
         // Create a new edge from the source of the incoming edge to the target of the outgoing edge
         const newEdge = {
@@ -180,7 +176,7 @@ export const BotResponseNode = ({
         )
       );
     },
-    [getEdges, setEdges, setNodes]
+    [incomingEdge, outgoingEdge, setEdges, setNodes]
   );
 
   return (
@@ -192,8 +188,8 @@ export const BotResponseNode = ({
       <div className="relative flex  flex-col items-center justify-center">
         <Popover>
           <PopoverTrigger>
-            {isHovered ? (
-              <div className="text-red-500 text-xs w-[145px]  text-center cursor-pointer absolute -top-5 left-0">
+            {isHovered && id !== "3" ? (
+              <div className="text-red-500 text-xs w-[145px]  text-center cursor-pointer absolute -top-4 left-0">
                 Delete
               </div>
             ) : (
@@ -204,7 +200,7 @@ export const BotResponseNode = ({
               )
             )}
           </PopoverTrigger>
-          <PopoverContent className="-mt-[60px]  shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
+          <PopoverContent className="-mt-14  shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
               className="text-red-500 text-center text-xs cursor-pointer"
               onClick={() => {
@@ -218,9 +214,13 @@ export const BotResponseNode = ({
             </span>
             <div className="h-px bg-gray-300 my-1" />
             <span
-              className="text-red-500 text-center text-xs cursor-pointer"
+              className={`${
+                outgoingEdge ? "text-red-500" : "text-red-100"
+              } text-center text-xs ${
+                outgoingEdge ? "cursor-pointe" : "cursor-not-allowed"
+              } `}
               onClick={() => {
-                deleteNodeAndChildren(id);
+                outgoingEdge && deleteNodeAndChildren(id);
               }}
             >
               Delete with children
@@ -338,7 +338,7 @@ export const UserInputNode = ({
         <Popover>
           <PopoverTrigger>
             {isHovered ? (
-              <div className="text-red-500 text-xs w-14   text-center cursor-pointer absolute -top-6 left-0">
+              <div className="text-red-500 text-xs w-14   text-center cursor-pointer absolute -top-[22px] left-0">
                 Delete
               </div>
             ) : (
@@ -349,12 +349,12 @@ export const UserInputNode = ({
               )
             )}
           </PopoverTrigger>
-          <PopoverContent className="-mt-[68px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
+          <PopoverContent className="-mt-[65px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
-              className="text-red-500 text-center text-xs cursor-pointer"
-              onClick={() => {
-                setNodes((nodes) => nodes.filter((node) => node.id !== id));
-              }}
+              className="text-red-100 text-center text-xs cursor-no-drop"
+              // onClick={() => {
+              //   setNodes((nodes) => nodes.filter((node) => node.id !== id));
+              // }}
             >
               Delete single block
             </span>
@@ -439,7 +439,7 @@ export const QuestionNode = ({
         <Popover>
           <PopoverTrigger>
             {isHovered ? (
-              <div className="text-red-500 text-xs  w-[145px] text-center cursor-pointer absolute -top-5 left-0">
+              <div className="text-red-500 text-xs  w-[145px] text-center cursor-pointer absolute -top-4 left-0">
                 Delete
               </div>
             ) : (
@@ -450,7 +450,7 @@ export const QuestionNode = ({
               )
             )}
           </PopoverTrigger>
-          <PopoverContent className="-mt-[58px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
+          <PopoverContent className="-mt-14 -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
               className="text-red-100 text-center text-xs cursor-no-drop"
               // onClick={() => {
@@ -532,7 +532,7 @@ export const SuccessNode = ({
         <Popover>
           <PopoverTrigger>
             {isHovered ? (
-              <div className="text-red-500 text-xs  w-[145px] text-center cursor-pointer absolute -top-5 left-0">
+              <div className="text-red-500 text-xs  w-[145px] text-center cursor-pointer absolute -top-4 left-0">
                 Delete
               </div>
             ) : (
@@ -543,7 +543,7 @@ export const SuccessNode = ({
               )
             )}
           </PopoverTrigger>
-          <PopoverContent className="-mt-[60px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
+          <PopoverContent className="-mt-14 -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
               className="text-red-500 text-center text-xs cursor-pointer"
               onClick={() => {
@@ -625,7 +625,7 @@ export const FailureNode = ({
         <Popover>
           <PopoverTrigger>
             {isHovered ? (
-              <div className="text-red-500 text-xs  w-[145px] text-center cursor-pointer absolute -top-5 left-0">
+              <div className="text-red-500 text-xs  w-[145px] text-center cursor-pointer absolute -top-4 left-0">
                 Delete
               </div>
             ) : (
@@ -636,7 +636,7 @@ export const FailureNode = ({
               )
             )}
           </PopoverTrigger>
-          <PopoverContent className="-mt-[60px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
+          <PopoverContent className="-mt-14 -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
               className="text-red-500 text-center text-xs cursor-pointer"
               onClick={() => {
@@ -718,7 +718,7 @@ export const CloseChatNode = ({
         <Popover>
           <PopoverTrigger>
             {isHovered ? (
-              <div className="text-red-500 text-xs  w-[130px] text-center cursor-pointer absolute -top-5 left-0">
+              <div className="text-red-500 text-xs  w-[130px] text-center cursor-pointer absolute -top-4 left-0">
                 Delete
               </div>
             ) : (
@@ -729,7 +729,7 @@ export const CloseChatNode = ({
               )
             )}
           </PopoverTrigger>
-          <PopoverContent className="-mt-[60px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
+          <PopoverContent className="-mt-14 -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
               className="text-red-500 text-center text-xs cursor-pointer"
               onClick={() => {
@@ -819,7 +819,7 @@ export const FaqNode = ({
         <Popover>
           <PopoverTrigger>
             {isHovered ? (
-              <div className="text-red-500 text-xs w-14   text-center cursor-pointer absolute -top-6 left-0">
+              <div className="text-red-500 text-xs w-14   text-center cursor-pointer absolute -top-[22px] left-0">
                 Delete
               </div>
             ) : (
@@ -830,7 +830,7 @@ export const FaqNode = ({
               )
             )}
           </PopoverTrigger>
-          <PopoverContent className="-mt-[68px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
+          <PopoverContent className="-mt-[65px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
               className="text-red-500 text-center text-xs cursor-pointer"
               onClick={() => {
@@ -934,7 +934,7 @@ export const GoToStepNode = ({
               )
             )}
           </PopoverTrigger>
-          <PopoverContent className="-mt-[60px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
+          <PopoverContent className="-mt-14 -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
               className="text-red-500 text-center text-xs cursor-pointer"
               onClick={() => {

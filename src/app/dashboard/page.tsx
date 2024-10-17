@@ -270,7 +270,7 @@ const MainComponent = () => {
         y: event.clientY,
       });
 
-      let connectedNode: Node;
+      let connectedNode: Node | null = null;
 
       nodes.forEach((existingNode) => {
         const isNear = isNearRightEdge(position, existingNode);
@@ -282,59 +282,62 @@ const MainComponent = () => {
           connectedNode = existingNode;
         }
       });
+
       if (
-        connectedNode! &&
-        connectedNode !== null &&
-        connectedNode!.type &&
+        connectedNode &&
+        (connectedNode as Node).type &&
         (((type === "goToStepNode" ||
           type === "faqNode" ||
           type === "closeChatNode" ||
           type === "userInputNode") &&
-          connectedNode!.type !== "botResponseNode") ||
+          (connectedNode as Node).type !== "botResponseNode") ||
           (type === "questionNode" &&
-            connectedNode!.type !== "botResponseNode" &&
-            connectedNode!.type !== "userInputNode"))
+            (connectedNode as Node).type !== "botResponseNode" &&
+            (connectedNode as Node).type !== "userInputNode"))
       ) {
         nodes.forEach((node) => highlightDroppableArea(node.id, false, ""));
         return;
       }
 
-      if (connectedNode!) {
-        const positionY = connectedNode.position.y ?? position.y;
+      if (connectedNode) {
+        const positionY = (connectedNode as Node).position?.y ?? position.y;
 
         const newNode: Node = {
           id: getId(),
           type,
           position: {
-            x: position.x + 40,
+            x: position.x + 100,
             y: positionY,
           },
           data: { label: label, message: "" },
         };
+
         const overlappingNode = nodes.find((node) => {
           const distance = Math.sqrt(
-            Math.pow(node.position.x - newNode?.position.x, 2) +
-              Math.pow(node.position.y - newNode?.position.y, 2)
+            Math.pow(node.position.x - newNode.position.x, 2) +
+              Math.pow(node.position.y - newNode.position.y, 2)
           );
           return distance < 200;
         });
+
         if (overlappingNode) {
           newNode.position.x += 200;
         }
+
         setNodes((nds) => [...nds, newNode]);
 
         if (type === "questionNode") {
           const successNode: Node = {
             id: getId(),
             type: "successNode",
-            position: { x: position.x + 250, y: positionY - 100 },
+            position: { x: position.x + 270, y: positionY - 100 },
             data: { label: "Success", message: "" },
           };
 
           const failureNode: Node = {
             id: getId(),
             type: "failureNode",
-            position: { x: position.x + 250, y: positionY + 100 },
+            position: { x: position.x + 270, y: positionY + 100 },
             data: { label: "Failure", message: "" },
           };
 
@@ -359,7 +362,7 @@ const MainComponent = () => {
           const botResponseNode: Node = {
             id: getId(),
             type: "botResponseNode",
-            position: { x: position.x + 180, y: positionY },
+            position: { x: position.x + 250, y: positionY },
             data: { label: "Bot Response", message: "" },
           };
 
@@ -440,7 +443,7 @@ const MainComponent = () => {
                   side="bottom"
                   align="center"
                   style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
-                  className=" mt-3 p-1 bg-white  text-black"
+                  className=" mt-3 p-1 bg-white  text-black !z-50"
                 >
                   Action
                 </TooltipContent>
@@ -455,7 +458,7 @@ const MainComponent = () => {
                   side="bottom"
                   align="center"
                   style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
-                  className=" mt-3 p-1 bg-white  text-black"
+                  className=" mt-3 p-1 bg-white  text-black !z-50"
                 >
                   Version History
                 </TooltipContent>
@@ -470,7 +473,7 @@ const MainComponent = () => {
                   side="bottom"
                   align="center"
                   style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
-                  className=" mt-3 p-1 bg-white  text-black"
+                  className=" mt-3 p-1 bg-white  text-black !z-50"
                 >
                   Attributes
                 </TooltipContent>
