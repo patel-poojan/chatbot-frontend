@@ -259,6 +259,7 @@ const MainComponent = () => {
       nonHighlightDroppableArea,
     ]
   );
+
   const onDrop = useCallback(
     (event: React.DragEvent): void => {
       setActionDialog(true);
@@ -270,120 +271,116 @@ const MainComponent = () => {
         y: event.clientY,
       });
 
-      let connectedNode: Node | null = null;
-
-      nodes.forEach((existingNode) => {
-        const isNear = isNearRightEdge(position, existingNode);
-        const hasSourceHandle = !notConnectableNode.includes(
-          existingNode.type || ""
-        );
-
-        if (isNear && hasSourceHandle) {
-          connectedNode = existingNode;
-        }
-      });
+      const connectedNode = nodes.find(
+        (existingNode) =>
+          isNearRightEdge(position, existingNode) &&
+          !notConnectableNode.includes(existingNode.type || "")
+      );
 
       if (
         connectedNode &&
-        (connectedNode as Node).type &&
+        connectedNode.type &&
         (((type === "goToStepNode" ||
           type === "faqNode" ||
           type === "closeChatNode" ||
           type === "userInputNode") &&
-          (connectedNode as Node).type !== "botResponseNode") ||
+          connectedNode.type !== "botResponseNode") ||
           (type === "questionNode" &&
-            (connectedNode as Node).type !== "botResponseNode" &&
-            (connectedNode as Node).type !== "userInputNode"))
+            connectedNode.type !== "botResponseNode" &&
+            connectedNode.type !== "userInputNode"))
       ) {
         nodes.forEach((node) => highlightDroppableArea(node.id, false, ""));
         return;
       }
 
-      if (connectedNode) {
-        const positionY = (connectedNode as Node).position?.y ?? position.y;
+      const positionY = connectedNode?.position?.y ?? position.y;
 
-        const newNode: Node = {
+      const newNode: Node = {
+        id: getId(),
+        type,
+        position: {
+          x: position.x + 100,
+          y: positionY,
+        },
+        data: { label, message: "" },
+      };
+      const overlappingNode = nodes.find((node) => {
+        const distance = Math.hypot(
+          node.position.x - newNode.position.x,
+          node.position.y - newNode.position.y
+        );
+        return distance < 200;
+      });
+
+      if (overlappingNode) {
+        newNode.position.x += 10;
+        newNode.position.y += 100;
+      }
+
+      const newNodes = [newNode];
+
+      if (type === "questionNode") {
+        const successNode: Node = {
           id: getId(),
-          type,
-          position: {
-            x: position.x + 100,
-            y: positionY,
-          },
-          data: { label: label, message: "" },
+          type: "successNode",
+          position: { x: position.x + 270, y: positionY - 100 },
+          data: { label: "Success", message: "" },
         };
 
-        const overlappingNode = nodes.find((node) => {
-          const distance = Math.sqrt(
-            Math.pow(node.position.x - newNode.position.x, 2) +
-              Math.pow(node.position.y - newNode.position.y, 2)
-          );
-          return distance < 200;
-        });
+        const failureNode: Node = {
+          id: getId(),
+          type: "failureNode",
+          position: { x: position.x + 270, y: positionY + 100 },
+          data: { label: "Failure", message: "" },
+        };
 
-        if (overlappingNode) {
-          newNode.position.x += 200;
-        }
-
-        setNodes((nds) => [...nds, newNode]);
-
-        if (type === "questionNode") {
-          const successNode: Node = {
-            id: getId(),
-            type: "successNode",
-            position: { x: position.x + 270, y: positionY - 100 },
-            data: { label: "Success", message: "" },
-          };
-
-          const failureNode: Node = {
-            id: getId(),
-            type: "failureNode",
-            position: { x: position.x + 270, y: positionY + 100 },
-            data: { label: "Failure", message: "" },
-          };
-
-          setNodes((nds) => [...nds, successNode, failureNode]);
-
-          setEdges((eds) => [
-            ...eds,
-            {
-              id: `edge-${newNode.id}-${successNode.id}`,
-              source: newNode.id,
-              target: successNode.id,
-              type: "customEdge",
-            },
-            {
-              id: `edge-${newNode.id}-${failureNode.id}`,
-              source: newNode.id,
-              target: failureNode.id,
-              type: "customEdge",
-            },
-          ]);
-        } else if (type === "userInputNode") {
-          const botResponseNode: Node = {
-            id: getId(),
-            type: "botResponseNode",
-            position: { x: position.x + 250, y: positionY },
-            data: { label: "Bot Response", message: "" },
-          };
-
-          setNodes((nds) => [...nds, botResponseNode]);
-
-          setEdges((eds) => [
-            ...eds,
-            {
-              id: `edge-${newNode.id}-${botResponseNode.id}`,
-              source: newNode.id,
-              target: botResponseNode.id,
-              type: "customEdge",
-            },
-          ]);
-        }
+        newNodes.push(successNode, failureNode);
 
         setEdges((eds) => [
           ...eds,
           {
-            id: `edge-${connectedNode?.id}-${newNode.id}`,
-            source: connectedNode?.id ?? "",
+            id: `edge-${newNode.id}-${successNode.id}`,
+            source: newNode.id,
+            target: successNode.id,
+            type: "customEdge",
+          },
+          {
+            id: `edge-${newNode.id}-${failureNode.id}`,
+            source: newNode.id,
+            target: failureNode.id,
+            type: "customEdge",
+          },
+        ]);
+      } else if (type === "userInputNode") {
+        const botResponseNode: Node = {
+          id: getId(),
+          type: "botResponseNode",
+          position: { x: position.x + 250, y: positionY },
+          data: { label: "Bot Response", message: "" },
+        };
+
+        newNodes.push(botResponseNode);
+
+        setEdges((eds) => [
+          ...eds,
+          {
+            id: `edge-${newNode.id}-${botResponseNode.id}`,
+            source: newNode.id,
+            target: botResponseNode.id,
+            type: "customEdge",
+          },
+        ]);
+      }
+
+      // Add the new node(s)
+      setNodes((nds) => [...nds, ...newNodes]);
+
+      if (connectedNode) {
+        setEdges((eds) => [
+          ...eds,
+          {
+            id: `edge-${connectedNode.id}-${newNode.id}`,
+            source: connectedNode.id,
             target: newNode.id,
             type: "customEdge",
           },
@@ -518,3 +515,151 @@ export default function Main() {
     </ReactFlowProvider>
   );
 }
+
+// const onDrop = useCallback(
+//   (event: React.DragEvent): void => {
+//     setActionDialog(true);
+//     event.preventDefault();
+//     if (!type) return;
+
+//     const position = screenToFlowPosition({
+//       x: event.clientX,
+//       y: event.clientY,
+//     });
+
+//     let connectedNode: Node | null = null;
+
+//     nodes.forEach((existingNode) => {
+//       const isNear = isNearRightEdge(position, existingNode);
+//       const hasSourceHandle = !notConnectableNode.includes(
+//         existingNode.type || ""
+//       );
+
+//       if (isNear && hasSourceHandle) {
+//         connectedNode = existingNode;
+//       }
+//     });
+
+//     if (
+//       connectedNode &&
+//       (connectedNode as Node).type &&
+//       (((type === "goToStepNode" ||
+//         type === "faqNode" ||
+//         type === "closeChatNode" ||
+//         type === "userInputNode") &&
+//         (connectedNode as Node).type !== "botResponseNode") ||
+//         (type === "questionNode" &&
+//           (connectedNode as Node).type !== "botResponseNode" &&
+//           (connectedNode as Node).type !== "userInputNode"))
+//     ) {
+//       nodes.forEach((node) => highlightDroppableArea(node.id, false, ""));
+//       return;
+//     }
+
+//     if (connectedNode) {
+//       const positionY = (connectedNode as Node).position?.y ?? position.y;
+
+//       const newNode: Node = {
+//         id: getId(),
+//         type,
+//         position: {
+//           x: position.x + 100,
+//           y: positionY,
+//         },
+//         data: { label: label, message: "" },
+//       };
+
+//       const overlappingNode = nodes.find((node) => {
+//         const distance = Math.sqrt(
+//           Math.pow(node.position.x - newNode.position.x, 2) +
+//             Math.pow(node.position.y - newNode.position.y, 2)
+//         );
+//         return distance < 200;
+//       });
+
+//       if (overlappingNode) {
+//         newNode.position.x += 0;
+//         newNode.position.y += 100;
+//       }
+
+//       setNodes((nds) => [...nds, newNode]);
+
+//       if (type === "questionNode") {
+//         const successNode: Node = {
+//           id: getId(),
+//           type: "successNode",
+//           position: { x: position.x + 270, y: positionY - 100 },
+//           data: { label: "Success", message: "" },
+//         };
+
+//         const failureNode: Node = {
+//           id: getId(),
+//           type: "failureNode",
+//           position: { x: position.x + 270, y: positionY + 100 },
+//           data: { label: "Failure", message: "" },
+//         };
+
+//         setNodes((nds) => [...nds, successNode, failureNode]);
+
+//         setEdges((eds) => [
+//           ...eds,
+//           {
+//             id: `edge-${newNode.id}-${successNode.id}`,
+//             source: newNode.id,
+//             target: successNode.id,
+//             type: "customEdge",
+//           },
+//           {
+//             id: `edge-${newNode.id}-${failureNode.id}`,
+//             source: newNode.id,
+//             target: failureNode.id,
+//             type: "customEdge",
+//           },
+//         ]);
+//       } else if (type === "userInputNode") {
+//         const botResponseNode: Node = {
+//           id: getId(),
+//           type: "botResponseNode",
+//           position: { x: position.x + 250, y: positionY },
+//           data: { label: "Bot Response", message: "" },
+//         };
+
+//         setNodes((nds) => [...nds, botResponseNode]);
+
+//         setEdges((eds) => [
+//           ...eds,
+//           {
+//             id: `edge-${newNode.id}-${botResponseNode.id}`,
+//             source: newNode.id,
+//             target: botResponseNode.id,
+//             type: "customEdge",
+//           },
+//         ]);
+//       }
+
+//       setEdges((eds) => [
+//         ...eds,
+//         {
+//           id: `edge-${connectedNode?.id}-${newNode.id}`,
+//           source: connectedNode?.id ?? "",
+//           target: newNode.id,
+//           type: "customEdge",
+//         },
+//       ]);
+//     }
+
+//     nodes.forEach((node) => highlightDroppableArea(node.id, false, ""));
+//   },
+//   [
+//     setActionDialog,
+//     type,
+//     screenToFlowPosition,
+//     label,
+//     nodes,
+//     isNearRightEdge,
+//     notConnectableNode,
+//     setNodes,
+//     setEdges,
+//     highlightDroppableArea,
+//   ]
+// );
