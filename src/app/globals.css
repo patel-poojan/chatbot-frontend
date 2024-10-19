@@ -86,6 +86,23 @@ body,
 *::-webkit-scrollbar {
   display: none;
 }
+.show-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  display: block !important;
+}
+
+.show-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #57c0dd;
+  border-radius: 10px;
+}
+
+.show-scrollbar::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+}
+
+.show-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #40a8c4;
+}
 
 .blue-gradient {
   background: linear-gradient(90deg, #58c8dd 0%, #53a7dd 100%);

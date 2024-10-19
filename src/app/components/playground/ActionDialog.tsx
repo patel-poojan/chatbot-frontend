@@ -21,7 +21,7 @@ const ActionDialog = ({ actionHandler }: { actionHandler: () => void }) => {
   return (
     <div
       style={{ boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)" }}
-      className="absolute z-10 bg-white px-5 min-[500px]:px-8 py-5 shadow-lg right-6 top-20 h-auto min-[500px]:w-[360px] rounded-lg flex flex-col gap-2"
+      className="absolute  bg-white px-5 min-[500px]:px-8 py-5  right-6 top-20 h-auto min-[500px]:w-[360px] rounded-lg flex flex-col gap-2"
       aria-modal="true"
       role="dialog"
     >

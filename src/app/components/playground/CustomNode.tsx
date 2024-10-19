@@ -241,7 +241,9 @@ export const BotResponseNode = ({
 
       {isHovered && (
         <IoMdAdd
-          onClick={actionHandler}
+          onClick={() => {
+            actionHandler();
+          }}
           className="bg-white text-black hover:text-[#1844F0] rounded-full h-6 w-6 p-1 cursor-pointer"
           style={{
             boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)",
@@ -309,18 +311,12 @@ export const UserInputNode = ({
       const edges = getEdges();
       const childEdges = edges.filter((edge) => edge.source === nodeId);
 
-      // Get the ids of the child nodes
       const childNodeIds = childEdges.map((edge) => edge.target);
 
-      // Remove the child edges
       setEdges((prevEdges) =>
         prevEdges.filter((edge) => edge.source !== nodeId)
       );
-
-      // Recursively delete all child nodes
       childNodeIds.forEach((childId) => deleteNodeAndChildren(childId));
-
-      // Finally, remove this node
 
       setNodes((nodes) => nodes.filter((node) => node.id !== nodeId));
     },
@@ -349,7 +345,7 @@ export const UserInputNode = ({
               )
             )}
           </PopoverTrigger>
-          <PopoverContent className="-mt-[65px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
+          <PopoverContent className="-mt-[64px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
               className="text-red-100 text-center text-xs cursor-no-drop"
               // onClick={() => {
@@ -389,7 +385,9 @@ export const UserInputNode = ({
       </div>
       {isHovered ? (
         <IoMdAdd
-          onClick={() => actionHandler()}
+          onClick={() => {
+            actionHandler();
+          }}
           className="bg-[#fff] hover:text-[#1844F0] rounded-full h-6 w-6 p-1 cursor-pointer "
           style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
         />
@@ -830,7 +828,7 @@ export const FaqNode = ({
               )
             )}
           </PopoverTrigger>
-          <PopoverContent className="-mt-[65px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
+          <PopoverContent className="-mt-[64px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
               className="text-red-500 text-center text-xs cursor-pointer"
               onClick={() => {

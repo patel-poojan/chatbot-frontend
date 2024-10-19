@@ -52,7 +52,7 @@ export const config = {
     "/create/document/train",
     "/create/website",
     "/create/website/train",
-    "/user",
+    "/users",
     "/training",
     "/login",
     // "/dashboard",

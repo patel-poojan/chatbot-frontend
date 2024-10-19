@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import {
   Controls,
@@ -45,6 +45,7 @@ import {
   usePlayground,
 } from "../components/playground/PlaygroundContext";
 import useWindowDimensions from "@/utils/windowSize";
+import ChatBotDialog from "../components/playground/ChatBotDialog";
 
 const ReactFlow = dynamic(
   () => import("@xyflow/react").then((mod) => mod.ReactFlow),
@@ -90,6 +91,7 @@ let idCounter = 5;
 const getId = () => `${idCounter++}`;
 const MainComponent = () => {
   const { actionDialog, actionHandler, setActionDialog } = usePlayground();
+  const [chatBotDialog, setChatBotDialog] = useState(false);
   const { screenToFlowPosition } = useReactFlow();
   const { type, label } = usePlayground();
   const { width: screenWidth } = useWindowDimensions();
@@ -115,7 +117,7 @@ const MainComponent = () => {
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-
+  console.log("node", nodes);
   const SNAP_MARGIN = 70;
   const isNearRightEdge = useCallback(
     (position: XYPosition, node: Node): boolean => {
@@ -321,14 +323,14 @@ const MainComponent = () => {
           const successNode: Node = {
             id: getId(),
             type: "successNode",
-            position: { x: position.x + 270, y: positionY - 100 },
+            position: { x: position.x + 300, y: positionY - 100 },
             data: { label: "Success", message: "" },
           };
 
           const failureNode: Node = {
             id: getId(),
             type: "failureNode",
-            position: { x: position.x + 270, y: positionY + 100 },
+            position: { x: position.x + 300, y: positionY + 100 },
             data: { label: "Failure", message: "" },
           };
 
@@ -388,13 +390,13 @@ const MainComponent = () => {
       setActionDialog,
       type,
       screenToFlowPosition,
-      label,
       nodes,
       isNearRightEdge,
       notConnectableNode,
+      highlightDroppableArea,
+      label,
       setNodes,
       setEdges,
-      highlightDroppableArea,
     ]
   );
 
@@ -412,6 +414,19 @@ const MainComponent = () => {
       ),
     [setEdges]
   );
+  const chatBotHandler = () => {
+    if (chatBotDialog) {
+      setChatBotDialog(false);
+    } else {
+      setChatBotDialog(true);
+      setActionDialog(false);
+    }
+  };
+  useEffect(() => {
+    if (actionDialog) {
+      setChatBotDialog(false);
+    }
+  }, [actionDialog, chatBotDialog]);
 
   return (
     <DashboardLayout>
@@ -426,7 +441,9 @@ const MainComponent = () => {
                 <TooltipTrigger asChild>
                   <button>
                     <IoFlashOutline
-                      className="text-xl cursor-pointer"
+                      className={`text-xl cursor-pointer ${
+                        actionDialog ? "text-[#57C0DD]" : ""
+                      } `}
                       onClick={actionHandler}
                     />
                   </button>
@@ -435,7 +452,7 @@ const MainComponent = () => {
                   side="bottom"
                   align="center"
                   style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
-                  className=" mt-3 p-1 bg-white  text-black !z-50"
+                  className=" mt-3 p-1 bg-[#57C0DD] text-white !z-50"
                 >
                   Action
                 </TooltipContent>
@@ -451,7 +468,7 @@ const MainComponent = () => {
                   side="bottom"
                   align="center"
                   style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
-                  className=" mt-3 p-1 bg-white  text-black !z-50"
+                  className=" mt-3 p-1 bg-[#57C0DD] text-white !z-50"
                 >
                   Version History
                 </TooltipContent>
@@ -466,14 +483,21 @@ const MainComponent = () => {
                   side="bottom"
                   align="center"
                   style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
-                  className=" mt-3 p-1 bg-white  text-black !z-50"
+                  className=" mt-3 p-1 bg-[#57C0DD] text-white !z-50"
                 >
                   Attributes
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </div>
-          <Button className="p-3 border text-xs font-normal border-black rounded-lg bg-white text-black hover:bg-transparent">
+          <Button
+            className={`p-3 border text-xs font-normal ${
+              chatBotDialog
+                ? "border-[#57C0DD] text-[#57C0DD]"
+                : "border-black text-black"
+            } rounded-lg bg-white  hover:bg-transparent`}
+            onClick={() => chatBotHandler()}
+          >
             Test your bot
           </Button>
           <Button className="py-3 px-5 bg-[#57C0DD] text-white rounded-lg hover:bg-[#57C0DD]">
@@ -498,6 +522,7 @@ const MainComponent = () => {
           <Controls showFitView />
         </ReactFlow>
         {actionDialog && <ActionDialog actionHandler={actionHandler} />}
+        {chatBotDialog && <ChatBotDialog chatBotHandler={chatBotHandler} />}
       </div>
     </DashboardLayout>
   );
