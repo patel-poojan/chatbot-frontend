@@ -15,7 +15,7 @@ const Page = () => {
     useCreateChatbot({
       onSuccess(data) {
         if (data.success) {
-          router.push(`/create/${data.data.type}/${data.data._id}`);
+          router.replace(`/create/${data.data.type}/${data.data._id}`);
           toast.success(data?.message);
         }
       },

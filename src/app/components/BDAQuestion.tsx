@@ -77,7 +77,7 @@ const BDAQuestion = ({
   const { mutate: onSave, isPending: savePending } = useSaveBDAQuestion({
     onSuccess(data) {
       const path = `/create/${type}/train/${chatBotId}`;
-      router.push(path);
+      router.replace(path);
       toast.success(data?.message);
     },
     onError(error: axiosError) {
@@ -164,7 +164,7 @@ const BDAQuestion = ({
           className="flex items-center gap-2 cursor-pointer"
           onClick={() => {
             const path = `/create/${type}/train/${chatBotId}`;
-            router.push(path);
+            router.replace(path);
           }}
         >
           <span className="text-[#57C0DD] text-base md:text-lg">Skip</span>

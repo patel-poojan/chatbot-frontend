@@ -70,7 +70,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
   });
   useEffect(() => {
     if (isUpdateSuccess && isAddSuccess) {
-      router.push("/dashboard");
+      router.replace("/dashboard");
     }
   }, [isAddSuccess, isUpdateSuccess, router]);
   const toSnakeCase = (text: string) => {
