@@ -165,22 +165,26 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
             <Textarea
               value={welcomeMessage}
               onChange={(e) => setwelcomeMessage(e.target.value)}
-              className="my-3 bg-[#FAFAFA] text-black font-light border border-transparent focus-visible:border-[#57C0DD] text-base w-full p-3  sm:p-4 md:p-6"
+              className="my-3 bg-[#FAFAFA] text-black font-light border border-transparent hover:border-[#57C0DD] focus-visible:border-[#57C0DD] text-base w-full p-3  sm:p-4 md:p-6"
               style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
             ></Textarea>
             <div className="flex items-center gap-2">
               <Button
                 className={`${
-                  FAQ ? "opacity-100" : "opacity-50"
-                } border bg-transparent hover:bg-transparent border-[#57C0DD] py-3 px-6 md:px-11 rounded-xl text-[#57C0DD]`}
+                  FAQ
+                    ? "opacity-100 hover:opacity-50"
+                    : "opacity-50 hover:opacity-100"
+                } border bg-transparent hover:bg-transparent hover:opacity-50 border-[#57C0DD] py-3 px-6 md:px-11 rounded-xl text-[#57C0DD]`}
                 onClick={() => setFAQ(!FAQ)}
               >
                 FAQ
               </Button>
               <Button
                 className={`${
-                  AboutUs ? "opacity-100" : "opacity-50"
-                } border bg-transparent hover:bg-transparent border-[#57C0DD] py-3 px-6 md:px-11 rounded-xl text-[#57C0DD]`}
+                  AboutUs
+                    ? "opacity-100 hover:opacity-50"
+                    : "opacity-50 hover:opacity-100"
+                } border bg-transparent hover:bg-transparent border-[#57C0DD]  py-3 px-6 md:px-11 rounded-xl text-[#57C0DD]`}
                 onClick={() => setAboutUs(!AboutUs)}
               >
                 About Chatbot
