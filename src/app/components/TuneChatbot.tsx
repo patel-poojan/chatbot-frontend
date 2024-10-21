@@ -188,11 +188,13 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
                 className="p-3 rounded-xl flex justify-between gap-3 items-center bg-[#FAFAFA] shadow-sm"
                 style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
               >
-                <span className="text-[#1E255EB2]">{item.title}</span>
+                <span className="text-[#1E255EB2] text-sm sm:text-base">
+                  {item.title}
+                </span>
                 <div className="flex items-center !w-fit gap-2">
                   <Input
                     value={item.value}
-                    className="!border-none !rounded-none shadow-none !bg-transparent !p-0 focus-visible:ring-0 !w-fit text-right"
+                    className="!border-none !rounded-none text-sm sm:text-base shadow-none !bg-transparent !p-0 focus-visible:ring-0 !w-fit text-right"
                     onChange={(e) =>
                       setAttributes((prev) =>
                         prev.map((attr, idx) =>
