@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import AlertDialog from "./AlertDialog";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -121,7 +121,17 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
       });
     }
   };
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
+  // Define inputRefs as an array of HTMLInputElement or null
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  const handleDivClick = (index: number) => {
+    setActiveIndex(index);
+    if (inputRefs.current[index]) {
+      inputRefs.current[index]!.focus();
+    }
+  };
   return (
     <div
       className=" relative   flex flex-col justify-between w-full bg-white rounded-3xl p-4 sm:p-6 md:p-8 lg:px-12 lg:py-10"
@@ -155,7 +165,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
             <Textarea
               value={welcomeMessage}
               onChange={(e) => setwelcomeMessage(e.target.value)}
-              className="my-3 bg-[#FAFAFA] text-black font-light !focus-visible:ring-0 text-base w-full p-3 !border-none sm:p-4 md:p-6"
+              className="my-3 bg-[#FAFAFA] text-black font-light border border-transparent focus-visible:border-[#57C0DD] text-base w-full p-3  sm:p-4 md:p-6"
               style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
             ></Textarea>
             <div className="flex items-center gap-2">
@@ -185,14 +195,21 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
             {attributes.map((item, index) => (
               <div
                 key={index}
-                className="p-3 rounded-xl flex justify-between gap-3 items-center bg-[#FAFAFA] shadow-sm"
+                className={`p-3 rounded-xl flex justify-between gap-3 items-center border border-transparent hover:border-[#57C0DD] cursor-pointer bg-[#FAFAFA] shadow-sm 
+            ${activeIndex === index ? "border border-[#57C0DD]" : ""}`}
                 style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
+                onClick={() => handleDivClick(index)}
               >
                 <span className="text-[#1E255EB2] text-sm sm:text-base">
                   {item.title}
                 </span>
                 <div className="flex items-center !w-fit gap-2">
                   <Input
+                    ref={(el: HTMLInputElement | null) => {
+                      if (el) {
+                        inputRefs.current[index] = el;
+                      }
+                    }}
                     value={item.value}
                     className="!border-none !rounded-none text-sm sm:text-base shadow-none !bg-transparent !p-0 focus-visible:ring-0 !w-fit text-right"
                     onChange={(e) =>
@@ -208,7 +225,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
                   <BiSolidEditAlt className="text-xl" />
                 </div>
               </div>
-            ))}
+            ))}{" "}
           </div>
         </div>
 
