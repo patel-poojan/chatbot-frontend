@@ -59,6 +59,7 @@ const ChooseIndustryTemplate = ({
       return [];
     }
   };
+
   const {
     data: IndustryList,
     isLoading: loadIndustryList,
@@ -78,6 +79,7 @@ const ChooseIndustryTemplate = ({
       up();
     }
   };
+
   return (
     <div className="w-full max-w-7xl flex-1 mx-auto h-auto flex flex-col">
       {loadIndustryList && <Loader />}
@@ -136,6 +138,7 @@ const ChooseIndustryTemplate = ({
                       key={Industry.category}
                       value={Industry.category}
                       onSelect={(currentValue) => {
+                        setSubIndustryValue(Industry.subcategories[0]);
                         setIndustryValue(
                           currentValue === industryValue ? "" : currentValue
                         );

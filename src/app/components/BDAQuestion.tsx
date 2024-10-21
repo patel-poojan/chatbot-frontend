@@ -162,7 +162,10 @@ const BDAQuestion = ({
 
         <div
           className="flex items-center gap-2 cursor-pointer"
-          onClick={continueHandler}
+          onClick={() => {
+            const path = `/create/${type}/train/${chatBotId}`;
+            router.push(path);
+          }}
         >
           <span className="text-[#57C0DD] text-base md:text-lg">Skip</span>
           <FaArrowRightLong className="text-[#57C0DD] text-base md:text-lg" />
