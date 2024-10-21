@@ -91,7 +91,7 @@ const Details = ({
       const errorMessage =
         error?.response?.data?.errors?.message ||
         error?.response?.data?.message ||
-        "Login failed";
+        "Delete user failed";
       toast.error(errorMessage);
     },
   });

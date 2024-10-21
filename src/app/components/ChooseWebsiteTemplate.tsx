@@ -10,15 +10,33 @@ import React, { useState } from "react";
 import { IoIosArrowDown, IoIosArrowUp, IoMdCheckmark } from "react-icons/io";
 import { TfiWorld } from "react-icons/tfi";
 import AlertDialog from "./AlertDialog";
+import { toast } from "sonner";
 
 const ChooseWebsiteTemplate = ({
   websiteStepHandler,
+  botId,
+  scanType,
+  websiteUrl,
+  setWebsiteUrl,
+  setScanType,
 }: {
   websiteStepHandler: (type: "up" | "down") => void;
+  botId: string;
+  scanType: string;
+  websiteUrl: string;
+  setWebsiteUrl: React.Dispatch<React.SetStateAction<string>>;
+  setScanType: React.Dispatch<React.SetStateAction<string>>;
 }) => {
-  const [page, setPage] = useState("Scan a full page");
   const [dropDown, setDropDown] = useState(false);
-
+  const continueHandler = () => {
+    if (websiteUrl.length === 0) {
+      toast.warning("Please enter website url");
+    } else if (scanType.length === 0) {
+      toast.warning("Please select scan type");
+    } else {
+      websiteStepHandler("up");
+    }
+  };
   return (
     <div
       className="h-full flex-1 flex flex-col justify-between w-full bg-white rounded-3xl p-4 sm:p-6 lg:px-12 lg:py-10 "
@@ -40,23 +58,27 @@ const ChooseWebsiteTemplate = ({
          mt-4 mb-3 flex items-center bg-[#F2F2F2]"
         >
           <Input
+            value={websiteUrl}
+            onChange={(e) => setWebsiteUrl(e.target.value)}
             className="flex-1 border-none shadow-none pe-[2px] sm:pe-1 bg-transparent focus-visible:ring-0 text-sm sm:text-base placeholder:text-sm sm:placeholder:text-base placeholder:font-light "
             placeholder="Enter a URL address"
           ></Input>
           <div className="mx-2 sm:mx-3 md:mx-5">
             <DropdownMenu onOpenChange={() => setDropDown(!dropDown)}>
               <DropdownMenuTrigger className="focus-visible:!outline-none w-full md:w-auto text-sm sm:text-base md:text-lg font-normal text-black flex items-center justify-between gap-1 sm:gap-2">
-                {page}
+                {scanType === "FULLPAGE"
+                  ? "Scan a full page"
+                  : "Scan a single page"}
                 {dropDown ? <IoIosArrowUp /> : <IoIosArrowDown />}
               </DropdownMenuTrigger>
               <DropdownMenuContent className="p-2 md:p-3 rounded-xl mt-3  me-12 sm:me-20 md:me-28 w-auto">
                 <DropdownMenuItem
                   className="p-2  hover:bg-[#EEEEEE] flex flex-col justify-start items-start cursor-pointer"
-                  onClick={() => setPage("Scan a full page")}
+                  onClick={() => setScanType("FULLPAGE")}
                 >
                   <div className="text-sm sm:text-base md:text-lg font-medium flex items-center justify-between w-full">
                     Scan a full page
-                    {page === "Scan a full page" && <IoMdCheckmark />}
+                    {scanType === "FULLPAGE" && <IoMdCheckmark />}
                   </div>
                   <div className="text-xs sm:text-sm md:text-base font-light">
                     Entire content from the provided page
@@ -64,11 +86,11 @@ const ChooseWebsiteTemplate = ({
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="p-2  hover:bg-[#EEEEEE] flex flex-col justify-start items-start cursor-pointer"
-                  onClick={() => setPage("Scan a single page")}
+                  onClick={() => setScanType("SINGLEPAGE")}
                 >
                   <div className="text-sm sm:text-base md:text-lg font-medium flex items-center justify-between w-full">
                     Scan a single page
-                    {page === "Scan a single page" && <IoMdCheckmark />}
+                    {scanType === "SINGLEPAGE" && <IoMdCheckmark />}
                   </div>
                   <div className="text-xs sm:text-sm md:text-base font-light">
                     Only single URL you provided
@@ -86,6 +108,7 @@ const ChooseWebsiteTemplate = ({
 
       <div className="mt-6 sm:mt-0  sm:ms-auto flex  items-center gap-4">
         <AlertDialog
+          botId={botId}
           trigger={
             <Button
               className="w-full sm:w-auto px-8 py-2 sm:px-11 border border-[#57C0DD] bg-transparent text-[#57C0DD] hover:bg-transparent"
@@ -98,7 +121,7 @@ const ChooseWebsiteTemplate = ({
 
         <Button
           className="w-full sm:w-auto px-8 py-2 sm:px-11 border blue-gradient hover:bg-transparent"
-          onClick={() => websiteStepHandler("up")}
+          onClick={() => continueHandler()}
         >
           Continue
         </Button>

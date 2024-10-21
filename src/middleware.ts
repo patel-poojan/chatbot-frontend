@@ -55,6 +55,10 @@ export const config = {
     "/users",
     "/training",
     "/login",
-    // "/dashboard",
+    "/create/website/:path*",
+    "/create/document/:path*",
+    "/create/website/train/:path*",
+    "/create/document/train/:path*",
+    "/dashboard",
   ],
 };

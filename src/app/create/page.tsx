@@ -5,11 +5,31 @@ import { CgNotes } from "react-icons/cg";
 import { TfiWorld } from "react-icons/tfi";
 import DashboardLayout from "../components/DashboardLayout";
 import { FaArrowLeftLong } from "react-icons/fa6";
-
+import { useCreateChatbot } from "@/utils/botCreation-api";
+import { toast } from "sonner";
+import { axiosError } from "@/types/axiosTypes";
+import { Loader } from "../components/Loader";
 const Page = () => {
   const router = useRouter();
+  const { mutate: onCreateChatbot, isPending: isCreateChatbotPending } =
+    useCreateChatbot({
+      onSuccess(data) {
+        if (data.success) {
+          router.push(`/create/${data.data.type}/${data.data._id}`);
+          toast.success(data?.message);
+        }
+      },
+      onError(error: axiosError) {
+        const errorMessage =
+          error?.response?.data?.errors?.message ||
+          error?.response?.data?.message ||
+          "Failed to create chatbot!";
+        toast.error(errorMessage);
+      },
+    });
   return (
     <DashboardLayout>
+      {isCreateChatbotPending && <Loader />}
       <div className="flex-1 flex flex-col  max-[500px]:p-4 overflow-auto">
         <div className="flex   gap-3">
           <FaArrowLeftLong
@@ -31,7 +51,7 @@ const Page = () => {
           <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
             <div
               className="border flex flex-col bg-white justify-center hover:border-primary rounded-3xl p-4 sm:p-6 cursor-pointer"
-              onClick={() => router.push("/create/website")}
+              onClick={() => onCreateChatbot({ type: "website" })}
               style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
             >
               <TfiWorld className="text-3xl sm:text-4xl font-bold text-[#57C0DD] mb-3 sm:mb-4" />
@@ -46,7 +66,7 @@ const Page = () => {
 
             <div
               className=" flex flex-col bg-white justify-center hover:border-primary border rounded-3xl p-4 sm:p-6 cursor-pointer "
-              onClick={() => router.push("/create/document")}
+              onClick={() => onCreateChatbot({ type: "document" })}
               style={{
                 boxShadow: "0px 0px 4px 0px #0000001F",
               }}

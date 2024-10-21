@@ -67,7 +67,7 @@ const CreateUserDialog = ({
       const errorMessage =
         error?.response?.data?.errors?.message ||
         error?.response?.data?.message ||
-        "Login failed";
+        "Failed to add user";
       toast.error(errorMessage);
     },
   });

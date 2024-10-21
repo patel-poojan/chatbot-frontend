@@ -2,10 +2,13 @@
 import BDAQuestion from "@/app/components/BDAQuestion";
 import ChooseIndustryTemplate from "@/app/components/ChooseIndustryTemplate";
 import OuterTemplate from "@/app/components/OuterTemplate";
+
 import React, { useState } from "react";
 
-const Page = () => {
+const Page = ({ params }: { params: { id: string } }) => {
   const [step, setStep] = useState(0);
+  const [industry, setIndustry] = useState<string>("");
+  const [subIndustry, setSubIndustry] = useState<string>("");
   const up = () => {
     setStep(step + 1);
   };
@@ -15,9 +18,19 @@ const Page = () => {
   return (
     <OuterTemplate>
       {step === 0 ? (
-        <ChooseIndustryTemplate up={up} />
+        <ChooseIndustryTemplate
+          up={up}
+          setIndustry={setIndustry}
+          setSubIndustry={setSubIndustry}
+        />
       ) : (
-        <BDAQuestion down={down} type="document" />
+        <BDAQuestion
+          down={down}
+          type="website"
+          industry={industry}
+          subIndustry={subIndustry}
+          chatBotId={params.id}
+        />
       )}
     </OuterTemplate>
   );

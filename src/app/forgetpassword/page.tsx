@@ -30,7 +30,7 @@ const ForgetPassword = () => {
         const errorMessage =
           error?.response?.data?.errors?.message ||
           error?.response?.data?.message ||
-          "Reset password failed";
+          "forget password failed";
         toast.error(errorMessage);
       },
     });

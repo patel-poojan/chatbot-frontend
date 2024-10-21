@@ -117,7 +117,6 @@ const MainComponent = () => {
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  console.log("node", nodes);
   const SNAP_MARGIN = 70;
   const isNearRightEdge = useCallback(
     (position: XYPosition, node: Node): boolean => {
@@ -206,7 +205,6 @@ const MainComponent = () => {
         );
 
         if (hasSourceHandle) {
-          console.log("1");
           if (
             existingNode &&
             existingNode !== null &&

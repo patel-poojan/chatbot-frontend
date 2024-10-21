@@ -3,11 +3,20 @@ import React, { useState } from "react";
 import ChooseWebsiteTemplate from "./ChooseWebsiteTemplate";
 import ChooseDocumentTemplate from "./ChooseDocumentTemplate";
 import TuneChatbot from "./TuneChatbot";
+
 // import { useRouter } from "next/navigation";
 
-const ChatbotTrainTemplate = ({ type }: { type: string }) => {
+const ChatbotTrainTemplate = ({
+  type,
+  botId,
+}: {
+  type: string;
+  botId: string;
+}) => {
   const [step, setStep] = useState(0);
   const [websiteStep, setWebsiteStep] = useState(0);
+  const [websiteUrl, setWebsiteUrl] = useState<string>("");
+  const [scanType, setScanType] = useState<string>("SINGLEPAGE");
   const stepHandler = () => {
     setStep(step + 1);
   };
@@ -34,6 +43,7 @@ const ChatbotTrainTemplate = ({ type }: { type: string }) => {
   //     window.removeEventListener("beforeunload", handleUnload);
   //   };
   // }, []);
+  console.log("bkp", botId);
   return (
     <div className="w-full  max-w-7xl flex-1 mx-auto h-auto flex flex-col gap-4 md:gap-6">
       <div className="w-fit md:mx-5 mx-auto">
@@ -64,11 +74,22 @@ const ChatbotTrainTemplate = ({ type }: { type: string }) => {
         {step === 0 ? (
           type === "website" ? (
             websiteStep === 0 ? (
-              <ChooseWebsiteTemplate websiteStepHandler={websiteStepHandler} />
+              <ChooseWebsiteTemplate
+                botId={botId}
+                websiteStepHandler={websiteStepHandler}
+                scanType={scanType}
+                websiteUrl={websiteUrl}
+                setWebsiteUrl={setWebsiteUrl}
+                setScanType={setScanType}
+              />
             ) : (
               <ChooseDocumentTemplate
                 optional={true}
                 stepHandler={stepHandler}
+                scanType={scanType}
+                websiteUrl={websiteUrl}
+                botId={botId}
+                type="website"
                 // websiteStepHandler={websiteStepHandler}
               />
             )
@@ -76,11 +97,13 @@ const ChatbotTrainTemplate = ({ type }: { type: string }) => {
             <ChooseDocumentTemplate
               optional={false}
               stepHandler={stepHandler}
+              botId={botId}
+              type="document"
               // websiteStepHandler={websiteStepHandler}
             />
           )
         ) : (
-          <TuneChatbot />
+          <TuneChatbot botId={botId} />
         )}
       </div>
     </div>

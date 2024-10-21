@@ -7,13 +7,35 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useDeleteBot } from "@/utils/botCreation-api";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { IoCloseOutline } from "react-icons/io5";
-
-const AlertDialog = ({ trigger }: { trigger: React.ReactNode }) => {
+import { toast } from "sonner";
+import { axiosError } from "@/types/axiosTypes";
+import { Loader } from "./Loader";
+const AlertDialog = ({
+  trigger,
+  botId,
+}: {
+  trigger: React.ReactNode;
+  botId?: string;
+}) => {
   const router = useRouter();
+  const { mutate: onDelete, isPending } = useDeleteBot({
+    onSuccess(data) {
+      router.push("/create");
+      toast.success(data?.message);
+    },
+    onError(error: axiosError) {
+      const errorMessage =
+        error?.response?.data?.errors?.message ||
+        error?.response?.data?.message ||
+        "Delete bot failed";
+      toast.error(errorMessage);
+    },
+  });
   return (
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
@@ -24,6 +46,7 @@ const AlertDialog = ({ trigger }: { trigger: React.ReactNode }) => {
             Data loss alert
           </DialogDescription>
         </DialogHeader>
+        {isPending && <Loader />}
         <div className="gap-4 flex flex-col">
           <div className="flex items-center justify-between">
             <div className="text-primary  text-base">
@@ -38,7 +61,9 @@ const AlertDialog = ({ trigger }: { trigger: React.ReactNode }) => {
             <Button
               className="border border-[#57C0DD] text-xs text-[#57C0DD] py-2 w-[105px] sm:w-[116px] bg-transparent rounded-full hover:bg-[#f0faff]"
               onClick={() => {
-                router.push("/chatbotlist");
+                if (botId) {
+                  onDelete({ chatbotId: botId });
+                }
               }}
             >
               Go back
