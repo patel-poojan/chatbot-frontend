@@ -14,7 +14,6 @@ import React from "react";
 import { IoCloseOutline } from "react-icons/io5";
 import { toast } from "sonner";
 import { axiosError } from "@/types/axiosTypes";
-import { Loader } from "./Loader";
 const AlertDialog = ({
   trigger,
   botId,
@@ -23,7 +22,7 @@ const AlertDialog = ({
   botId?: string;
 }) => {
   const router = useRouter();
-  const { mutate: onDelete, isPending } = useDeleteBot({
+  const { mutate: onDelete } = useDeleteBot({
     onSuccess(data) {
       router.push("/create");
       toast.success(data?.message);
@@ -46,7 +45,7 @@ const AlertDialog = ({
             Data loss alert
           </DialogDescription>
         </DialogHeader>
-        {isPending && <Loader />}
+        {/* {isPending && <Loader />} */}
         <div className="gap-4 flex flex-col">
           <div className="flex items-center justify-between">
             <div className="text-primary  text-base">
