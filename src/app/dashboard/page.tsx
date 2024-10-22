@@ -454,7 +454,7 @@ const MainComponent = () => {
                       onClick={() => setAiSection(true)}
                     >
                       <Image
-                        src="/images/faq.svg"
+                        src="/images/vector.svg"
                         alt="AI"
                         width={17}
                         height={17}
