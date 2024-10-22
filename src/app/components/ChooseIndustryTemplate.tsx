@@ -94,7 +94,7 @@ const ChooseIndustryTemplate = ({
         </div>
         <Button
           onClick={continueHandler}
-          className="blue-gradient text-white flex gap-2 items-center py-0 md:py-4 px-2 md:px-9 text-xs max-[500px]:h-7 md:text-lg rounded md:my-3"
+          className="bg-gradient-to-r hover:from-[#53A7DD] hover:to-[#58C8DD]  from-[#58C8DD] to-[#53A7DD] text-white flex gap-2 items-center py-0 md:py-4 px-2 md:px-9 text-xs max-[500px]:h-7 md:text-lg rounded md:my-3"
         >
           Continue
           <FaArrowRightLong className="text-base md:text-lg text-white" />

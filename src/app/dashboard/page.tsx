@@ -46,6 +46,8 @@ import {
 } from "../components/playground/PlaygroundContext";
 import useWindowDimensions from "@/utils/windowSize";
 import ChatBotDialog from "../components/playground/ChatBotDialog";
+import Image from "next/image";
+import AIKnowledge from "../components/playground/AIKnowladge";
 
 const ReactFlow = dynamic(
   () => import("@xyflow/react").then((mod) => mod.ReactFlow),
@@ -91,6 +93,7 @@ let idCounter = 5;
 const getId = () => `${idCounter++}`;
 const MainComponent = () => {
   const { actionDialog, actionHandler, setActionDialog } = usePlayground();
+  const [aiSection, setAiSection] = useState(false);
   const [chatBotDialog, setChatBotDialog] = useState(false);
   const { screenToFlowPosition } = useReactFlow();
   const { type, label } = usePlayground();
@@ -428,100 +431,144 @@ const MainComponent = () => {
 
   return (
     <DashboardLayout>
-      <div className=" sm:p-6 flex flex-1 flex-col relative bg-[#F6F6F6]">
-        <div className="absolute right-6 z-10 top-6 flex items-center gap-3">
-          <div
-            className="flex items-center py-2 px-4 bg-white gap-3 rounded-lg"
-            style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
-          >
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button>
-                    <IoFlashOutline
-                      className={`text-xl cursor-pointer ${
-                        actionDialog ? "text-[#57C0DD]" : ""
-                      } `}
-                      onClick={actionHandler}
-                    />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent
-                  side="bottom"
-                  align="center"
-                  style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
-                  className=" mt-3 p-1 bg-[#57C0DD] text-white !z-50"
-                >
-                  Action
-                </TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button>
-                    <MdUpdate className="text-xl cursor-pointer" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent
-                  side="bottom"
-                  align="center"
-                  style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
-                  className=" mt-3 p-1 bg-[#57C0DD] text-white !z-50"
-                >
-                  Version History
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button>
-                    <IoCode className="text-xl cursor-pointer" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent
-                  side="bottom"
-                  align="center"
-                  style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
-                  className=" mt-3 p-1 bg-[#57C0DD] text-white !z-50"
-                >
-                  Attributes
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-          <Button
-            className={`p-3 border text-xs font-normal ${
-              chatBotDialog
-                ? "border-[#57C0DD] text-[#57C0DD]"
-                : "border-black text-black"
-            } rounded-lg bg-white  hover:bg-transparent`}
-            onClick={() => chatBotHandler()}
-          >
-            Test your bot
-          </Button>
-          <Button className="py-3 px-5 bg-[#57C0DD] text-white rounded-lg hover:bg-[#57C0DD]">
-            Publish
-          </Button>
+      {aiSection ? (
+        <div className="p-4 sm:p-6 flex flex-1 flex-col relative ">
+          <AIKnowledge setAiSection={setAiSection} />
         </div>
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onDrop={onDrop}
-          onDragOver={onDragOver}
-          onConnect={onConnect}
-          nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
-          // nodesDraggable={false}
-          fitView={screenWidth < 768 ? true : false}
-          defaultViewport={{ x: 0, y: 200, zoom: 1 }}
-          className="bg-[#F6F6F6]"
-        >
-          <Controls showFitView />
-        </ReactFlow>
-        {actionDialog && <ActionDialog actionHandler={actionHandler} />}
-        {chatBotDialog && <ChatBotDialog chatBotHandler={chatBotHandler} />}
-      </div>
+      ) : (
+        <div className=" sm:p-6 flex flex-1 flex-col relative bg-[#F6F6F6]">
+          <div className="absolute top-6 flex items-center justify-normal gap-3 flex-wrap-reverse md:justify-between w-full left-0 px-6 z-10">
+            <div className=" flex items-center gap-3">
+              <div
+                className="p-3 h-9  flex items-center justify-center rounded-lg bg-white"
+                style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
+              >
+                www.chatbot.com
+              </div>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div
+                      className="py-2 px-3 h-9 flex items-center justify-center bg-white rounded-lg cursor-pointer"
+                      style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
+                      onClick={() => setAiSection(true)}
+                    >
+                      <Image
+                        src="/images/AI_vector.svg"
+                        alt="stand"
+                        width={17}
+                        height={17}
+                        priority
+                        quality={100}
+                      />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    side="bottom"
+                    align="center"
+                    style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
+                    className=" mt-1  p-1 bg-[#57C0DD] text-white !z-50"
+                  >
+                    Action
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            <div className=" flex items-center gap-3">
+              <div
+                className="flex items-center py-2 px-4 bg-white gap-3 rounded-lg"
+                style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
+              >
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button>
+                        <IoFlashOutline
+                          className={`text-xl cursor-pointer ${
+                            actionDialog ? "text-[#57C0DD]" : ""
+                          } `}
+                          onClick={actionHandler}
+                        />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      side="bottom"
+                      align="center"
+                      style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
+                      className=" mt-3 p-1 bg-[#57C0DD] text-white !z-50"
+                    >
+                      Action
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button>
+                        <MdUpdate className="text-xl cursor-pointer" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      side="bottom"
+                      align="center"
+                      style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
+                      className=" mt-3 p-1 bg-[#57C0DD] text-white !z-50"
+                    >
+                      Version History
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button>
+                        <IoCode className="text-xl cursor-pointer" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      side="bottom"
+                      align="center"
+                      style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
+                      className=" mt-3 p-1 bg-[#57C0DD] text-white !z-50"
+                    >
+                      Attributes
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <Button
+                className={`p-3 border text-xs font-normal ${
+                  chatBotDialog
+                    ? "border-[#57C0DD] text-[#57C0DD]"
+                    : "border-black text-black"
+                } rounded-lg bg-white  hover:bg-transparent`}
+                onClick={() => chatBotHandler()}
+              >
+                Test your bot
+              </Button>
+              <Button className="py-3 px-5 bg-[#57C0DD] text-white rounded-lg hover:bg-[#57C0DD]">
+                Publish
+              </Button>
+            </div>
+          </div>
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onDrop={onDrop}
+            onDragOver={onDragOver}
+            onConnect={onConnect}
+            nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
+            // nodesDraggable={false}
+            fitView={screenWidth < 768 ? true : false}
+            defaultViewport={{ x: 0, y: 200, zoom: 1 }}
+            className="bg-[#F6F6F6]"
+          >
+            <Controls showFitView />
+          </ReactFlow>
+          {actionDialog && <ActionDialog actionHandler={actionHandler} />}
+          {chatBotDialog && <ChatBotDialog chatBotHandler={chatBotHandler} />}
+        </div>
+      )}
     </DashboardLayout>
   );
 };

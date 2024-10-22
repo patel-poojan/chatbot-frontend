@@ -100,7 +100,9 @@ const BDAQuestion = ({
   };
   return (
     <div className="w-full  max-w-7xl flex-1 mx-auto h-auto flex flex-col">
-      {loadBDAQuestionList || (savePending && <Loader />)}
+      {(loadBDAQuestionList ||
+        (questionAnswer.length === 0 && !errorInBDAQuestionList) ||
+        savePending) && <Loader />}
       <div className="flex flex-col min-[830px]:flex-row justify-between items-start min-[830px]:items-center gap-3">
         <div className="text-lg flex-wrap sm:text-2xl font-semibold text-black flex items-center gap-2">
           Your selected industry is
@@ -108,7 +110,7 @@ const BDAQuestion = ({
         </div>
         {/* <Link href={`${type}/train/${chatBotId}`}> */}
         <Button
-          className="text-xs blue-gradient max-[500px]:h-8 md:text-lg text-white flex gap-2 items-center py-2 px-4 md:py-4 md:px-9 rounded my-1 md:my-3"
+          className="text-xs bg-gradient-to-r hover:from-[#53A7DD] hover:to-[#58C8DD]  from-[#58C8DD] to-[#53A7DD]  max-[500px]:h-8 md:text-lg text-white flex gap-2 items-center py-2 px-4 md:py-4 md:px-9 rounded my-1 md:my-3"
           onClick={() => continueHandler()}
         >
           Continue

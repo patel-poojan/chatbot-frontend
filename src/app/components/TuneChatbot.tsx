@@ -123,7 +123,6 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
   };
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
-  // Define inputRefs as an array of HTMLInputElement or null
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const handleDivClick = (index: number) => {
@@ -132,6 +131,20 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
       inputRefs.current[index]!.focus();
     }
   };
+
+  // useEffect(() => {
+  //   const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+  //     router.push("/create"); // Navigate to the /create page before the page is refreshed
+  //     event.preventDefault(); // Prevent the default reload
+  //   };
+
+  //   window.addEventListener("beforeunload", handleBeforeUnload);
+
+  //   return () => {
+  //     window.removeEventListener("beforeunload", handleBeforeUnload);
+  //   };
+  // }, [router]);
+
   return (
     <div
       className=" relative   flex flex-col justify-between w-full bg-white rounded-3xl p-4 sm:p-6 md:p-8 lg:px-12 lg:py-10"
@@ -279,7 +292,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
           }
         />
         <Button
-          className="w-full sm:w-auto px-8 py-2 sm:px-11 border blue-gradient hover:bg-transparent"
+          className="w-full sm:w-auto px-8 py-2 sm:px-11 border  bg-gradient-to-r hover:from-[#53A7DD] hover:to-[#58C8DD]  from-[#58C8DD] to-[#53A7DD]  hover:bg-transparent"
           onClick={continueHandler}
         >
           Continue

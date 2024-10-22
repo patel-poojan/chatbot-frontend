@@ -43,7 +43,7 @@ const ChatbotTrainTemplate = ({
   //     window.removeEventListener("beforeunload", handleUnload);
   //   };
   // }, []);
-  console.log("bkp", botId);
+
   return (
     <div className="w-full  max-w-7xl flex-1 mx-auto h-auto flex flex-col gap-4 md:gap-6">
       <div className="w-fit md:mx-5 mx-auto">

@@ -148,7 +148,7 @@ const ChooseDocumentTemplate = ({
                   />
                 </div>
                 <label className="flex items-center justify-between border border-[#57C0DD]  w-full  p-2">
-                  <div className="flex justify-between items-center w-full">
+                  <div className="flex justify-between items-center w-full gap-2">
                     <span className="text-sm truncate sm:text-base w-full text-center text-[#57C0DD]">
                       {file.name}
                     </span>
@@ -205,7 +205,7 @@ const ChooseDocumentTemplate = ({
           }
         />
         <Button
-          className="w-full sm:w-auto px-8 py-2 sm:px-11 border blue-gradient hover:bg-transparent"
+          className="w-full sm:w-auto px-8 py-2 sm:px-11 border bg-gradient-to-r hover:from-[#53A7DD] hover:to-[#58C8DD]  from-[#58C8DD] to-[#53A7DD]  hover:bg-transparent"
           onClick={() => continueHandler()}
         >
           Continue
