@@ -272,7 +272,7 @@ const AIKnowledge = ({
               </div>
               <div className="flex-1 flex flex-col mx-2 relative overflow-hidden">
                 {tab === "websites" ? (
-                  <>
+                  <div className="flex-1">
                     <div
                       className="h-12 w-full  border rounded-xl
          mt-4 mb-3 flex items-center bg-[#F2F2F2]"
@@ -326,7 +326,7 @@ const AIKnowledge = ({
                       By sharing your URL, you confirm you have the necessary
                       rights to share its content.
                     </p>
-                  </>
+                  </div>
                 ) : (
                   <div className="flex-1 overflow-y-auto ">
                     <div className="grid overflow-y-auto gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ">
