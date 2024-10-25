@@ -7,6 +7,7 @@ import CommentCard from "./components/CommentCard";
 import BottomBar from "./components/BottomBar";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import Head from "next/head";
 
 export default function Home() {
   const [emailId, setEmailId] = useState<string>("");
@@ -57,9 +58,7 @@ export default function Home() {
 
   useEffect(() => {
     const currentText = texts[loopNum % texts.length];
-    const updatedText = isDeleting
-      ? currentText.substring(0, charIndex - 1)
-      : currentText.substring(0, charIndex + 1);
+    const updatedText = isDeleting ? currentText.substring(0, charIndex - 1) : currentText.substring(0, charIndex + 1);
 
     setDisplayedText(updatedText);
 
@@ -70,31 +69,23 @@ export default function Home() {
       setLoopNum(loopNum + 1);
     }
 
-    const timer = setTimeout(
-      () => setCharIndex(charIndex + (isDeleting ? -1 : 1)),
-      typingSpeed
-    );
+    const timer = setTimeout(() => setCharIndex(charIndex + (isDeleting ? -1 : 1)), typingSpeed);
 
     return () => clearTimeout(timer);
   }, [charIndex, isDeleting, loopNum, texts, typingSpeed]);
   return (
     <div>
+      <Head>
+        <link rel="preload" href={"/images/chatbot_temp.svg"} as="image" />
+      </Head>
       <TopBar
         content={
           <div className="h-full flex flex-col w-full bg-white">
             <div className="w-full text-left flex-1">
-              <p className="text-sm border-b border-[#F3F3F3] py-4 font-semibold text-[#1E255E]">
-                Product
-              </p>
-              <p className="text-sm border-b border-[#F3F3F3] py-4 font-semibold text-[#1E255E]">
-                Pricing
-              </p>
-              <p className="text-sm border-b border-[#F3F3F3] py-4 font-semibold text-[#1E255E]">
-                Integration
-              </p>
-              <p className="text-sm border-b border-[#F3F3F3] py-4 font-semibold text-[#1E255E]">
-                Resources
-              </p>
+              <p className="text-sm border-b border-[#F3F3F3] py-4 font-semibold text-[#1E255E]">Product</p>
+              <p className="text-sm border-b border-[#F3F3F3] py-4 font-semibold text-[#1E255E]">Pricing</p>
+              <p className="text-sm border-b border-[#F3F3F3] py-4 font-semibold text-[#1E255E]">Integration</p>
+              <p className="text-sm border-b border-[#F3F3F3] py-4 font-semibold text-[#1E255E]">Resources</p>
             </div>
             <form
               onSubmit={(e) => {
@@ -192,8 +183,9 @@ export default function Home() {
                 layout="responsive"
                 width={630}
                 height={506}
-                quality={100}
+                quality={70}
                 className="object-contain"
+                priority
               />
             </div>
           </div>
@@ -208,8 +200,7 @@ export default function Home() {
             <div
               onClick={() => setFlowIndex(0)}
               style={{
-                boxShadow:
-                  flowIndex === 0 ? "0px 0px 2px 0px #0000001F" : "none",
+                boxShadow: flowIndex === 0 ? "0px 0px 2px 0px #0000001F" : "none",
               }}
               className={`${
                 flowIndex === 0
@@ -222,8 +213,7 @@ export default function Home() {
             <div
               onClick={() => setFlowIndex(1)}
               style={{
-                boxShadow:
-                  flowIndex === 1 ? "0px 0px 2px 0px #0000001F" : "none",
+                boxShadow: flowIndex === 1 ? "0px 0px 2px 0px #0000001F" : "none",
               }}
               className={`${
                 flowIndex === 1
@@ -319,8 +309,8 @@ export default function Home() {
             Cover all customer journey touchpoint automatically
           </h2>
           <p className="text-lg font-normal text-[#1e255eb3] text-center px-4  mb-8 md:mb-12 max-w-4xl mx-auto">
-            Now your customer relations can focus on optimization, scale up
-            through automation, and manage top-tier clients.
+            Now your customer relations can focus on optimization, scale up through automation, and manage top-tier
+            clients.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-7 mx-auto px-0 sm:px-4">
             <MarketingTemplate
@@ -333,11 +323,7 @@ export default function Home() {
               title="Marketing"
               navigationText="Hire chatBot as Marketer"
             />
-            <MarketingTemplate
-              imgSrc="/images/sales.svg"
-              title="Sales"
-              navigationText="Hire chatBot as Sales Rep"
-            />
+            <MarketingTemplate imgSrc="/images/sales.svg" title="Sales" navigationText="Hire chatBot as Sales Rep" />
           </div>
         </div>
 
@@ -348,9 +334,8 @@ export default function Home() {
             Transform Your Data into a Powerful Chatbot
           </h2>
           <p className="mb-6 mb:mb-8 lg:mb-12 text-[#1E255EB2] text-center font-normal max-w-6xl text-base sm:text-lg mx-auto">
-            By integrating your resources—internal documents, website content,
-            and expert knowledge—we develop a chatbot that efficiently delivers
-            relevant information and enhances user engagement.
+            By integrating your resources—internal documents, website content, and expert knowledge—we develop a chatbot
+            that efficiently delivers relevant information and enhances user engagement.
           </p>
           <div className="flex flex-col md:flex-row items-center gap-6">
             <div className="w-full md:w-1/2">
@@ -421,9 +406,7 @@ export default function Home() {
                   className="object-cover"
                 />
                 <div>
-                  <h3 className="text-2xl text-primary font-semibold mb-2">
-                    {feature.title}
-                  </h3>
+                  <h3 className="text-2xl text-primary font-semibold mb-2">{feature.title}</h3>
                   <p className="text-[#1E255EB2] text-xl">{feature.message}</p>
                 </div>
               </div>
