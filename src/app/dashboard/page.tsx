@@ -48,6 +48,8 @@ import useWindowDimensions from "@/utils/windowSize";
 import ChatBotDialog from "../components/playground/ChatBotDialog";
 import Image from "next/image";
 import AIKnowledge from "../components/playground/AIKnowladge";
+import AttributesDialog from "../components/playground/AttributesDialog";
+import UpdateChatbotNameDialog from "../components/playground/UpdateChatbotNameDialog";
 
 const ReactFlow = dynamic(
   () => import("@xyflow/react").then((mod) => mod.ReactFlow),
@@ -95,6 +97,7 @@ const MainComponent = () => {
   const { actionDialog, actionHandler, setActionDialog } = usePlayground();
   const [aiSection, setAiSection] = useState(false);
   const [chatBotDialog, setChatBotDialog] = useState(false);
+  const [attributesDialog, setAttributesDialog] = useState(false);
   const { screenToFlowPosition } = useReactFlow();
   const { type, label } = usePlayground();
   const { width: screenWidth } = useWindowDimensions();
@@ -340,7 +343,7 @@ const MainComponent = () => {
           setEdges((eds) => [
             ...eds,
             {
-              id: `edge-${newNode.id}-${successNode.id}`,
+              id: `${newNode.id}-${successNode.id}`,
               source: newNode.id,
               target: successNode.id,
               type: "customEdge",
@@ -365,7 +368,7 @@ const MainComponent = () => {
           setEdges((eds) => [
             ...eds,
             {
-              id: `edge-${newNode.id}-${botResponseNode.id}`,
+              id: `${newNode.id}-${botResponseNode.id}`,
               source: newNode.id,
               target: botResponseNode.id,
               type: "customEdge",
@@ -377,7 +380,7 @@ const MainComponent = () => {
         setEdges((eds) => [
           ...eds,
           {
-            id: `edge-${connectedNode.id}-${newNode.id}`,
+            id: `${connectedNode.id}-${newNode.id}`,
             source: connectedNode.id,
             target: newNode.id,
             type: "customEdge",
@@ -407,7 +410,7 @@ const MainComponent = () => {
         addEdge(
           {
             ...connection,
-            id: `edge-${prevEdges.length + 1}`,
+            id: `${prevEdges.length + 1}`,
             type: "customEdge",
           },
           prevEdges
@@ -421,11 +424,22 @@ const MainComponent = () => {
     } else {
       setChatBotDialog(true);
       setActionDialog(false);
+      setAttributesDialog(false);
+    }
+  };
+  const attributesHandler = () => {
+    if (attributesDialog) {
+      setAttributesDialog(false);
+    } else {
+      setChatBotDialog(false);
+      setActionDialog(false);
+      setAttributesDialog(true);
     }
   };
   useEffect(() => {
     if (actionDialog) {
       setChatBotDialog(false);
+      setAttributesDialog(false);
     }
   }, [actionDialog, chatBotDialog]);
 
@@ -439,12 +453,17 @@ const MainComponent = () => {
         <div className=" sm:p-6 flex flex-1 flex-col relative bg-[#F6F6F6]">
           <div className="absolute top-6 flex items-center justify-normal gap-3 flex-wrap-reverse md:justify-between w-full left-0 px-6 z-10">
             <div className=" flex items-center gap-3">
-              <div
-                className="p-3 h-9  flex items-center justify-center rounded-lg bg-white"
-                style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
-              >
-                www.chatbot.com
-              </div>
+              <UpdateChatbotNameDialog
+                trigger={
+                  <div
+                    className="p-3 h-9  flex items-center cursor-pointer justify-center rounded-lg bg-white"
+                    style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
+                  >
+                    www.chatbot.com
+                  </div>
+                }
+              />
+
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -518,8 +537,12 @@ const MainComponent = () => {
                   </Tooltip>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <button>
-                        <IoCode className="text-xl cursor-pointer" />
+                      <button onClick={() => attributesHandler()}>
+                        <IoCode
+                          className={`text-xl cursor-pointer ${
+                            attributesDialog ? "text-[#57C0DD]" : ""
+                          } `}
+                        />
                       </button>
                     </TooltipTrigger>
                     <TooltipContent
@@ -567,6 +590,9 @@ const MainComponent = () => {
           </ReactFlow>
           {actionDialog && <ActionDialog actionHandler={actionHandler} />}
           {chatBotDialog && <ChatBotDialog chatBotHandler={chatBotHandler} />}
+          {attributesDialog && (
+            <AttributesDialog attributesHandler={attributesHandler} />
+          )}
         </div>
       )}
     </DashboardLayout>

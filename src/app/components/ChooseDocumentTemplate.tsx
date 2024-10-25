@@ -51,7 +51,6 @@ const ChooseDocumentTemplate = ({
     },
   });
   const continueHandler = () => {
-    console.log("botId", botId);
     if (type === "document" && botId) {
       if (files.length === 0) {
         toast.warning("Please select document");

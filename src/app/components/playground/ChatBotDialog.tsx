@@ -100,7 +100,7 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
   }, [ChatArray]);
   return (
     <div
-      className="absolute  min-[425px]:right-6 top-20 flex flex-col  min-[425px]:w-[375px] h-[65vh] max-[425px]:mx-6 min-[500px]:h-[60vh] rounded-lg overflow-hidden"
+      className="absolute  min-[425px]:right-6 top-32 min-[699px]:top-20 flex flex-col  min-[425px]:w-[375px] h-[65vh] max-[425px]:mx-6 min-[500px]:h-[60vh] rounded-lg overflow-hidden"
       style={{ boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)" }}
     >
       <div className="w-full p-6 bg-white justify-between flex items-center">
