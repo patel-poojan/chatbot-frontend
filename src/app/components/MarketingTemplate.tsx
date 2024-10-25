@@ -13,7 +13,7 @@ const MarketingTemplate = ({
   navigationText: string;
 }) => {
   return (
-    <div className="px-6 py-8 sm:py-10 lg:py-12 bg-white rounded-3xl shadow-md">
+    <div className="px-4 py-6 sm:py-10 lg:py-12 bg-white rounded-3xl shadow-md">
       <div className="flex flex-col items-center gap-3">
         <Image
           src={imgSrc}

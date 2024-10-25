@@ -137,3 +137,26 @@ body,
   box-shadow: 0 0 20px red !important;
   border-radius: 30px;
 }
+
+/* text animation */
+
+.text_animation {
+  display: inline;
+}
+
+.cursor_animation {
+  border-left: 4px solid white;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0% {
+    border-color: white;
+  }
+  50% {
+    border-color: transparent;
+  }
+  100% {
+    border-color: white;
+  }
+}

@@ -12,6 +12,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Switch } from "@/components/ui/switch";
 import {
   Table,
   TableBody,
@@ -20,6 +21,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import useWindowDimensions from "@/utils/windowSize";
 import Image from "next/image";
 import React, { useState } from "react";
@@ -31,6 +38,7 @@ import {
   IoSearchSharp,
 } from "react-icons/io5";
 import { MdPublic } from "react-icons/md";
+import { RiDeleteBin6Line } from "react-icons/ri";
 
 const AIKnowledge = ({
   setAiSection,
@@ -71,7 +79,7 @@ const AIKnowledge = ({
           screenWidth > 500 ? "calc(100dvh - 72px)" : "calc(100dvh - 96px)",
       }}
     >
-      <div className="flex  justify-between items-center">
+      <div className="flex mx-2 justify-between items-center">
         <div className="text-xs text-black hidden sm:block">
           www.chatbot.com
         </div>
@@ -96,7 +104,7 @@ const AIKnowledge = ({
       </div>
 
       <div
-        className="flex-1 border bg-white flex flex-col md:flex-row overflow-hidden"
+        className="flex-1 border bg-white flex flex-col md:flex-row overflow-hidden !rounded-xl"
         style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
       >
         <div
@@ -213,6 +221,13 @@ const AIKnowledge = ({
                           </span>
                         </div>
                       </TableHead>
+                      <TableHead className="py-2 text-center">
+                        <div className="flex items-center flex-wrap justify-center">
+                          <span className="break-all text-[#1E255E] font-medium ">
+                            Action
+                          </span>
+                        </div>
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody className="overflow-y-auto ">
@@ -238,6 +253,59 @@ const AIKnowledge = ({
                               } break-all items-center justify-center`}
                             >
                               {detail.state ?? ""}
+                            </div>
+                          </TableCell>
+
+                          <TableCell>
+                            <div className="flex  justify-center gap-2 align-baseline">
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div>
+                                      <Switch
+                                        checked={true}
+                                        // checked={
+                                        //   selectedPermission.find(
+                                        //     (p) => p._id === permission._id
+                                        //   )
+                                        //     ? true
+                                        //     : false
+                                        // }
+                                        // onCheckedChange={() =>
+                                        //   OnChangePermission(permission._id)
+                                        // }
+                                      />
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent
+                                    side="bottom"
+                                    align="center"
+                                    style={{
+                                      boxShadow: "0px 0px 4px 0px #0000001F",
+                                    }}
+                                    className="  p-1 bg-[#57C0DD] text-white !z-50"
+                                  >
+                                    AI Disable
+                                  </TooltipContent>
+                                </Tooltip>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <button>
+                                      <RiDeleteBin6Line className="text-lg cursor-pointer" />
+                                    </button>
+                                  </TooltipTrigger>
+                                  <TooltipContent
+                                    side="bottom"
+                                    align="center"
+                                    style={{
+                                      boxShadow: "0px 0px 4px 0px #0000001F",
+                                    }}
+                                    className=" mt-1 p-1 bg-[#57C0DD] text-white !z-50"
+                                  >
+                                    Delete
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                             </div>
                           </TableCell>
                         </TableRow>
@@ -397,3 +465,50 @@ const AIKnowledge = ({
 };
 
 export default AIKnowledge;
+
+{
+  /* <Popover>
+                                <PopoverTrigger>
+                                  <VscSettings className="text-lg rotate-90 cursor-pointer" />
+                                </PopoverTrigger>
+                                <PopoverContent
+                                  className="w-[200px] flex flex-col gap-2"
+                                  onInteractOutside={(e) => {
+                                    e.preventDefault();
+                                  }}
+                                >
+                                  <RadioGroup className="gap-1">
+                                    <div className="flex items-center space-x-2">
+                                      <RadioGroupItem
+                                        value="Used by AI"
+                                        id="r1"
+                                        // className="focus:text-[#57C0DD] flex items-center gap-2  focus:border focus:border-[#57C0DD] "
+                                      />
+                                      <label
+                                        htmlFor="r1"
+                                        className="text-[#1E255E] text-sm"
+                                      >
+                                        Used by AI
+                                      </label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                      <RadioGroupItem
+                                        value="Not used by AI"
+                                        id="r2"
+                                        itemType="radio"
+                                        // className="focus:text-[#57C0DD] flex items-center gap-2  focus:border focus:border-[#57C0DD] "
+                                      />
+                                      <label
+                                        htmlFor="r2"
+                                        className="text-[#1E255E] text-sm"
+                                      >
+                                        Not used by AI
+                                      </label>
+                                    </div>
+                                  </RadioGroup>
+                                  <Button className="bg-gradient-to-r p-1 mt-1 h-auto hover:from-[#53A7DD] hover:to-[#58C8DD]  from-[#58C8DD] to-[#53A7DD]">
+                                    Save
+                                  </Button>
+                                </PopoverContent>
+                              </Popover> */
+}
