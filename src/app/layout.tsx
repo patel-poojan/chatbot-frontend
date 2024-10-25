@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Poppins } from "next/font/google";
 import ClientProvider from "./components/ClientProvider";
+import store from "./context/store";
+import { Provider } from "react-redux";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -23,9 +25,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={poppins.className}>
       <body>
-        <>
+        <Provider store={store}>
           <ClientProvider>{children}</ClientProvider>
-        </>
+        </Provider>
       </body>
     </html>
   );
