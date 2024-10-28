@@ -205,7 +205,13 @@ const ChooseDocumentTemplate = ({
         />
         <Button
           className="w-full sm:w-auto px-8 py-2 sm:px-11 border bg-gradient-to-r hover:from-[#53A7DD] hover:to-[#58C8DD]  from-[#58C8DD] to-[#53A7DD]  hover:bg-transparent"
-          onClick={() => continueHandler()}
+          onClick={() => {
+            if (files.length === 0) {
+              toast.warning("Please select document");
+            } else {
+              continueHandler();
+            }
+          }}
         >
           Continue
         </Button>

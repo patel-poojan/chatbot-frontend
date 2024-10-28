@@ -17,7 +17,11 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { Input } from "@/components/ui/input";
 import { BiSolidEditAlt } from "react-icons/bi";
-import { useAddAttributes, useUpdateChatbot } from "@/utils/botCreation-api";
+import {
+  useAddAttributes,
+  useSetupPlayground,
+  useUpdateChatbot,
+} from "@/utils/botCreation-api";
 import { toast } from "sonner";
 import { axiosError } from "../../types/axiosTypes";
 import { Loader } from "./Loader";
@@ -28,13 +32,14 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
   const { width: screenWidth } = useWindowDimensions();
   const [FAQ, setFAQ] = useState(true);
   const [attributes, setAttributes] = useState([
-    { title: "Company Name", value: "Chatbot" },
+    { title: "Chatbot Name", value: "Chatbot" },
+    { title: "Company Name", value: "" },
     { title: "Company Address", value: "" },
     { title: "About Us", value: "" },
   ]);
   const [AboutUs, setAboutUs] = useState(true);
   const [welcomeMessage, setwelcomeMessage] = useState(
-    `👋 Welcome to Chatbot! I’m ChatBot, your AI assistant 🤖. What can I do for you?`
+    `👋 Welcome to Chatbot! I'm ChatBot, your AI assistant 🤖. What can I do for you?`
   );
   const {
     mutate: onUpdateBot,
@@ -68,11 +73,27 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
       toast.error(errorMessage);
     },
   });
+  const {
+    mutate: onSetupPlayground,
+    isPending: isPendingSetupPlayground,
+    isSuccess: isSetupPlaygroundSuccess,
+  } = useSetupPlayground({
+    onSuccess(data) {
+      toast.success(data?.message);
+    },
+    onError(error: axiosError) {
+      const errorMessage =
+        error?.response?.data?.errors?.message ||
+        error?.response?.data?.message ||
+        "playground setup failed";
+      toast.error(errorMessage);
+    },
+  });
   useEffect(() => {
-    if (isUpdateSuccess && isAddSuccess) {
-      router.replace("/dashboard");
+    if (isUpdateSuccess && isAddSuccess && isSetupPlaygroundSuccess) {
+      router.replace(`/dashboard/${botId}`);
     }
-  }, [isAddSuccess, isUpdateSuccess, router]);
+  }, [botId, isAddSuccess, isSetupPlaygroundSuccess, isUpdateSuccess, router]);
   const toSnakeCase = (text: string) => {
     return text
       .toLowerCase()
@@ -81,10 +102,12 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
   };
   const continueHandler = () => {
     if (!attributes[0].value) {
-      toast.warning("Please enter company name");
+      toast.warning("Please enter chatbot name");
     } else if (!attributes[1].value) {
-      toast.warning("Please enter company address");
+      toast.warning("Please enter company name");
     } else if (!attributes[2].value) {
+      toast.warning("Please enter company address");
+    } else if (!attributes[3].value) {
       toast.warning("Please enter about us");
     } else if (!welcomeMessage) {
       toast.warning("Please enter welcome message");
@@ -95,7 +118,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
         chatbotId: botId,
         details: {
           name: attributes[0].value ?? "chatbot",
-          aboutAs: attributes[2].value,
+          aboutAs: attributes[3].value,
           welcomeMessage: welcomeMessage,
           configuredButtons: [
             {
@@ -117,6 +140,24 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
             alias: toSnakeCase(item.title),
             value: item.value,
           })),
+        },
+      });
+      onSetupPlayground({
+        chatbotId: botId,
+        details: {
+          welcome: welcomeMessage,
+          replies: [
+            {
+              name: "FAQ",
+              enabled: FAQ,
+              position: { x: 330, y: AboutUs ? -90 : 10 },
+            },
+            {
+              name: "About Us",
+              enabled: AboutUs,
+              position: { x: 330, y: FAQ ? 110 : 10 },
+            },
+          ],
         },
       });
     }
@@ -159,7 +200,9 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
         } `,
       }}
     >
-      {(isPending || isPendingAddProcess) && <Loader />}
+      {(isPending || isPendingAddProcess || isPendingSetupPlayground) && (
+        <Loader />
+      )}
       <div className="flex-1 flex flex-col lg:flex-row gap-6 w-full overflow-hidden">
         <div className="w-full lg:w-3/5 flex-1 flex flex-col overflow-hidden ">
           <div className="mb-4 sm:mb-6">

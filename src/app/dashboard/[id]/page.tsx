@@ -13,10 +13,7 @@ import {
   XYPosition,
   ReactFlowProvider,
 } from "@xyflow/react";
-import DashboardLayout from "../components/DashboardLayout";
 import "@xyflow/react/dist/style.css";
-
-import CustomEdge from "../components/playground/CustomEdge";
 import {
   AiAssistNode,
   BotResponseNode,
@@ -29,7 +26,7 @@ import {
   SuccessNode,
   UserInputNode,
   CloseChatNode,
-} from "../components/playground/CustomNode";
+} from "@/app/components/playground/CustomNode";
 import { Button } from "@/components/ui/button";
 import { IoCode, IoFlashOutline } from "react-icons/io5";
 import { MdUpdate } from "react-icons/md";
@@ -39,17 +36,22 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import ActionDialog from "../components/playground/ActionDialog";
+import ActionDialog from "@/app/components/playground/ActionDialog";
 import {
   PlaygroundProvider,
   usePlayground,
-} from "../components/playground/PlaygroundContext";
+} from "@/app/components/playground/PlaygroundContext";
 import useWindowDimensions from "@/utils/windowSize";
-import ChatBotDialog from "../components/playground/ChatBotDialog";
+import ChatBotDialog from "@/app/components/playground/ChatBotDialog";
 import Image from "next/image";
-import AIKnowledge from "../components/playground/AIKnowladge";
-import AttributesDialog from "../components/playground/AttributesDialog";
-import UpdateChatbotNameDialog from "../components/playground/UpdateChatbotNameDialog";
+import AIKnowledge from "@/app/components/playground/AIKnowladge";
+import AttributesDialog from "@/app/components/playground/AttributesDialog";
+import UpdateChatbotNameDialog from "@/app/components/playground/UpdateChatbotNameDialog";
+import DashboardLayout from "@/app/components/DashboardLayout";
+import CustomEdge from "@/app/components/playground/CustomEdge";
+import { axiosInstance } from "@/utils/axiosInstance";
+import { useQuery } from "@tanstack/react-query";
+import { Loader } from "@/app/components/Loader";
 
 const ReactFlow = dynamic(
   () => import("@xyflow/react").then((mod) => mod.ReactFlow),
@@ -93,7 +95,51 @@ const initialEdges: Edge[] = [
 
 let idCounter = 5;
 const getId = () => `${idCounter++}`;
-const MainComponent = () => {
+type FetchPlaygroundResponse = {
+  statusCode: number;
+  data: {
+    _id: string;
+    chatbotId: string;
+    createdAt: string;
+    updatedAt: string;
+    diagram: {
+      nodes: {
+        id: string;
+        type: string;
+        name: string;
+        isDelete: boolean;
+      }[];
+      edges: {
+        id: string;
+        source: string;
+        target: string;
+        type: string;
+      }[];
+    };
+  };
+  message: string;
+  success: boolean;
+};
+const MainComponent = ({ botId }: { botId: string }) => {
+  const fetchInitialPlayground = async () => {
+    const response: FetchPlaygroundResponse = await axiosInstance.get(
+      `/playground/${botId}`
+    );
+    if (response.success) {
+      return response.data;
+    }
+  };
+
+  const {
+    data: playgroundData,
+    isLoading: loadPlayground,
+    isError: errorInPlayground,
+    // refetch: refetchPlayground,
+  } = useQuery({
+    queryKey: ["playGround"],
+    queryFn: fetchInitialPlayground,
+  });
+
   const { actionDialog, actionHandler, setActionDialog } = usePlayground();
   const [aiSection, setAiSection] = useState(false);
   const [chatBotDialog, setChatBotDialog] = useState(false);
@@ -107,7 +153,6 @@ const MainComponent = () => {
       defaultNode: DefaultNode,
       botResponseNode: BotResponseNode,
       aiAssistNode: AiAssistNode,
-      // flowNode: FlowNode,
       closeChatNode: CloseChatNode,
       goToStepNode: GoToStepNode,
       faqNode: FaqNode,
@@ -123,6 +168,21 @@ const MainComponent = () => {
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  useEffect(() => {
+    if (
+      playgroundData &&
+      playgroundData?.diagram &&
+      playgroundData?.diagram.nodes &&
+      playgroundData?.diagram.edges
+    ) {
+      const nnn = playgroundData?.diagram.nodes;
+      const eee = playgroundData?.diagram.edges;
+      console.log("nodes", nnn);
+      console.log("edges", eee);
+    }
+  }, [playgroundData]);
+
   const SNAP_MARGIN = 70;
   const isNearRightEdge = useCallback(
     (position: XYPosition, node: Node): boolean => {
@@ -445,6 +505,7 @@ const MainComponent = () => {
 
   return (
     <DashboardLayout>
+      {loadPlayground && <Loader />}
       {aiSection ? (
         <div className="p-4 sm:p-6 flex flex-1 flex-col relative ">
           <AIKnowledge setAiSection={setAiSection} />
@@ -571,23 +632,27 @@ const MainComponent = () => {
               </Button>
             </div>
           </div>
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            onConnect={onConnect}
-            nodeTypes={nodeTypes}
-            edgeTypes={edgeTypes}
-            // nodesDraggable={false}
-            fitView={screenWidth < 768 ? true : false}
-            defaultViewport={{ x: 0, y: 200, zoom: 1 }}
-            className="bg-[#F6F6F6]"
-          >
-            <Controls showFitView />
-          </ReactFlow>
+          {errorInPlayground ? (
+            <div className="text-[red] m-auto">something went wrong</div>
+          ) : (
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onDrop={onDrop}
+              onDragOver={onDragOver}
+              onConnect={onConnect}
+              nodeTypes={nodeTypes}
+              edgeTypes={edgeTypes}
+              // nodesDraggable={false}
+              fitView={screenWidth < 768 ? true : false}
+              defaultViewport={{ x: 0, y: 200, zoom: 1 }}
+              className="bg-[#F6F6F6]"
+            >
+              <Controls showFitView />
+            </ReactFlow>
+          )}
           {actionDialog && <ActionDialog actionHandler={actionHandler} />}
           {chatBotDialog && <ChatBotDialog chatBotHandler={chatBotHandler} />}
           {attributesDialog && (
@@ -598,11 +663,11 @@ const MainComponent = () => {
     </DashboardLayout>
   );
 };
-export default function Main() {
+export default function Main({ params }: { params: { id: string } }) {
   return (
     <ReactFlowProvider>
       <PlaygroundProvider>
-        <MainComponent />
+        <MainComponent botId={params.id} />
       </PlaygroundProvider>
     </ReactFlowProvider>
   );

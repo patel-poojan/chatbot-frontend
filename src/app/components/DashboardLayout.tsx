@@ -158,7 +158,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       </div>
       <div
         className={`flex-1 w-full flex flex-col bg-white ${
-          pathName === "/dashboard"
+          pathName.startsWith("/dashboard")
             ? "p-0"
             : "max-[500px]:p-0 p-6 lg:p-8 xl:px-16 xl:py-12"
         }   min-[500px]:rounded-3xl overflow-hidden h-full`}

@@ -49,7 +49,7 @@ const ChooseIndustryTemplate = ({
   const router = useRouter();
   const fetchIndustry = async () => {
     const response: FetchIndustryListResponse = await axiosInstance.get(
-      `/bot/get-category`
+      `/bda/get-category`
     );
     if (response.data.length >= 0) {
       setIndustryValue(response.data[0].category);
@@ -129,7 +129,7 @@ const ChooseIndustryTemplate = ({
           <Command>
             <CommandInput placeholder="Search framework..." />
             <CommandList className="max-h-[120px] md:max-h-[150px] overflow-scroll">
-              <CommandEmpty>No framework found.</CommandEmpty>
+              <CommandEmpty>No industry found.</CommandEmpty>
               <CommandGroup>
                 {!errorInIndustryList &&
                   IndustryList &&
@@ -196,7 +196,7 @@ const ChooseIndustryTemplate = ({
           <Command>
             <CommandInput placeholder="Search framework..." />
             <CommandList>
-              <CommandEmpty>No framework found.</CommandEmpty>
+              <CommandEmpty>No subindustry found.</CommandEmpty>
               <CommandGroup>
                 {!errorInIndustryList &&
                   IndustryList &&

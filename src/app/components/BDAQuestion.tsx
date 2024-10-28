@@ -41,7 +41,7 @@ const BDAQuestion = ({
   >([]);
   const fetchBDAQuestion = async () => {
     const response: FetchBDAQuestionListResponse = await axiosInstance.post(
-      `/bot/questions`,
+      `/bda/questions`,
       {
         category: industry,
         subcategory: subIndustry,

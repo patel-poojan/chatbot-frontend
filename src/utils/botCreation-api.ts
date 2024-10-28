@@ -94,7 +94,7 @@ export const useSaveBDAQuestion = ({
       data: SaveBDAQuestionRequest
     ): Promise<SaveBDAQuestionResponse> => {
       return axiosInstance.post(
-        `/bot/submit-question-data
+        `/bda/submit-question-data
 `,
         data
       );
@@ -256,6 +256,36 @@ export const useAddAttributes = ({
     mutationFn: (data: AddAttributesRequest): Promise<trainBotResponse> => {
       return axiosInstance.post(
         `/chatbot/${data.chatbotId}/attributes`,
+        data.details
+      );
+    },
+    onError,
+    onSuccess,
+  });
+
+type SetupPlaygroundRequest = {
+  chatbotId: string;
+  details: {
+    welcome: string;
+    replies: {
+      name: string;
+      enabled: boolean;
+      position: { x: number; y: number };
+    }[];
+  };
+};
+export const useSetupPlayground = ({
+  onSuccess,
+  onError,
+}: {
+  onSuccess: (data: DefaultResponse) => void;
+  onError: (error: axiosError) => void;
+}) =>
+  useMutation({
+    mutationKey: ["setup", "playground"],
+    mutationFn: (data: SetupPlaygroundRequest): Promise<DefaultResponse> => {
+      return axiosInstance.post(
+        `/playground/setup/${data.chatbotId}`,
         data.details
       );
     },
