@@ -1,13 +1,30 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import { useDeleteNode } from "@/utils/playground-api";
+import { usePathname } from "next/navigation";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useMemo,
+} from "react";
+import { toast } from "sonner";
+import { axiosError } from "@/types/axiosTypes";
 
 interface PlaygroundContextType {
   type: string | null;
   label: string | null;
   setType: React.Dispatch<React.SetStateAction<string | null>>;
   setLabel: React.Dispatch<React.SetStateAction<string | null>>;
-  actionDialog: boolean;
-  setActionDialog: React.Dispatch<React.SetStateAction<boolean>>;
-  actionHandler: () => void;
+  reFetch: boolean;
+  refetchHandler: () => void;
+  notConnectableNode: string[];
+  isPageLoader: boolean;
+  setIsPageLoader: React.Dispatch<React.SetStateAction<boolean>>;
+  deleteNodeHandler: (
+    isSingleNode: boolean,
+    parentNodeId: string,
+    currentNodeId: string
+  ) => void;
 }
 
 const PlaygroundContext = createContext<PlaygroundContextType | undefined>(
@@ -23,10 +40,64 @@ export const PlaygroundProvider: React.FC<PlaygroundProviderProps> = ({
 }) => {
   const [type, setType] = useState<string | null>(null);
   const [label, setLabel] = useState<string | null>(null);
-  const [actionDialog, setActionDialog] = useState(false);
+  const [reFetch, setRefetch] = useState(false);
+  const [isPageLoader, setIsPageLoader] = useState(false);
 
-  const actionHandler = () => {
-    setActionDialog((prev) => !prev);
+  const notConnectableNode = useMemo(
+    () => [
+      "aiAssistNode",
+      "startNode",
+      "defaultNode",
+      "goToStepNode",
+      "faqNode",
+      "closeChatNode",
+      "successNode",
+      "failureNode",
+      "defaultBotResponseNode",
+    ],
+    []
+  );
+
+  const refetchHandler = () => {
+    setRefetch((prev) => !prev);
+  };
+
+  const pathname = usePathname();
+  const chatbotId = pathname?.split("/").pop();
+  const { mutate: onDeleteNode } = useDeleteNode({
+    onSuccess(data) {
+      setIsPageLoader(false);
+      refetchHandler();
+      toast.success(data?.message, {
+        duration: 2000,
+      });
+    },
+
+    onError(error: axiosError) {
+      setIsPageLoader(false);
+      const errorMessage =
+        error?.response?.data?.errors?.message ||
+        error?.response?.data?.message ||
+        "failed to delete node";
+      toast.error(errorMessage);
+    },
+  });
+  const deleteNodeHandler = (
+    isSingleNode: boolean,
+    parentNodeId: string,
+    currentNodeId: string
+  ) => {
+    if (parentNodeId && currentNodeId && chatbotId) {
+      setIsPageLoader(true);
+      onDeleteNode({
+        chatbotId,
+        parentNodeId: parentNodeId,
+        currentNodeId: currentNodeId,
+        isSingleNode,
+      });
+    } else {
+      toast.error("something went wrong");
+    }
   };
 
   return (
@@ -36,9 +107,12 @@ export const PlaygroundProvider: React.FC<PlaygroundProviderProps> = ({
         label,
         setType,
         setLabel,
-        actionDialog,
-        actionHandler,
-        setActionDialog,
+        reFetch,
+        refetchHandler,
+        notConnectableNode,
+        isPageLoader,
+        setIsPageLoader,
+        deleteNodeHandler,
       }}
     >
       {children}

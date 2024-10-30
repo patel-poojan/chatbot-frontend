@@ -26,6 +26,7 @@ import {
   SuccessNode,
   UserInputNode,
   CloseChatNode,
+  DefaultBotResponseNode,
 } from "@/app/components/playground/CustomNode";
 import { Button } from "@/components/ui/button";
 import { IoCode, IoFlashOutline } from "react-icons/io5";
@@ -45,56 +46,60 @@ import useWindowDimensions from "@/utils/windowSize";
 import ChatBotDialog from "@/app/components/playground/ChatBotDialog";
 import Image from "next/image";
 import AIKnowledge from "@/app/components/playground/AIKnowladge";
-import AttributesDialog from "@/app/components/playground/AttributesDialog";
 import UpdateChatbotNameDialog from "@/app/components/playground/UpdateChatbotNameDialog";
 import DashboardLayout from "@/app/components/DashboardLayout";
 import CustomEdge from "@/app/components/playground/CustomEdge";
 import { axiosInstance } from "@/utils/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
 import { Loader } from "@/app/components/Loader";
+import { useAddNode } from "@/utils/playground-api";
+import { toast } from "sonner";
+import { axiosError } from "@/types/axiosTypes";
+import AttributesDialog from "@/app/components/playground/AttributesDialog";
 
 const ReactFlow = dynamic(
   () => import("@xyflow/react").then((mod) => mod.ReactFlow),
   { ssr: false }
 );
 
-const initialNodes: Node[] = [
-  {
-    id: "1",
-    type: "startNode",
-    data: { label: "Start Point", message: "" },
-    position: { x: 10, y: 200 },
-  },
-  {
-    id: "2",
-    type: "defaultNode",
-    data: { label: "Default Response", message: "" },
-    position: { x: 230, y: 390 },
-  },
-  {
-    id: "3",
-    type: "botResponseNode",
-    data: {
-      label: "Bot Response",
-      message: "Welcome message",
-    },
-    position: { x: 230, y: 10 },
-  },
-  {
-    id: "4",
-    type: "aiAssistNode",
-    data: { label: "AI Assist", message: "Welcome message" },
-    position: { x: 230, y: 200 },
-  },
-];
-const initialEdges: Edge[] = [
-  { id: "1-2", source: "1", target: "2", type: "customEdge" },
-  { id: "1-3", source: "1", target: "3", type: "customEdge" },
-  { id: "1-4", source: "1", target: "4", type: "customEdge" },
-];
+// const initialNodes: Node[] = [
+//   {
+//     id: "1",
+//     type: "startNode",
+//     data: { label: "Start Point", message: "" },
+//     position: { x: 10, y: 200 },
+//   },
+//   {
+//     id: "2",
+//     type: "defaultNode",
+//     data: { label: "Default Response", message: "" },
+//     position: { x: 230, y: 390 },
+//   },
+//   {
+//     id: "3",
+//     type: "botResponseNode",
+//     data: {
+//       label: "Bot Response",
+//       message: "Welcome message",
+//     },
+//     position: { x: 230, y: 10 },
+//   },
+//   {
+//     id: "4",
+//     type: "aiAssistNode",
+//     data: { label: "AI Assist", message: "Welcome message" },
+//     position: { x: 230, y: 200 },
+//   },
+// ];
+// const initialEdges: Edge[] = [
+//   { id: "1-2", source: "1", target: "2", type: "customEdge" },
+//   { id: "1-3", source: "1", target: "3", type: "customEdge" },
+//   { id: "1-4", source: "1", target: "4", type: "customEdge" },
+// ];
 
-let idCounter = 5;
-const getId = () => `${idCounter++}`;
+// let idCounter = 5;
+// const getId = () => `${idCounter++}`;
+
 type FetchPlaygroundResponse = {
   statusCode: number;
   data: {
@@ -106,8 +111,8 @@ type FetchPlaygroundResponse = {
       nodes: {
         id: string;
         type: string;
-        name: string;
-        isDelete: boolean;
+        data: { label: string; message: string; isDelete: boolean };
+        position: { x: number; y: number };
       }[];
       edges: {
         id: string;
@@ -134,18 +139,57 @@ const MainComponent = ({ botId }: { botId: string }) => {
     data: playgroundData,
     isLoading: loadPlayground,
     isError: errorInPlayground,
-    // refetch: refetchPlayground,
+    refetch: refetchPlayground,
   } = useQuery({
     queryKey: ["playGround"],
     queryFn: fetchInitialPlayground,
   });
 
-  const { actionDialog, actionHandler, setActionDialog } = usePlayground();
+  const {
+    mutate: onAddNode,
+    isPending: pendingAddNode,
+    // data: updatedPlaygroundData,
+  } = useAddNode({
+    onSuccess(data) {
+      const updatedPlaygroundData = data?.data;
+      if (
+        updatedPlaygroundData &&
+        updatedPlaygroundData?.diagram &&
+        updatedPlaygroundData?.diagram.nodes &&
+        updatedPlaygroundData?.diagram.edges
+      ) {
+        const nnn = updatedPlaygroundData?.diagram.nodes;
+        const eee = updatedPlaygroundData?.diagram.edges;
+
+        const nodesKp = nnn.map((node) => ({
+          id: node.id,
+          type: node.type,
+          position: node.position,
+          data: node.data,
+        }));
+        setNodes(nodesKp);
+        setEdges(eee);
+      }
+
+      toast.success(data?.message);
+    },
+
+    onError(error: axiosError) {
+      const errorMessage =
+        error?.response?.data?.errors?.message ||
+        error?.response?.data?.message ||
+        "failed to add";
+      toast.error(errorMessage);
+    },
+  });
+
+  const [actionDialog, setActionDialog] = useState(false);
   const [aiSection, setAiSection] = useState(false);
   const [chatBotDialog, setChatBotDialog] = useState(false);
   const [attributesDialog, setAttributesDialog] = useState(false);
   const { screenToFlowPosition } = useReactFlow();
-  const { type, label } = usePlayground();
+  // const { type, label } = usePlayground();
+  const { type, reFetch, notConnectableNode, isPageLoader } = usePlayground();
   const { width: screenWidth } = useWindowDimensions();
   const nodeTypes = useMemo(
     () => ({
@@ -160,14 +204,15 @@ const MainComponent = ({ botId }: { botId: string }) => {
       questionNode: QuestionNode,
       successNode: SuccessNode,
       failureNode: FailureNode,
+      defaultBotResponseNode: DefaultBotResponseNode,
     }),
     []
   );
 
   const edgeTypes = useMemo(() => ({ customEdge: CustomEdge }), []);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState([] as Node[]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([] as Edge[]);
 
   useEffect(() => {
     if (
@@ -176,12 +221,23 @@ const MainComponent = ({ botId }: { botId: string }) => {
       playgroundData?.diagram.nodes &&
       playgroundData?.diagram.edges
     ) {
-      const nnn = playgroundData?.diagram.nodes;
-      const eee = playgroundData?.diagram.edges;
-      console.log("nodes", nnn);
-      console.log("edges", eee);
+      const updatedNodes = playgroundData?.diagram.nodes;
+      const updatedEdges = playgroundData?.diagram.edges;
+
+      const nodesKp = updatedNodes.map((node) => ({
+        id: node.id,
+        type: node.type,
+        position: node.position,
+        data: node.data,
+      }));
+      setNodes(nodesKp);
+      setEdges(updatedEdges);
     }
-  }, [playgroundData]);
+  }, [playgroundData, setEdges, setNodes]);
+
+  useEffect(() => {
+    refetchPlayground();
+  }, [reFetch, refetchPlayground]);
 
   const SNAP_MARGIN = 70;
   const isNearRightEdge = useCallback(
@@ -239,20 +295,6 @@ const MainComponent = ({ botId }: { botId: string }) => {
     []
   );
 
-  const notConnectableNode = useMemo(
-    () => [
-      "aiAssistNode",
-      "startNode",
-      "defaultNode",
-      "goToStepNode",
-      "faqNode",
-      "closeChatNode",
-      "successNode",
-      "failureNode",
-    ],
-    []
-  );
-
   const onDragOver = useCallback(
     (event: React.DragEvent): void => {
       setActionDialog(false);
@@ -267,7 +309,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
       nodes.forEach((existingNode) => {
         const isNear = isNearRightEdge(position, existingNode);
         const hasSourceHandle = !notConnectableNode.includes(
-          existingNode.type || ""
+          existingNode!.type || ""
         );
 
         if (hasSourceHandle) {
@@ -355,97 +397,117 @@ const MainComponent = ({ botId }: { botId: string }) => {
       ) {
         nodes.forEach((node) => highlightDroppableArea(node.id, false, ""));
         return;
-      }
-      if (connectedNode) {
+      } else if (connectedNode) {
         const positionY = connectedNode?.position?.y ?? position.y;
 
-        const newNode: Node = {
-          id: getId(),
-          type,
-          position: {
-            x: position.x + 100,
-            y: positionY,
+        // const newNode: Node = {
+        //   id: getId(),
+        //   type,
+        //   position: {
+        //     x: position.x + 100,
+        //     y: positionY,
+        //   },
+        //   data: { label, message: "" },
+        // };
+        onAddNode({
+          chatbotId: botId,
+          parentNodeId: connectedNode.id,
+          details: {
+            type,
+            nodeData: {
+              message: "",
+              position: {
+                x: position.x + 100,
+                y:
+                  type === "userInputNode" || type === "faqNode"
+                    ? positionY - 7
+                    : connectedNode.type === "userInputNode" ||
+                      connectedNode.type === "faqNode"
+                    ? positionY + 7
+                    : positionY,
+              },
+            },
           },
-          data: { label, message: "" },
-        };
-        const overlappingNode = nodes.find((node) => {
-          const distance = Math.hypot(
-            node.position.x - newNode.position.x,
-            node.position.y - newNode.position.y
-          );
-          return distance < 200;
         });
 
-        if (overlappingNode) {
-          newNode.position.x += 10;
-          newNode.position.y += 100;
-        }
+        // const overlappingNode = nodes.find((node) => {
+        //   const distance = Math.hypot(
+        //     node.position.x - newNode.position.x,
+        //     node.position.y - newNode.position.y
+        //   );
+        //   return distance < 200;
+        // });
 
-        const newNodes = [newNode];
+        // if (overlappingNode) {
+        //   newNode.position.x += 10;
+        //   newNode.position.y += 100;
+        // }
 
-        if (type === "questionNode") {
-          const successNode: Node = {
-            id: getId(),
-            type: "successNode",
-            position: { x: position.x + 300, y: positionY - 100 },
-            data: { label: "Success", message: "" },
-          };
+        // const newNodes = [newNode];
 
-          const failureNode: Node = {
-            id: getId(),
-            type: "failureNode",
-            position: { x: position.x + 300, y: positionY + 100 },
-            data: { label: "Failure", message: "" },
-          };
+        // if (type === "questionNode") {
+        //   const successNode: Node = {
+        //     id: getId(),
+        //     type: "successNode",
+        //     position: { x: position.x + 300, y: positionY - 100 },
+        //     data: { label: "Success", message: "" },
+        //   };
 
-          newNodes.push(successNode, failureNode);
+        //   const failureNode: Node = {
+        //     id: getId(),
+        //     type: "failureNode",
+        //     position: { x: position.x + 300, y: positionY + 100 },
+        //     data: { label: "Failure", message: "" },
+        //   };
 
-          setEdges((eds) => [
-            ...eds,
-            {
-              id: `${newNode.id}-${successNode.id}`,
-              source: newNode.id,
-              target: successNode.id,
-              type: "customEdge",
-            },
-            {
-              id: `edge-${newNode.id}-${failureNode.id}`,
-              source: newNode.id,
-              target: failureNode.id,
-              type: "customEdge",
-            },
-          ]);
-        } else if (type === "userInputNode") {
-          const botResponseNode: Node = {
-            id: getId(),
-            type: "botResponseNode",
-            position: { x: position.x + 250, y: positionY },
-            data: { label: "Bot Response", message: "" },
-          };
+        //   newNodes.push(successNode, failureNode);
 
-          newNodes.push(botResponseNode);
+        //   setEdges((eds) => [
+        //     ...eds,
+        //     {
+        //       id: `${newNode.id}-${successNode.id}`,
+        //       source: newNode.id,
+        //       target: successNode.id,
+        //       type: "customEdge",
+        //     },
+        //     {
+        //       id: `edge-${newNode.id}-${failureNode.id}`,
+        //       source: newNode.id,
+        //       target: failureNode.id,
+        //       type: "customEdge",
+        //     },
+        //   ]);
+        // } else if (type === "userInputNode") {
+        //   const botResponseNode: Node = {
+        //     id: getId(),
+        //     type: "botResponseNode",
+        //     position: { x: position.x + 250, y: positionY },
+        //     data: { label: "Bot Response", message: "" },
+        //   };
 
-          setEdges((eds) => [
-            ...eds,
-            {
-              id: `${newNode.id}-${botResponseNode.id}`,
-              source: newNode.id,
-              target: botResponseNode.id,
-              type: "customEdge",
-            },
-          ]);
-        }
-        setNodes((nds) => [...nds, ...newNodes]);
+        //   newNodes.push(botResponseNode);
 
-        setEdges((eds) => [
-          ...eds,
-          {
-            id: `${connectedNode.id}-${newNode.id}`,
-            source: connectedNode.id,
-            target: newNode.id,
-            type: "customEdge",
-          },
-        ]);
+        //   setEdges((eds) => [
+        //     ...eds,
+        //     {
+        //       id: `${newNode.id}-${botResponseNode.id}`,
+        //       source: newNode.id,
+        //       target: botResponseNode.id,
+        //       type: "customEdge",
+        //     },
+        //   ]);
+        // }
+        // setNodes((nds) => [...nds, ...newNodes]);
+
+        // setEdges((eds) => [
+        //   ...eds,
+        //   {
+        //     id: `${connectedNode.id}-${newNode.id}`,
+        //     source: connectedNode.id,
+        //     target: newNode.id,
+        //     type: "customEdge",
+        //   },
+        // ]);
       }
 
       nodes.forEach((node) => highlightDroppableArea(node.id, false, ""));
@@ -458,9 +520,8 @@ const MainComponent = ({ botId }: { botId: string }) => {
       isNearRightEdge,
       notConnectableNode,
       highlightDroppableArea,
-      label,
-      setNodes,
-      setEdges,
+      onAddNode,
+      botId,
     ]
   );
 
@@ -487,6 +548,15 @@ const MainComponent = ({ botId }: { botId: string }) => {
       setAttributesDialog(false);
     }
   };
+  const actionHandler = () => {
+    if (actionDialog) {
+      setChatBotDialog(false);
+      setAttributesDialog(false);
+      setActionDialog(false);
+    } else {
+      setActionDialog(true);
+    }
+  };
   const attributesHandler = () => {
     if (attributesDialog) {
       setAttributesDialog(false);
@@ -496,16 +566,9 @@ const MainComponent = ({ botId }: { botId: string }) => {
       setAttributesDialog(true);
     }
   };
-  useEffect(() => {
-    if (actionDialog) {
-      setChatBotDialog(false);
-      setAttributesDialog(false);
-    }
-  }, [actionDialog, chatBotDialog]);
-
   return (
     <DashboardLayout>
-      {loadPlayground && <Loader />}
+      {(loadPlayground || pendingAddNode || isPageLoader) && <Loader />}
       {aiSection ? (
         <div className="p-4 sm:p-6 flex flex-1 flex-col relative ">
           <AIKnowledge setAiSection={setAiSection} />
@@ -645,10 +708,11 @@ const MainComponent = ({ botId }: { botId: string }) => {
               onConnect={onConnect}
               nodeTypes={nodeTypes}
               edgeTypes={edgeTypes}
-              // nodesDraggable={false}
+              nodesDraggable={false}
               fitView={screenWidth < 768 ? true : false}
               defaultViewport={{ x: 0, y: 200, zoom: 1 }}
               className="bg-[#F6F6F6]"
+              proOptions={{ hideAttribution: true }}
             >
               <Controls showFitView />
             </ReactFlow>
@@ -656,7 +720,11 @@ const MainComponent = ({ botId }: { botId: string }) => {
           {actionDialog && <ActionDialog actionHandler={actionHandler} />}
           {chatBotDialog && <ChatBotDialog chatBotHandler={chatBotHandler} />}
           {attributesDialog && (
-            <AttributesDialog attributesHandler={attributesHandler} />
+            <AttributesDialog
+              attributesHandler={attributesHandler}
+              chatbotId={botId}
+              attributeDialog={attributesDialog}
+            />
           )}
         </div>
       )}
@@ -672,151 +740,3 @@ export default function Main({ params }: { params: { id: string } }) {
     </ReactFlowProvider>
   );
 }
-
-// const onDrop = useCallback(
-//   (event: React.DragEvent): void => {
-//     setActionDialog(true);
-//     event.preventDefault();
-//     if (!type) return;
-
-//     const position = screenToFlowPosition({
-//       x: event.clientX,
-//       y: event.clientY,
-//     });
-
-//     let connectedNode: Node | null = null;
-
-//     nodes.forEach((existingNode) => {
-//       const isNear = isNearRightEdge(position, existingNode);
-//       const hasSourceHandle = !notConnectableNode.includes(
-//         existingNode.type || ""
-//       );
-
-//       if (isNear && hasSourceHandle) {
-//         connectedNode = existingNode;
-//       }
-//     });
-
-//     if (
-//       connectedNode &&
-//       (connectedNode as Node).type &&
-//       (((type === "goToStepNode" ||
-//         type === "faqNode" ||
-//         type === "closeChatNode" ||
-//         type === "userInputNode") &&
-//         (connectedNode as Node).type !== "botResponseNode") ||
-//         (type === "questionNode" &&
-//           (connectedNode as Node).type !== "botResponseNode" &&
-//           (connectedNode as Node).type !== "userInputNode"))
-//     ) {
-//       nodes.forEach((node) => highlightDroppableArea(node.id, false, ""));
-//       return;
-//     }
-
-//     if (connectedNode) {
-//       const positionY = (connectedNode as Node).position?.y ?? position.y;
-
-//       const newNode: Node = {
-//         id: getId(),
-//         type,
-//         position: {
-//           x: position.x + 100,
-//           y: positionY,
-//         },
-//         data: { label: label, message: "" },
-//       };
-
-//       const overlappingNode = nodes.find((node) => {
-//         const distance = Math.sqrt(
-//           Math.pow(node.position.x - newNode.position.x, 2) +
-//             Math.pow(node.position.y - newNode.position.y, 2)
-//         );
-//         return distance < 200;
-//       });
-
-//       if (overlappingNode) {
-//         newNode.position.x += 0;
-//         newNode.position.y += 100;
-//       }
-
-//       setNodes((nds) => [...nds, newNode]);
-
-//       if (type === "questionNode") {
-//         const successNode: Node = {
-//           id: getId(),
-//           type: "successNode",
-//           position: { x: position.x + 270, y: positionY - 100 },
-//           data: { label: "Success", message: "" },
-//         };
-
-//         const failureNode: Node = {
-//           id: getId(),
-//           type: "failureNode",
-//           position: { x: position.x + 270, y: positionY + 100 },
-//           data: { label: "Failure", message: "" },
-//         };
-
-//         setNodes((nds) => [...nds, successNode, failureNode]);
-
-//         setEdges((eds) => [
-//           ...eds,
-//           {
-//             id: `edge-${newNode.id}-${successNode.id}`,
-//             source: newNode.id,
-//             target: successNode.id,
-//             type: "customEdge",
-//           },
-//           {
-//             id: `edge-${newNode.id}-${failureNode.id}`,
-//             source: newNode.id,
-//             target: failureNode.id,
-//             type: "customEdge",
-//           },
-//         ]);
-//       } else if (type === "userInputNode") {
-//         const botResponseNode: Node = {
-//           id: getId(),
-//           type: "botResponseNode",
-//           position: { x: position.x + 250, y: positionY },
-//           data: { label: "Bot Response", message: "" },
-//         };
-
-//         setNodes((nds) => [...nds, botResponseNode]);
-
-//         setEdges((eds) => [
-//           ...eds,
-//           {
-//             id: `edge-${newNode.id}-${botResponseNode.id}`,
-//             source: newNode.id,
-//             target: botResponseNode.id,
-//             type: "customEdge",
-//           },
-//         ]);
-//       }
-
-//       setEdges((eds) => [
-//         ...eds,
-//         {
-//           id: `edge-${connectedNode?.id}-${newNode.id}`,
-//           source: connectedNode?.id ?? "",
-//           target: newNode.id,
-//           type: "customEdge",
-//         },
-//       ]);
-//     }
-
-//     nodes.forEach((node) => highlightDroppableArea(node.id, false, ""));
-//   },
-//   [
-//     setActionDialog,
-//     type,
-//     screenToFlowPosition,
-//     label,
-//     nodes,
-//     isNearRightEdge,
-//     notConnectableNode,
-//     setNodes,
-//     setEdges,
-//     highlightDroppableArea,
-//   ]
-// );

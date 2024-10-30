@@ -1,52 +1,207 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useQuery } from "@tanstack/react-query";
 import React, { useEffect, useRef, useState } from "react";
 import { BiEditAlt } from "react-icons/bi";
 import { FaPlus } from "react-icons/fa";
 import { IoCloseOutline } from "react-icons/io5";
 import { RiDeleteBinLine } from "react-icons/ri";
+import { Loader } from "../Loader";
+import { toast } from "sonner";
+import { axiosInstance } from "@/utils/axiosInstance";
+import {
+  useAddAttributes,
+  useDeleteAttribute,
+  useUpdateAttributes,
+} from "@/utils/attributes-api";
+import { axiosError } from "@/types/axiosTypes";
+import { ToSnakeCase } from "@/utils/text-conveter";
 
-interface AttributesDialogProps {
-  attributesHandler: () => void;
+interface Attribute {
+  _id: string;
+  chatbotId: string;
+  name: string;
+  alias: string;
+  value: string;
+  __v: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
-const AttributesDialog: React.FC<AttributesDialogProps> = ({
+interface FetchAttributesResponse {
+  statusCode: number;
+  data: Attribute[];
+  message: string;
+  success: boolean;
+}
+
+const AttributesDialog = ({
   attributesHandler,
+  chatbotId,
+  attributeDialog,
+}: {
+  attributesHandler: () => void;
+  chatbotId: string;
+  attributeDialog: boolean;
 }) => {
   const [tab, setTab] = useState(0);
-  const [title, setTitle] = useState<string>("");
+  const [name, setName] = useState<string>("");
   const [value, setValue] = useState<string>("");
-  const titleInputRef = useRef<HTMLInputElement>(null);
-  const attributeList = [
-    { title: "Title1", value: "value1" },
-    { title: "Title2", value: "value2" },
-    { title: "Title3", value: "value3" },
-  ];
+  const [originalName, setOriginalName] = useState<string>("");
+  const [originalValue, setOriginalValue] = useState<string>("");
+  const [editId, setEditId] = useState<string>("");
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const [attributeList, setAttributeList] = useState<Attribute[]>([]);
 
   useEffect(() => {
     if (tab === 0) {
-      setTitle("");
+      setName("");
       setValue("");
+      setEditId("");
+      setOriginalName("");
+      setOriginalValue("");
     }
   }, [tab]);
-
+  const { mutate: onAddAttributes, isPending: isAddPending } = useAddAttributes(
+    {
+      onSuccess(data) {
+        setAttributeList(data?.data);
+        setName("");
+        setValue("");
+        setEditId("");
+        setOriginalName("");
+        setOriginalValue("");
+        toast.success(data?.message);
+      },
+      onError(error: axiosError) {
+        const errorMessage =
+          error?.response?.data?.errors?.message ||
+          error?.response?.data?.message ||
+          "add attributes failed";
+        toast.error(errorMessage);
+      },
+    }
+  );
+  const { mutate: onUpdateAttributes, isPending: isUpdatePending } =
+    useUpdateAttributes({
+      onSuccess(data) {
+        setAttributeList(data?.data);
+        setOriginalName(name);
+        setOriginalValue(value);
+        toast.success(data?.message);
+      },
+      onError(error: axiosError) {
+        const errorMessage =
+          error?.response?.data?.errors?.message ||
+          error?.response?.data?.message ||
+          "update attributes failed";
+        toast.error(errorMessage);
+      },
+    });
   const handleSave = () => {
-    console.log("Saved value:", title, value);
-    // Implement save logic
+    if (!name) {
+      toast.warning("Please enter name");
+    } else if (!value) {
+      toast.warning("Please enter value");
+    } else {
+      onAddAttributes({
+        chatbotId: chatbotId,
+        details: {
+          attributes: [
+            {
+              name: name,
+              alias: ToSnakeCase(name),
+              value: value,
+            },
+          ],
+        },
+      });
+    }
   };
   const handleEditClick = () => {
-    titleInputRef.current?.focus();
+    nameInputRef.current?.focus();
+  };
+  const handleUpdate = (attributeId: string) => {
+    if (!name) {
+      toast.warning("Please enter name");
+    } else if (!value) {
+      toast.warning("Please enter value");
+    } else {
+      if (originalName !== name || originalValue !== value) {
+        onUpdateAttributes({
+          chatbotId: chatbotId,
+          attributeId: attributeId,
+          details: {
+            name: name,
+            alias: ToSnakeCase(name),
+            value: value,
+          },
+        });
+      }
+    }
+  };
+  const fetchAttributesHandler = async () => {
+    const response: FetchAttributesResponse = await axiosInstance.get(
+      `/chatbot/${chatbotId}/attributes`
+    );
+    if (response.success) {
+      setAttributeList(response.data);
+      return response.data;
+    } else {
+      setAttributeList([]);
+      return [];
+    }
+  };
+
+  const {
+    // data: fetchAttributes,
+    isLoading: loadFetchAttributes,
+    isError: errorInFetchAttributes,
+  } = useQuery({
+    queryKey: ["Attributes"],
+    queryFn: fetchAttributesHandler,
+    enabled: attributeDialog === true ? true : false,
+  });
+  useEffect(() => {
+    if (errorInFetchAttributes) {
+      toast.error("failed to fetch attributes");
+    }
+  }, [errorInFetchAttributes]);
+  const { mutate: onDeleteAttribute, isPending: isPendingDelete } =
+    useDeleteAttribute({
+      onSuccess(data) {
+        setTab(0);
+        setAttributeList(data?.data);
+        toast.success(data?.message);
+      },
+      onError(error: axiosError) {
+        const errorMessage =
+          error?.response?.data?.errors?.message ||
+          error?.response?.data?.message ||
+          "delete attributes failed";
+        toast.error(errorMessage);
+      },
+    });
+  const handleDelete = (attributeId: string) => {
+    onDeleteAttribute({
+      chatbotId: chatbotId,
+      attributeId: attributeId,
+    });
   };
   return (
     <div
-      className="absolute md:right-6 top-32 min-[699px]:top-20 px-4 pb-4 sm:px-6 sm:pb-4 pt-2 sm:pt-3 w-[-webkit-fill-available]  bg-[#F8F8F8] md:w-[600px] min-[870px]:w-[700px] h-auto md:h-[70vh] mx-6 md:mx-0 rounded-lg overflow-hidden"
+      className="absolute md:right-6 top-32 min-[699px]:top-20 px-4 pb-4 sm:px-6 sm:pb-4 pt-2 sm:pt-3 w-[-webkit-fill-available] bg-[#F8F8F8] md:w-[600px] min-[870px]:w-[700px] h-auto md:h-[70vh] mx-6 md:mx-0 rounded-lg overflow-hidden"
       style={{ boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)" }}
     >
+      {(loadFetchAttributes ||
+        isAddPending ||
+        isUpdatePending ||
+        isPendingDelete) && <Loader />}
       <div className="flex items-center justify-between mb-1 md:mb-3 ">
-        <div> </div>
+        <div></div>
         <div className="text-primary font-medium text-lg">Attributes</div>
         <IoCloseOutline
-          className="text-2xl cursor-pointer  "
+          className="text-2xl cursor-pointer"
           onClick={() => attributesHandler()}
           aria-label="Close dialog"
         />
@@ -64,9 +219,9 @@ const AttributesDialog: React.FC<AttributesDialogProps> = ({
                   Title
                 </label>
                 <Input
-                  id="title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   placeholder="Add title"
                   className="mt-2 p-5 text-[#1E255EB2] bg-white flex-1 border-[#EFEFEF] rounded focus-visible:ring-0 placeholder:text-sm w-full"
                 />
@@ -97,10 +252,12 @@ const AttributesDialog: React.FC<AttributesDialogProps> = ({
             <div>
               <div className="flex items-center justify-between">
                 <Input
-                  id="title"
-                  value={title}
-                  ref={titleInputRef}
-                  onChange={(e) => setTitle(e.target.value)}
+                  id="name"
+                  value={name}
+                  ref={nameInputRef}
+                  onChange={(e) => setName(e.target.value)}
+                  onBlur={() => handleUpdate(editId)}
+                  onKeyDown={(e) => e.key === "Enter" && handleUpdate(editId)}
                   placeholder="Add title"
                   className="p-0 max-w-[200px] !shadow-none text-primary font-medium text-lg bg-transparent !w-fit border-none rounded focus-visible:px-2 placeholder:text-sm"
                 />
@@ -114,7 +271,10 @@ const AttributesDialog: React.FC<AttributesDialogProps> = ({
                       Rename
                     </span>
                   </div>
-                  <div className="bg-white p-2 rounded cursor-pointer flex items-center gap-1">
+                  <div
+                    className="bg-white p-2 rounded cursor-pointer flex items-center gap-1"
+                    onClick={() => handleDelete(editId)}
+                  >
                     <RiDeleteBinLine className="text-[#FF0000]" />
                     <span className="text-sm hidden md:block font-normal text-[#FF0000]">
                       Delete
@@ -134,6 +294,9 @@ const AttributesDialog: React.FC<AttributesDialogProps> = ({
                   value={value}
                   onChange={(e) => setValue(e.target.value)}
                   placeholder="Add value"
+                  onBlur={() => handleUpdate(editId)}
+                  onKeyDown={(e) => e.key === "Enter" && handleUpdate(editId)}
+                  onClick={(e) => e.stopPropagation()}
                   className="mt-2 p-5 text-[#1E255EB2] bg-white flex-1 border-[#EFEFEF] rounded focus-visible:ring-0 placeholder:text-sm w-full"
                 />
               </div>
@@ -142,32 +305,34 @@ const AttributesDialog: React.FC<AttributesDialogProps> = ({
         </div>
 
         <div
-          className="w-full md:w-2/6 h-auto md:h-[55vh] p-5 bg-white rounded-xl flex flex-col gap-4"
+          className="w-full md:w-2/6 h-auto max-[768px]:max-h-[30vh]  md:h-[55vh] p-5 bg-white rounded-xl flex flex-col gap-3"
           style={{ boxShadow: "1px 0px 8px 2px #00000014" }}
         >
-          <div className="flex flex-col gap-3">
-            {attributeList.map((item, index) => (
-              <span
-                key={index}
-                onClick={() => {
-                  setTab(1);
-                  setTitle(item.title);
-                  setValue(item.value);
-                }}
-                className="text-primary cursor-pointer font-normal text-sm"
-              >
-                {item.title}
-              </span>
-            ))}
-            <div
-              className="flex items-center cursor-pointer gap-2"
-              onClick={() => setTab(0)}
-            >
-              <FaPlus className="text-[#7A7A7A]" />
-              <span className="text-[#7A7A7A] font-normal text-sm">
-                Add new
-              </span>
-            </div>
+          <div className="flex flex-col  overflow-auto gap-3">
+            {attributeList &&
+              attributeList.map((item, index) => (
+                <span
+                  key={index}
+                  onClick={() => {
+                    setTab(1);
+                    setName(item.name);
+                    setOriginalName(item.name);
+                    setOriginalValue(item.value);
+                    setValue(item.value);
+                    setEditId(item._id);
+                  }}
+                  className="text-primary cursor-pointer font-normal text-sm opacity-80 hover:opacity-100"
+                >
+                  {item.name}
+                </span>
+              ))}
+          </div>
+          <div
+            className="flex items-center cursor-pointer gap-2 "
+            onClick={() => setTab(0)}
+          >
+            <FaPlus className="text-[#7A7A7A]" />
+            <span className="text-[#7A7A7A] font-normal text-sm">Add new</span>
           </div>
         </div>
       </div>

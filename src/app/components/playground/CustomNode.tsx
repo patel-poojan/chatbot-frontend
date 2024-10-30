@@ -1,16 +1,19 @@
+"use client";
 import { Position, useReactFlow } from "@xyflow/react";
 import CustomHandle from "./CustomHandle";
 import { GoHomeFill } from "react-icons/go";
 import { IoIosSend, IoMdAdd } from "react-icons/io";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
-import { usePlayground } from "./PlaygroundContext";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { MdCancel, MdCheckCircle, MdOutlineQuestionMark } from "react-icons/md";
+import AddNodePopup from "./AddNodePopup";
+import { usePlayground } from "./PlaygroundContext";
+import BotResponseDialog from "../BotResponseDialog";
 
 const NodeContainer = ({
   children,
@@ -40,13 +43,13 @@ export const StartNode = ({
 }: {
   data: { label: string; message: string; actionHandler: () => void };
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const { actionHandler } = usePlayground();
+  // const [isHovered, setIsHovered] = useState(false);
+  // const { actionHandler } = usePlayground();
   return (
     <div
       className="relative flex items-center gap-2"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      // onMouseEnter={() => setIsHovered(true)}
+      // onMouseLeave={() => setIsHovered(false)}
     >
       {data.message && (
         <span className="text-black text-xs opacity-70 w-[145px] text-center absolute -top-5 left-0">
@@ -61,7 +64,7 @@ export const StartNode = ({
         <span className="text-white text-sm">{data.label}</span>
         <CustomHandle type="source" position={Position.Right} />
       </NodeContainer>
-      {isHovered && (
+      {/* {isHovered && (
         <IoMdAdd
           className="bg-[#fff] rounded-full hover:text-[#1844F0] h-6 w-6 p-1 cursor-pointer"
           onClick={() => actionHandler()}
@@ -69,7 +72,7 @@ export const StartNode = ({
             boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)",
           }}
         />
-      )}
+      )} */}
     </div>
   );
 };
@@ -79,13 +82,13 @@ export const DefaultNode = ({
 }: {
   data: { label: string; message: string; actionHandler: () => void };
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const { actionHandler } = usePlayground();
+  // const [isHovered, setIsHovered] = useState(false);
+  // const { actionHandler } = usePlayground();
   return (
     <div
       className="relative flex items-center gap-2"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      // onMouseEnter={() => setIsHovered(true)}
+      // onMouseLeave={() => setIsHovered(false)}
     >
       {data.message && (
         <span className="text-black text-xs opacity-70 w-[152px] text-center absolute -top-5 left-0">
@@ -98,8 +101,9 @@ export const DefaultNode = ({
       >
         {data.label}
         <CustomHandle type="target" position={Position.Left} />
+        <CustomHandle type="source" position={Position.Right} />
       </NodeContainer>
-      {isHovered && (
+      {/* {isHovered && (
         <IoMdAdd
           onClick={() => actionHandler()}
           className="bg-[#fff] rounded-full hover:text-[#1844F0] h-6 w-6 p-1 cursor-pointer"
@@ -107,7 +111,7 @@ export const DefaultNode = ({
             boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)",
           }}
         />
-      )}
+      )} */}
     </div>
   );
 };
@@ -119,65 +123,21 @@ export const BotResponseNode = ({
   data: {
     label: string;
     message?: string;
-    actionHandler: () => void;
+    isDelete: boolean;
   };
   id: string;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const { actionHandler } = usePlayground();
-  const { setNodes, setEdges, getEdges } = useReactFlow();
-  const deleteNodeAndChildren = useCallback(
-    (nodeId: string) => {
-      const edges = getEdges();
-      const childEdges = edges.filter((edge) => edge.source === nodeId);
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const { getEdges, getNodes } = useReactFlow();
+  const { deleteNodeHandler } = usePlayground();
 
-      // Get the ids of the child nodes
-      const childNodeIds = childEdges.map((edge) => edge.target);
-
-      // Remove the child edges
-      setEdges((prevEdges) =>
-        prevEdges.filter((edge) => edge.source !== nodeId)
-      );
-
-      // Recursively delete all child nodes
-      childNodeIds.forEach((childId) => deleteNodeAndChildren(childId));
-
-      // Finally, remove this node
-
-      setNodes((nodes) => nodes.filter((node) => node.id !== nodeId));
-    },
-    [getEdges, setEdges, setNodes]
-  );
   const edges = getEdges();
-  const incomingEdge = edges.find((edge) => edge.target === id);
   const outgoingEdge = edges.find((edge) => edge.source === id);
-  const deleteNodeAndReconnect = useCallback(
-    (nodeId: string) => {
-      if (incomingEdge && outgoingEdge) {
-        // Create a new edge from the source of the incoming edge to the target of the outgoing edge
-        const newEdge = {
-          id: `edge-${incomingEdge.source}-${outgoingEdge.target}`,
-          source: incomingEdge.source,
-          target: outgoingEdge.target,
-          type: "customEdge", // Use your edge type
-        };
-
-        // Add the new edge
-        setEdges((prevEdges) => [...prevEdges, newEdge]);
-      }
-
-      // Remove the center node
-      setNodes((nodes) => nodes.filter((node) => node.id !== nodeId));
-
-      // Remove the edges related to the center node
-      setEdges((prevEdges) =>
-        prevEdges.filter(
-          (edge) => edge.source !== nodeId && edge.target !== nodeId
-        )
-      );
-    },
-    [incomingEdge, outgoingEdge, setEdges, setNodes]
-  );
+  const incomingEdge = edges.find((edge) => edge.target === id);
+  const nodes = getNodes();
+  const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
+  const currentNode = nodes.find((node) => node.id === id);
 
   return (
     <div
@@ -188,7 +148,7 @@ export const BotResponseNode = ({
       <div className="relative flex  flex-col items-center justify-center">
         <Popover>
           <PopoverTrigger>
-            {isHovered && id !== "3" ? (
+            {isHovered && data.isDelete ? (
               <div className="text-red-500 text-xs w-[145px]  text-center cursor-pointer absolute -top-4 left-0">
                 Delete
               </div>
@@ -203,12 +163,13 @@ export const BotResponseNode = ({
           <PopoverContent className="-mt-14  shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
               className="text-red-500 text-center text-xs cursor-pointer"
-              onClick={() => {
-                deleteNodeAndReconnect(id);
-              }}
-              // onClick={() => {
-              //   setNodes((nodes) => nodes.filter((node) => node.id !== id));
-              // }}
+              onClick={() =>
+                deleteNodeHandler(
+                  true,
+                  parentNode?.id ?? "",
+                  currentNode?.id ?? ""
+                )
+              }
             >
               Delete single block
             </span>
@@ -217,10 +178,15 @@ export const BotResponseNode = ({
               className={`${
                 outgoingEdge ? "text-red-500" : "text-red-100"
               } text-center text-xs ${
-                outgoingEdge ? "cursor-pointe" : "cursor-not-allowed"
+                outgoingEdge ? "cursor-pointer" : "cursor-not-allowed"
               } `}
               onClick={() => {
-                outgoingEdge && deleteNodeAndChildren(id);
+                outgoingEdge &&
+                  deleteNodeHandler(
+                    false,
+                    parentNode?.id ?? "",
+                    currentNode?.id ?? ""
+                  );
               }}
             >
               Delete with children
@@ -228,44 +194,85 @@ export const BotResponseNode = ({
           </PopoverContent>
         </Popover>
 
-        <NodeContainer
-          nodeCss="bg-white  w-[145px]"
-          shadow="0px 0px 12px 4px #00000014"
-        >
-          <IoIosSend className="text-black text-base " />
-          <span className="text-black text-sm">{data.label}</span>
-          <CustomHandle type="target" position={Position.Left} />
-          <CustomHandle type="source" position={Position.Right} />
-        </NodeContainer>
+        <BotResponseDialog
+          trigger={
+            <button>
+              <NodeContainer
+                nodeCss="bg-white  w-[145px]"
+                shadow="0px 0px 12px 4px #00000014"
+              >
+                <IoIosSend className="text-black text-base " />
+                <span className="text-black text-sm">{data.label}</span>
+                <CustomHandle type="target" position={Position.Left} />
+                <CustomHandle type="source" position={Position.Right} />
+              </NodeContainer>
+            </button>
+          }
+        />
       </div>
 
       {isHovered && (
         <IoMdAdd
-          onClick={() => {
-            actionHandler();
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsPopupVisible((prev) => !prev);
           }}
           className="bg-white text-black hover:text-[#1844F0] rounded-full h-6 w-6 p-1 cursor-pointer"
-          style={{
-            boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)",
-          }}
+          style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
+        />
+      )}
+      {isPopupVisible && (
+        <AddNodePopup
+          parentId={id}
+          isPopupVisible={isPopupVisible}
+          setIsPopupVisible={setIsPopupVisible}
+          position={currentNode?.position || { x: 0, y: 0 }}
+          parentType={currentNode?.type || ""}
         />
       )}
     </div>
   );
 };
+export const DefaultBotResponseNode = ({
+  data,
+}: {
+  data: {
+    label: string;
+    message?: string;
+    isDelete: boolean;
+  };
+}) => {
+  return (
+    <div className="flex items-center gap-2">
+      {data.message && (
+        <span className="text-black text-xs opacity-70 w-[145px] text-center absolute -top-5 left-0">
+          {data.message}
+        </span>
+      )}
 
+      <NodeContainer
+        nodeCss="bg-white  w-[145px]"
+        shadow="0px 0px 12px 4px #00000014"
+      >
+        <IoIosSend className="text-black text-base " />
+        <span className="text-black text-sm">{data.label}</span>
+        <CustomHandle type="target" position={Position.Left} />
+      </NodeContainer>
+    </div>
+  );
+};
 export const AiAssistNode = ({
   data,
 }: {
   data: { label: string; message: string; actionHandler: () => void };
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const { actionHandler } = usePlayground();
+  // const [isHovered, setIsHovered] = useState(false);
+  // const { actionHandler } = usePlayground();
   return (
     <div
       className="relative flex gap-2 items-center "
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      // onMouseEnter={() => setIsHovered(true)}
+      // onMouseLeave={() => setIsHovered(false)}
     >
       {data.message && (
         <span className="text-black text-xs opacity-70 w-[145px] text-center absolute -top-5 left-0">
@@ -286,42 +293,34 @@ export const AiAssistNode = ({
         <span className="text-white text-sm">{data.label}</span>
         <CustomHandle type="target" position={Position.Left} />
       </NodeContainer>
-      {isHovered && (
+      {/* {isHovered && (
         <IoMdAdd
           onClick={() => actionHandler()}
           className="bg-[#fff] hover:text-[#1844F0] rounded-full h-6 w-6 p-1 cursor-pointer"
           style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
         />
-      )}
+      )} */}
     </div>
   );
 };
+
 export const UserInputNode = ({
   data,
   id,
 }: {
-  data: { label: string; message: string; actionHandler: () => void };
+  data: { label: string; message: string; isDelete: boolean };
   id: string;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const { actionHandler } = usePlayground();
-  const { setNodes, setEdges, getEdges } = useReactFlow();
-  const deleteNodeAndChildren = useCallback(
-    (nodeId: string) => {
-      const edges = getEdges();
-      const childEdges = edges.filter((edge) => edge.source === nodeId);
-
-      const childNodeIds = childEdges.map((edge) => edge.target);
-
-      setEdges((prevEdges) =>
-        prevEdges.filter((edge) => edge.source !== nodeId)
-      );
-      childNodeIds.forEach((childId) => deleteNodeAndChildren(childId));
-
-      setNodes((nodes) => nodes.filter((node) => node.id !== nodeId));
-    },
-    [getEdges, setEdges, setNodes]
-  );
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const { getEdges, getNodes } = useReactFlow();
+  const { deleteNodeHandler } = usePlayground();
+  const edges = getEdges();
+  const outgoingEdge = edges.find((edge) => edge.source === id);
+  const incomingEdge = edges.find((edge) => edge.target === id);
+  const nodes = getNodes();
+  const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
+  const currentNode = nodes.find((node) => node.id === id);
   return (
     <div
       className="relative flex items-center gap-2"
@@ -333,7 +332,7 @@ export const UserInputNode = ({
       <div className="relative flex  flex-col items-center justify-center">
         <Popover>
           <PopoverTrigger>
-            {isHovered ? (
+            {isHovered && data.isDelete ? (
               <div className="text-red-500 text-xs w-14   text-center cursor-pointer absolute -top-[22px] left-0">
                 Delete
               </div>
@@ -345,20 +344,38 @@ export const UserInputNode = ({
               )
             )}
           </PopoverTrigger>
-          <PopoverContent className="-mt-[64px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
+          <PopoverContent className="-mt-[63px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
-              className="text-red-100 text-center text-xs cursor-no-drop"
-              // onClick={() => {
-              //   setNodes((nodes) => nodes.filter((node) => node.id !== id));
-              // }}
+              className={`${
+                !outgoingEdge ? "text-red-500" : "text-red-100"
+              } text-center text-xs ${
+                !outgoingEdge ? "cursor-pointer" : "cursor-not-allowed"
+              } `}
+              onClick={() => {
+                !outgoingEdge &&
+                  deleteNodeHandler(
+                    true,
+                    parentNode?.id ?? "",
+                    currentNode?.id ?? ""
+                  );
+              }}
             >
               Delete single block
             </span>
             <div className="h-px bg-gray-300 my-1" />
             <span
-              className="text-red-500 text-center text-xs cursor-pointer"
+              className={`${
+                outgoingEdge ? "text-red-500" : "text-red-100"
+              } text-center text-xs ${
+                outgoingEdge ? "cursor-pointer" : "cursor-not-allowed"
+              } `}
               onClick={() => {
-                deleteNodeAndChildren(id);
+                outgoingEdge &&
+                  deleteNodeHandler(
+                    false,
+                    parentNode?.id ?? "",
+                    currentNode?.id ?? ""
+                  );
               }}
             >
               Delete with children
@@ -385,14 +402,24 @@ export const UserInputNode = ({
       </div>
       {isHovered ? (
         <IoMdAdd
-          onClick={() => {
-            actionHandler();
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsPopupVisible((prev) => !prev);
           }}
           className="bg-[#fff] hover:text-[#1844F0] rounded-full h-6 w-6 p-1 cursor-pointer "
           style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
         />
       ) : (
         <></>
+      )}
+      {isPopupVisible && (
+        <AddNodePopup
+          parentId={id}
+          isPopupVisible={isPopupVisible}
+          setIsPopupVisible={setIsPopupVisible}
+          position={currentNode?.position || { x: 0, y: 0 }}
+          parentType={currentNode?.type || ""}
+        />
       )}
     </div>
   );
@@ -402,31 +429,19 @@ export const QuestionNode = ({
   data,
   id,
 }: {
-  data: { label: string; message: string; actionHandler: () => void };
+  data: { label: string; message: string; isDelete: boolean };
   id: string;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const { setNodes, setEdges, getEdges } = useReactFlow();
-  const deleteNodeAndChildren = useCallback(
-    (nodeId: string) => {
-      const edges = getEdges();
-      const childEdges = edges.filter((edge) => edge.source === nodeId);
-
-      // Get the ids of the child nodes
-      const childNodeIds = childEdges.map((edge) => edge.target);
-
-      // Remove the child edges
-      setEdges((prevEdges) =>
-        prevEdges.filter((edge) => edge.source !== nodeId)
-      );
-
-      // Recursively delete all child nodes
-      childNodeIds.forEach((childId) => deleteNodeAndChildren(childId));
-      setNodes((nodes) => nodes.filter((node) => node.id !== nodeId));
-    },
-    [getEdges, setEdges, setNodes]
-  );
-  const { actionHandler } = usePlayground();
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const { getEdges, getNodes } = useReactFlow();
+  const { deleteNodeHandler } = usePlayground();
+  const edges = getEdges();
+  const outgoingEdge = edges.find((edge) => edge.source === id);
+  const incomingEdge = edges.find((edge) => edge.target === id);
+  const nodes = getNodes();
+  const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
+  const currentNode = nodes.find((node) => node.id === id);
   return (
     <div
       className="relative flex items-center gap-2"
@@ -436,7 +451,7 @@ export const QuestionNode = ({
       <div className="relative flex  flex-col items-center justify-center">
         <Popover>
           <PopoverTrigger>
-            {isHovered ? (
+            {isHovered && data.isDelete ? (
               <div className="text-red-500 text-xs  w-[145px] text-center cursor-pointer absolute -top-4 left-0">
                 Delete
               </div>
@@ -450,18 +465,36 @@ export const QuestionNode = ({
           </PopoverTrigger>
           <PopoverContent className="-mt-14 -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
-              className="text-red-100 text-center text-xs cursor-no-drop"
-              // onClick={() => {
-              //   setNodes((nodes) => nodes.filter((node) => node.id !== id));
-              // }}
+              className={`${
+                !outgoingEdge ? "text-red-500" : "text-red-100"
+              } text-center text-xs ${
+                !outgoingEdge ? "cursor-pointer" : "cursor-not-allowed"
+              } `}
+              onClick={() => {
+                !outgoingEdge &&
+                  deleteNodeHandler(
+                    true,
+                    parentNode?.id ?? "",
+                    currentNode?.id ?? ""
+                  );
+              }}
             >
               Delete single block
             </span>
             <div className="h-px bg-gray-300 my-1" />
             <span
-              className="text-red-500 text-center text-xs cursor-pointer"
+              className={`${
+                outgoingEdge ? "text-red-500" : "text-red-100"
+              } text-center text-xs ${
+                outgoingEdge ? "cursor-pointer" : "cursor-not-allowed"
+              } `}
               onClick={() => {
-                deleteNodeAndChildren(id);
+                outgoingEdge &&
+                  deleteNodeHandler(
+                    false,
+                    parentNode?.id ?? "",
+                    currentNode?.id ?? ""
+                  );
               }}
             >
               Delete with children
@@ -480,9 +513,21 @@ export const QuestionNode = ({
       </div>
       {isHovered && (
         <IoMdAdd
-          onClick={() => actionHandler()}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsPopupVisible((prev) => !prev);
+          }}
           className="bg-[#fff] hover:text-[#1844F0] rounded-full h-6 w-6 p-1 cursor-pointer"
           style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
+        />
+      )}
+      {isPopupVisible && (
+        <AddNodePopup
+          parentId={id}
+          isPopupVisible={isPopupVisible}
+          setIsPopupVisible={setIsPopupVisible}
+          position={currentNode?.position || { x: 0, y: 0 }}
+          parentType={currentNode?.type || ""}
         />
       )}
     </div>
@@ -492,34 +537,19 @@ export const SuccessNode = ({
   data,
   id,
 }: {
-  data: { label: string; message: string; actionHandler: () => void };
+  data: { label: string; message: string; isDelete: boolean };
   id: string;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const { setNodes, setEdges, getEdges } = useReactFlow();
-  const deleteNodeAndChildren = useCallback(
-    (nodeId: string) => {
-      const edges = getEdges();
-      const childEdges = edges.filter((edge) => edge.source === nodeId);
-
-      // Get the ids of the child nodes
-      const childNodeIds = childEdges.map((edge) => edge.target);
-
-      // Remove the child edges
-      setEdges((prevEdges) =>
-        prevEdges.filter((edge) => edge.source !== nodeId)
-      );
-
-      // Recursively delete all child nodes
-      childNodeIds.forEach((childId) => deleteNodeAndChildren(childId));
-
-      // Finally, remove this node
-
-      setNodes((nodes) => nodes.filter((node) => node.id !== nodeId));
-    },
-    [getEdges, setEdges, setNodes]
-  );
-  const { actionHandler } = usePlayground();
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const { getEdges, getNodes } = useReactFlow();
+  const { deleteNodeHandler } = usePlayground();
+  const edges = getEdges();
+  const outgoingEdge = edges.find((edge) => edge.source === id);
+  const incomingEdge = edges.find((edge) => edge.target === id);
+  const nodes = getNodes();
+  const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
+  const currentNode = nodes.find((node) => node.id === id);
   return (
     <div
       className="relative flex items-center gap-2"
@@ -529,7 +559,7 @@ export const SuccessNode = ({
       <div className="relative flex  flex-col items-center justify-center">
         <Popover>
           <PopoverTrigger>
-            {isHovered ? (
+            {isHovered && data.isDelete ? (
               <div className="text-red-500 text-xs  w-[145px] text-center cursor-pointer absolute -top-4 left-0">
                 Delete
               </div>
@@ -543,19 +573,37 @@ export const SuccessNode = ({
           </PopoverTrigger>
           <PopoverContent className="-mt-14 -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
-              className="text-red-500 text-center text-xs cursor-pointer"
+              className={`${
+                !outgoingEdge ? "text-red-500" : "text-red-100"
+              } text-center text-xs ${
+                !outgoingEdge ? "cursor-pointer" : "cursor-not-allowed"
+              } `}
               onClick={() => {
-                setNodes((nodes) => nodes.filter((node) => node.id !== id));
+                !outgoingEdge &&
+                  deleteNodeHandler(
+                    true,
+                    parentNode?.id ?? "",
+                    currentNode?.id ?? ""
+                  );
               }}
             >
               Delete single block
             </span>
             <div className="h-px bg-gray-300 my-1" />
             <span
-              className="text-red-100 text-center text-xs cursor-no-drop"
-              // onClick={() => {
-              //   deleteNodeAndChildren(id);
-              // }}
+              className={`${
+                outgoingEdge ? "text-red-500" : "text-red-100"
+              } text-center text-xs ${
+                outgoingEdge ? "cursor-pointer" : "cursor-not-allowed"
+              } `}
+              onClick={() => {
+                outgoingEdge &&
+                  deleteNodeHandler(
+                    false,
+                    parentNode?.id ?? "",
+                    currentNode?.id ?? ""
+                  );
+              }}
             >
               Delete with children
             </span>
@@ -573,9 +621,21 @@ export const SuccessNode = ({
       </div>
       {isHovered && (
         <IoMdAdd
-          onClick={() => actionHandler()}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsPopupVisible((prev) => !prev);
+          }}
           className="bg-[#fff] hover:text-[#1844F0] rounded-full h-6 w-6 p-1 cursor-pointer"
           style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
+        />
+      )}
+      {isPopupVisible && (
+        <AddNodePopup
+          parentId={id}
+          isPopupVisible={isPopupVisible}
+          setIsPopupVisible={setIsPopupVisible}
+          position={currentNode?.position || { x: 0, y: 0 }}
+          parentType={currentNode?.type || ""}
         />
       )}
     </div>
@@ -585,34 +645,19 @@ export const FailureNode = ({
   data,
   id,
 }: {
-  data: { label: string; message: string; actionHandler: () => void };
+  data: { label: string; message: string; isDelete: boolean };
   id: string;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const { setNodes, setEdges, getEdges } = useReactFlow();
-  const deleteNodeAndChildren = useCallback(
-    (nodeId: string) => {
-      const edges = getEdges();
-      const childEdges = edges.filter((edge) => edge.source === nodeId);
-
-      // Get the ids of the child nodes
-      const childNodeIds = childEdges.map((edge) => edge.target);
-
-      // Remove the child edges
-      setEdges((prevEdges) =>
-        prevEdges.filter((edge) => edge.source !== nodeId)
-      );
-
-      // Recursively delete all child nodes
-      childNodeIds.forEach((childId) => deleteNodeAndChildren(childId));
-
-      // Finally, remove this node
-
-      setNodes((nodes) => nodes.filter((node) => node.id !== nodeId));
-    },
-    [getEdges, setEdges, setNodes]
-  );
-  const { actionHandler } = usePlayground();
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const { getEdges, getNodes } = useReactFlow();
+  const { deleteNodeHandler } = usePlayground();
+  const edges = getEdges();
+  const outgoingEdge = edges.find((edge) => edge.source === id);
+  const incomingEdge = edges.find((edge) => edge.target === id);
+  const nodes = getNodes();
+  const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
+  const currentNode = nodes.find((node) => node.id === id);
   return (
     <div
       className="relative flex items-center gap-2"
@@ -622,7 +667,7 @@ export const FailureNode = ({
       <div className="relative flex  flex-col items-center justify-center">
         <Popover>
           <PopoverTrigger>
-            {isHovered ? (
+            {isHovered && data.isDelete ? (
               <div className="text-red-500 text-xs  w-[145px] text-center cursor-pointer absolute -top-4 left-0">
                 Delete
               </div>
@@ -636,19 +681,37 @@ export const FailureNode = ({
           </PopoverTrigger>
           <PopoverContent className="-mt-14 -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
-              className="text-red-500 text-center text-xs cursor-pointer"
+              className={`${
+                !outgoingEdge ? "text-red-500" : "text-red-100"
+              } text-center text-xs ${
+                !outgoingEdge ? "cursor-pointer" : "cursor-not-allowed"
+              } `}
               onClick={() => {
-                setNodes((nodes) => nodes.filter((node) => node.id !== id));
+                !outgoingEdge &&
+                  deleteNodeHandler(
+                    true,
+                    parentNode?.id ?? "",
+                    currentNode?.id ?? ""
+                  );
               }}
             >
               Delete single block
             </span>
             <div className="h-px bg-gray-300 my-1" />
             <span
-              className="text-red-100 text-center text-xs cursor-no-drop"
-              // onClick={() => {
-              //   deleteNodeAndChildren(id);
-              // }}
+              className={`${
+                outgoingEdge ? "text-red-500" : "text-red-100"
+              } text-center text-xs ${
+                outgoingEdge ? "cursor-pointer" : "cursor-not-allowed"
+              } `}
+              onClick={() => {
+                outgoingEdge &&
+                  deleteNodeHandler(
+                    false,
+                    parentNode?.id ?? "",
+                    currentNode?.id ?? ""
+                  );
+              }}
             >
               Delete with children
             </span>
@@ -666,9 +729,21 @@ export const FailureNode = ({
       </div>
       {isHovered && (
         <IoMdAdd
-          onClick={() => actionHandler()}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsPopupVisible((prev) => !prev);
+          }}
           className="bg-[#fff] hover:text-[#1844F0] rounded-full h-6 w-6 p-1 cursor-pointer"
           style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
+        />
+      )}
+      {isPopupVisible && (
+        <AddNodePopup
+          parentId={id}
+          isPopupVisible={isPopupVisible}
+          setIsPopupVisible={setIsPopupVisible}
+          position={currentNode?.position || { x: 0, y: 0 }}
+          parentType={currentNode?.type || ""}
         />
       )}
     </div>
@@ -678,34 +753,19 @@ export const CloseChatNode = ({
   data,
   id,
 }: {
-  data: { label: string; message: string; actionHandler: () => void };
+  data: { label: string; message: string; isDelete: boolean };
   id: string;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const { setNodes, setEdges, getEdges } = useReactFlow();
-  const deleteNodeAndChildren = useCallback(
-    (nodeId: string) => {
-      const edges = getEdges();
-      const childEdges = edges.filter((edge) => edge.source === nodeId);
-
-      // Get the ids of the child nodes
-      const childNodeIds = childEdges.map((edge) => edge.target);
-
-      // Remove the child edges
-      setEdges((prevEdges) =>
-        prevEdges.filter((edge) => edge.source !== nodeId)
-      );
-
-      // Recursively delete all child nodes
-      childNodeIds.forEach((childId) => deleteNodeAndChildren(childId));
-
-      // Finally, remove this node
-
-      setNodes((nodes) => nodes.filter((node) => node.id !== nodeId));
-    },
-    [getEdges, setEdges, setNodes]
-  );
-  const { actionHandler } = usePlayground();
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const { getEdges, getNodes } = useReactFlow();
+  const { deleteNodeHandler } = usePlayground();
+  const edges = getEdges();
+  const outgoingEdge = edges.find((edge) => edge.source === id);
+  const incomingEdge = edges.find((edge) => edge.target === id);
+  const nodes = getNodes();
+  const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
+  const currentNode = nodes.find((node) => node.id === id);
   return (
     <div
       className="relative flex items-center gap-2"
@@ -715,7 +775,7 @@ export const CloseChatNode = ({
       <div className="relative flex  flex-col items-center justify-center">
         <Popover>
           <PopoverTrigger>
-            {isHovered ? (
+            {isHovered && data.isDelete ? (
               <div className="text-red-500 text-xs  w-[130px] text-center cursor-pointer absolute -top-4 left-0">
                 Delete
               </div>
@@ -729,19 +789,37 @@ export const CloseChatNode = ({
           </PopoverTrigger>
           <PopoverContent className="-mt-14 -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
-              className="text-red-500 text-center text-xs cursor-pointer"
+              className={`${
+                !outgoingEdge ? "text-red-500" : "text-red-100"
+              } text-center text-xs ${
+                !outgoingEdge ? "cursor-pointer" : "cursor-not-allowed"
+              } `}
               onClick={() => {
-                setNodes((nodes) => nodes.filter((node) => node.id !== id));
+                !outgoingEdge &&
+                  deleteNodeHandler(
+                    true,
+                    parentNode?.id ?? "",
+                    currentNode?.id ?? ""
+                  );
               }}
             >
               Delete single block
             </span>
             <div className="h-px bg-gray-300 my-1" />
             <span
-              className="text-red-100 text-center text-xs cursor-no-drop"
-              // onClick={() => {
-              //   deleteNodeAndChildren(id);
-              // }}
+              className={`${
+                outgoingEdge ? "text-red-500" : "text-red-100"
+              } text-center text-xs ${
+                outgoingEdge ? "cursor-pointer" : "cursor-not-allowed"
+              } `}
+              onClick={() => {
+                outgoingEdge &&
+                  deleteNodeHandler(
+                    false,
+                    parentNode?.id ?? "",
+                    currentNode?.id ?? ""
+                  );
+              }}
             >
               Delete with children
             </span>
@@ -764,9 +842,21 @@ export const CloseChatNode = ({
       </div>
       {isHovered && (
         <IoMdAdd
-          onClick={() => actionHandler()}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsPopupVisible((prev) => !prev);
+          }}
           className="bg-[#fff] hover:text-[#1844F0] rounded-full h-6 w-6 p-1 cursor-pointer"
           style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
+        />
+      )}
+      {isPopupVisible && (
+        <AddNodePopup
+          parentId={id}
+          isPopupVisible={isPopupVisible}
+          setIsPopupVisible={setIsPopupVisible}
+          position={currentNode?.position || { x: 0, y: 0 }}
+          parentType={currentNode?.type || ""}
         />
       )}
     </div>
@@ -777,34 +867,19 @@ export const FaqNode = ({
   data,
   id,
 }: {
-  data: { label: string; message: string; actionHandler: () => void };
+  data: { label: string; message: string; isDelete: boolean };
   id: string;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const { actionHandler } = usePlayground();
-  const { setNodes, setEdges, getEdges } = useReactFlow();
-  const deleteNodeAndChildren = useCallback(
-    (nodeId: string) => {
-      const edges = getEdges();
-      const childEdges = edges.filter((edge) => edge.source === nodeId);
-
-      // Get the ids of the child nodes
-      const childNodeIds = childEdges.map((edge) => edge.target);
-
-      // Remove the child edges
-      setEdges((prevEdges) =>
-        prevEdges.filter((edge) => edge.source !== nodeId)
-      );
-
-      // Recursively delete all child nodes
-      childNodeIds.forEach((childId) => deleteNodeAndChildren(childId));
-
-      // Finally, remove this node
-
-      setNodes((nodes) => nodes.filter((node) => node.id !== nodeId));
-    },
-    [getEdges, setEdges, setNodes]
-  );
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const { getEdges, getNodes } = useReactFlow();
+  const { deleteNodeHandler } = usePlayground();
+  const edges = getEdges();
+  const outgoingEdge = edges.find((edge) => edge.source === id);
+  const incomingEdge = edges.find((edge) => edge.target === id);
+  const nodes = getNodes();
+  const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
+  const currentNode = nodes.find((node) => node.id === id);
   return (
     <div
       className="relative flex items-center gap-2"
@@ -816,7 +891,7 @@ export const FaqNode = ({
       <div className="relative flex  flex-col items-center justify-center">
         <Popover>
           <PopoverTrigger>
-            {isHovered ? (
+            {isHovered && data.isDelete ? (
               <div className="text-red-500 text-xs w-14   text-center cursor-pointer absolute -top-[22px] left-0">
                 Delete
               </div>
@@ -828,21 +903,39 @@ export const FaqNode = ({
               )
             )}
           </PopoverTrigger>
-          <PopoverContent className="-mt-[64px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
+          <PopoverContent className="-mt-[63px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
-              className="text-red-500 text-center text-xs cursor-pointer"
+              className={`${
+                !outgoingEdge ? "text-red-500" : "text-red-100"
+              } text-center text-xs ${
+                !outgoingEdge ? "cursor-pointer" : "cursor-not-allowed"
+              } `}
               onClick={() => {
-                setNodes((nodes) => nodes.filter((node) => node.id !== id));
+                !outgoingEdge &&
+                  deleteNodeHandler(
+                    true,
+                    parentNode?.id ?? "",
+                    currentNode?.id ?? ""
+                  );
               }}
             >
               Delete single block
             </span>
             <div className="h-px bg-gray-300 my-1" />
             <span
-              className="text-red-100 text-center text-xs cursor-no-drop"
-              // onClick={() => {
-              //   deleteNodeAndChildren(id);
-              // }}
+              className={`${
+                outgoingEdge ? "text-red-500" : "text-red-100"
+              } text-center text-xs ${
+                outgoingEdge ? "cursor-pointer" : "cursor-not-allowed"
+              } `}
+              onClick={() => {
+                outgoingEdge &&
+                  deleteNodeHandler(
+                    false,
+                    parentNode?.id ?? "",
+                    currentNode?.id ?? ""
+                  );
+              }}
             >
               Delete with children
             </span>
@@ -868,12 +961,24 @@ export const FaqNode = ({
       </div>
       {isHovered ? (
         <IoMdAdd
-          onClick={() => actionHandler()}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsPopupVisible((prev) => !prev);
+          }}
           className="bg-[#fff] hover:text-[#1844F0] rounded-full h-6 w-6 p-1 cursor-pointer "
           style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
         />
       ) : (
         <></>
+      )}
+      {isPopupVisible && (
+        <AddNodePopup
+          parentId={id}
+          isPopupVisible={isPopupVisible}
+          setIsPopupVisible={setIsPopupVisible}
+          position={currentNode?.position || { x: 0, y: 0 }}
+          parentType={currentNode?.type || ""}
+        />
       )}
     </div>
   );
@@ -883,34 +988,19 @@ export const GoToStepNode = ({
   data,
   id,
 }: {
-  data: { label: string; message: string; actionHandler: () => void };
+  data: { label: string; message: string; isDelete: boolean };
   id: string;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const { setNodes, setEdges, getEdges } = useReactFlow();
-  const deleteNodeAndChildren = useCallback(
-    (nodeId: string) => {
-      const edges = getEdges();
-      const childEdges = edges.filter((edge) => edge.source === nodeId);
-
-      // Get the ids of the child nodes
-      const childNodeIds = childEdges.map((edge) => edge.target);
-
-      // Remove the child edges
-      setEdges((prevEdges) =>
-        prevEdges.filter((edge) => edge.source !== nodeId)
-      );
-
-      // Recursively delete all child nodes
-      childNodeIds.forEach((childId) => deleteNodeAndChildren(childId));
-
-      // Finally, remove this node
-
-      setNodes((nodes) => nodes.filter((node) => node.id !== nodeId));
-    },
-    [getEdges, setEdges, setNodes]
-  );
-  const { actionHandler } = usePlayground();
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const { getEdges, getNodes } = useReactFlow();
+  const { deleteNodeHandler } = usePlayground();
+  const edges = getEdges();
+  const outgoingEdge = edges.find((edge) => edge.source === id);
+  const incomingEdge = edges.find((edge) => edge.target === id);
+  const nodes = getNodes();
+  const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
+  const currentNode = nodes.find((node) => node.id === id);
   return (
     <div
       className="relative flex items-center gap-2"
@@ -920,7 +1010,7 @@ export const GoToStepNode = ({
       <div className="relative flex  flex-col items-center justify-center">
         <Popover>
           <PopoverTrigger>
-            {isHovered ? (
+            {isHovered && data.isDelete ? (
               <div className="text-red-500 text-xs  w-[145px] text-center cursor-pointer absolute -top-4 left-0">
                 Delete
               </div>
@@ -934,19 +1024,37 @@ export const GoToStepNode = ({
           </PopoverTrigger>
           <PopoverContent className="-mt-14 -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
-              className="text-red-500 text-center text-xs cursor-pointer"
+              className={`${
+                !outgoingEdge ? "text-red-500" : "text-red-100"
+              } text-center text-xs ${
+                !outgoingEdge ? "cursor-pointer" : "cursor-not-allowed"
+              } `}
               onClick={() => {
-                setNodes((nodes) => nodes.filter((node) => node.id !== id));
+                !outgoingEdge &&
+                  deleteNodeHandler(
+                    true,
+                    parentNode?.id ?? "",
+                    currentNode?.id ?? ""
+                  );
               }}
             >
               Delete single block
             </span>
             <div className="h-px bg-gray-300 my-1" />
             <span
-              className="text-red-100 text-center text-xs cursor-no-drop"
-              // onClick={() => {
-              //   deleteNodeAndChildren(id);
-              // }}
+              className={`${
+                outgoingEdge ? "text-red-500" : "text-red-100"
+              } text-center text-xs ${
+                outgoingEdge ? "cursor-pointer" : "cursor-not-allowed"
+              } `}
+              onClick={() => {
+                outgoingEdge &&
+                  deleteNodeHandler(
+                    false,
+                    parentNode?.id ?? "",
+                    currentNode?.id ?? ""
+                  );
+              }}
             >
               Delete with children
             </span>
@@ -969,9 +1077,21 @@ export const GoToStepNode = ({
       </div>
       {isHovered && (
         <IoMdAdd
-          onClick={() => actionHandler()}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsPopupVisible((prev) => !prev);
+          }}
           className="bg-[#fff] hover:text-[#1844F0] rounded-full h-6 w-6 p-1 cursor-pointer"
           style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
+        />
+      )}
+      {isPopupVisible && (
+        <AddNodePopup
+          parentId={id}
+          isPopupVisible={isPopupVisible}
+          setIsPopupVisible={setIsPopupVisible}
+          position={currentNode?.position || { x: 0, y: 0 }}
+          parentType={currentNode?.type || ""}
         />
       )}
     </div>

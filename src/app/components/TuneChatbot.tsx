@@ -17,15 +17,13 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { Input } from "@/components/ui/input";
 import { BiSolidEditAlt } from "react-icons/bi";
-import {
-  useAddAttributes,
-  useSetupPlayground,
-  useUpdateChatbot,
-} from "@/utils/botCreation-api";
+import { useSetupPlayground, useUpdateChatbot } from "@/utils/botCreation-api";
 import { toast } from "sonner";
 import { axiosError } from "../../types/axiosTypes";
 import { Loader } from "./Loader";
 import { useRouter } from "next/navigation";
+import { ToSnakeCase } from "@/utils/text-conveter";
+import { useAddAttributes } from "@/utils/attributes-api";
 
 const TuneChatbot = ({ botId }: { botId: string }) => {
   const router = useRouter();
@@ -94,12 +92,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
       router.replace(`/dashboard/${botId}`);
     }
   }, [botId, isAddSuccess, isSetupPlaygroundSuccess, isUpdateSuccess, router]);
-  const toSnakeCase = (text: string) => {
-    return text
-      .toLowerCase()
-      .replace(/\s+/g, "_")
-      .replace(/[^\w_]/g, "");
-  };
+
   const continueHandler = () => {
     if (!attributes[0].value) {
       toast.warning("Please enter chatbot name");
@@ -137,7 +130,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
         details: {
           attributes: attributes.map((item) => ({
             name: item.title,
-            alias: toSnakeCase(item.title),
+            alias: ToSnakeCase(item.title),
             value: item.value,
           })),
         },
@@ -150,12 +143,12 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
             {
               name: "FAQ",
               enabled: FAQ,
-              position: { x: 330, y: AboutUs ? -90 : 10 },
+              position: { x: 530, y: AboutUs ? -150 : -57 },
             },
             {
               name: "About Us",
               enabled: AboutUs,
-              position: { x: 330, y: FAQ ? 110 : 10 },
+              position: { x: 530, y: FAQ ? 50 : -57 },
             },
           ],
         },

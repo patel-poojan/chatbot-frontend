@@ -234,35 +234,6 @@ export const useUpdateChatbot = ({
     onError,
   });
 
-type AddAttributesRequest = {
-  chatbotId: string;
-  details: {
-    attributes: {
-      name: string;
-      alias: string;
-      value: string;
-    }[];
-  };
-};
-export const useAddAttributes = ({
-  onSuccess,
-  onError,
-}: {
-  onSuccess: (data: trainBotResponse) => void;
-  onError: (error: axiosError) => void;
-}) =>
-  useMutation({
-    mutationKey: ["train", "Bot"],
-    mutationFn: (data: AddAttributesRequest): Promise<trainBotResponse> => {
-      return axiosInstance.post(
-        `/chatbot/${data.chatbotId}/attributes`,
-        data.details
-      );
-    },
-    onError,
-    onSuccess,
-  });
-
 type SetupPlaygroundRequest = {
   chatbotId: string;
   details: {
