@@ -49,9 +49,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
     },
     onError(error: axiosError) {
       const errorMessage =
-        error?.response?.data?.errors?.message ||
-        error?.response?.data?.message ||
-        "chatbot training failed";
+        error?.response?.data?.errors?.message || error?.response?.data?.message || "chatbot training failed";
       toast.error(errorMessage);
     },
   });
@@ -65,9 +63,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
     },
     onError(error: axiosError) {
       const errorMessage =
-        error?.response?.data?.errors?.message ||
-        error?.response?.data?.message ||
-        "chatbot training failed";
+        error?.response?.data?.errors?.message || error?.response?.data?.message || "chatbot training failed";
       toast.error(errorMessage);
     },
   });
@@ -81,9 +77,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
     },
     onError(error: axiosError) {
       const errorMessage =
-        error?.response?.data?.errors?.message ||
-        error?.response?.data?.message ||
-        "playground setup failed";
+        error?.response?.data?.errors?.message || error?.response?.data?.message || "playground setup failed";
       toast.error(errorMessage);
     },
   });
@@ -193,24 +187,16 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
         } `,
       }}
     >
-      {(isPending || isPendingAddProcess || isPendingSetupPlayground) && (
-        <Loader />
-      )}
+      {(isPending || isPendingAddProcess || isPendingSetupPlayground) && <Loader />}
       <div className="flex-1 flex flex-col lg:flex-row gap-6 w-full overflow-hidden">
-        <div className="w-full lg:w-3/5 flex-1 flex flex-col overflow-hidden ">
+        <div className="w-full lg:w-3/5 flex-1 flex flex-col  overflow-auto">
           <div className="mb-4 sm:mb-6">
-            <p className="text-black font-semibold text-2xl">
-              Tune your chatbot
-            </p>
-            <p className="text-[#1E255EB2] font-normal mt-2 text-base">
-              Add final tweaks to achieve better results.
-            </p>
+            <p className="text-black font-semibold text-2xl">Tune your chatbot</p>
+            <p className="text-[#1E255EB2] font-normal mt-2 text-base">Add final tweaks to achieve better results.</p>
           </div>
 
           <div className="mb-4 sm:mb-6">
-            <p className="text-black font-normal text-lg">
-              Customise your welcome message
-            </p>
+            <p className="text-black font-normal text-lg">Customise your welcome message</p>
             <Textarea
               value={welcomeMessage}
               onChange={(e) => setwelcomeMessage(e.target.value)}
@@ -220,9 +206,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
             <div className="flex items-center gap-2">
               <Button
                 className={`${
-                  FAQ
-                    ? "opacity-100 hover:opacity-50"
-                    : "opacity-50 hover:opacity-100"
+                  FAQ ? "opacity-100 hover:opacity-50" : "opacity-50 hover:opacity-100"
                 } border bg-transparent hover:bg-transparent hover:opacity-50 border-[#57C0DD] py-3 px-6 md:px-11 rounded-xl text-[#57C0DD]`}
                 onClick={() => setFAQ(!FAQ)}
               >
@@ -230,9 +214,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
               </Button>
               <Button
                 className={`${
-                  AboutUs
-                    ? "opacity-100 hover:opacity-50"
-                    : "opacity-50 hover:opacity-100"
+                  AboutUs ? "opacity-100 hover:opacity-50" : "opacity-50 hover:opacity-100"
                 } border bg-transparent hover:bg-transparent border-[#57C0DD]  py-3 px-6 md:px-11 rounded-xl text-[#57C0DD]`}
                 onClick={() => setAboutUs(!AboutUs)}
               >
@@ -241,10 +223,8 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
             </div>
           </div>
 
-          <p className="text-black font-normal text-lg mb-3">
-            Set up attributes
-          </p>
-          <div className="flex flex-col !overflow-y-auto gap-3 flex-1">
+          <p className="text-black font-normal text-lg mb-3">Set up attributes</p>
+          <div className="flex flex-col gap-3 flex-1">
             {attributes.map((item, index) => (
               <div
                 key={index}
@@ -253,10 +233,8 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
                 style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
                 onClick={() => handleDivClick(index)}
               >
-                <span className="text-[#1E255EB2] text-sm sm:text-base">
-                  {item.title}
-                </span>
-                <div className="flex items-center !w-fit gap-2">
+                <span className="text-[#1E255EB2] text-sm sm:text-base">{item.title}</span>
+                <div className="flex items-center gap-2">
                   <Input
                     ref={(el: HTMLInputElement | null) => {
                       if (el) {
@@ -267,11 +245,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
                     className="!border-none !rounded-none text-sm sm:text-base shadow-none !bg-transparent !p-0 focus-visible:ring-0 !w-fit text-right"
                     onChange={(e) =>
                       setAttributes((prev) =>
-                        prev.map((attr, idx) =>
-                          idx === index
-                            ? { ...attr, value: e.target.value }
-                            : attr
-                        )
+                        prev.map((attr, idx) => (idx === index ? { ...attr, value: e.target.value } : attr))
                       )
                     }
                   />
@@ -284,17 +258,9 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
 
         <div className="hidden lg:w-2/5 lg:flex flex-col gap-3 border-t-[40px] rounded-[30px] border-r-[40px] border-b-0 border-l-[40px] border-[#57C0DD] p-4">
           <div className="flex gap-3">
-            <Image
-              src="/images/online_bot.svg"
-              alt="bot"
-              width={50}
-              height={50}
-              quality={100}
-            />
+            <Image src="/images/online_bot.svg" alt="bot" width={50} height={50} quality={100} />
             <div className="flex flex-col my-1 justify-between">
-              <p className="text-[#1E255E] font-medium text-sm">
-                {attributes[0].value}
-              </p>
+              <p className="text-[#1E255E] font-medium text-sm">{attributes[0].value}</p>
               <p className="text-[#1E255EB2] font-light text-sm">Online</p>
             </div>
           </div>
@@ -318,7 +284,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
         </div>
       </div>
 
-      <div className="mt-6   sm:ms-auto flex items-center gap-4">
+      <div className="mt-6   sm:ms-auto flex flex-col xs:flex-row items-center gap-4">
         <AlertDialog
           botId={botId}
           trigger={
@@ -335,12 +301,13 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
         </Button>
       </div>
 
-      <div className="absolute lg:hidden bottom-20 right-3">
+      <div className="fixed lg:hidden bottom-4 right-4">
         <Sheet>
           <SheetTrigger>
             <Image
               src="/images/bot-icon.svg"
               alt="bot"
+              className="rounded-full bg-white"
               width={40}
               height={40}
               quality={100}
@@ -350,20 +317,10 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
             <SheetHeader>
               <SheetTitle className="w-full justify-between flex items-center">
                 <div className="flex gap-3">
-                  <Image
-                    src="/images/online_bot.svg"
-                    alt="bot"
-                    width={40}
-                    height={40}
-                    quality={100}
-                  />
+                  <Image src="/images/online_bot.svg" alt="bot" width={40} height={40} quality={100} />
                   <div className="flex flex-col my-1 justify-between">
-                    <p className="text-[#1E255E] font-medium text-sm">
-                      {attributes[0].value}
-                    </p>
-                    <p className="text-[#1E255EB2] font-light text-sm">
-                      Online
-                    </p>
+                    <p className="text-[#1E255E] font-medium text-sm">{attributes[0].value}</p>
+                    <p className="text-[#1E255EB2] font-light text-sm">Online</p>
                   </div>
                 </div>
                 <SheetClose>
