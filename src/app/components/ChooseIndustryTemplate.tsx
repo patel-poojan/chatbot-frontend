@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
@@ -77,8 +77,8 @@ const ChooseIndustryTemplate = ({
   const fetchIndustry = async () => {
     const response: FetchIndustryListResponse = await axiosInstance.get(`/bda/get-category`);
     if (response.data.length >= 0) {
-      setIndustryValue(response.data[0].category);
-      setSubIndustryValue(response.data[0].subcategories[0]);
+      // setIndustryValue(response.data[0].category);
+      // setSubIndustryValue(response.data[0].subcategories[0]);
       return response.data;
     } else {
       return [];
@@ -152,7 +152,7 @@ const ChooseIndustryTemplate = ({
       category: industryValue,
       subcategories: [
         {
-          subcategory: subIndustry,
+          subcategory: subIndustryValue,
           questions,
         },
       ],
@@ -167,9 +167,45 @@ const ChooseIndustryTemplate = ({
       return;
     }
     const response = await axiosInstance.put(`/bda/categories/${category?.id}`, body).then(() => {
-      toast.warning("BDA Updated successfuly");
+      toast.success("BDA Updated successfuly");
     });
   };
+
+  type FetchBDAQuestionListResponse = {
+    message: string;
+    statusCode: number;
+    success: boolean;
+    data: {
+      questions: string[];
+    };
+  };
+
+  // const [questionAnswer, setQuestionAnswer] = useState<{ question: string; answer: string }[]>([]);
+  const fetchBDAQuestion = async () => {
+    const response: FetchBDAQuestionListResponse = await axiosInstance.post(`/bda/questions`, {
+      category: industryValue,
+      subcategory: subIndustryValue,
+    });
+    if (response.data.questions.length >= 0) {
+      setInputs(
+        response.data.questions.map((question: string, index: number) => {
+          return { id: index, value: question };
+        })
+      );
+      return response.data.questions;
+    } else {
+      setInputs([]);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    if (industryValue !== "" && subIndustryValue !== "") {
+      fetchBDAQuestion();
+    }
+  }, [subIndustryValue]);
+
+  console.log(inputs, "inputs");
 
   return (
     <>
@@ -238,7 +274,7 @@ const ChooseIndustryTemplate = ({
                         key={Industry.category}
                         value={Industry.category}
                         onSelect={(currentValue) => {
-                          setSubIndustryValue(Industry.subcategories[0]);
+                          // setSubIndustryValue(Industry.subcategories[0]);
                           setIndustryValue(currentValue === industryValue ? "" : currentValue);
                           setOpenIndustryPopup(false);
                         }}
@@ -323,13 +359,12 @@ const ChooseIndustryTemplate = ({
             <span className="text-[#57C0DD] text-base md:text-lg">Back</span>
           </div>
         )}
-        {adminAction && (
+        {adminAction && inputs && subIndustryValue && industryValue && (
           <div className="mt-4 md:mt-6 px-1">
             <div className="text-lg md:text-xl mb-3 font-semibold text-black">Questions</div>
             {inputs.map((input, index) => (
-              <div className="flex gap-5">
+              <div className="flex gap-3" key={input.id}>
                 <Input
-                  key={input.id}
                   type="text"
                   value={input.value}
                   onChange={(e) => handleInputChange(input.id, e.target.value)}
