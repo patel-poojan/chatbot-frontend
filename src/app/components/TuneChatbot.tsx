@@ -189,7 +189,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
     >
       {(isPending || isPendingAddProcess || isPendingSetupPlayground) && <Loader />}
       <div className="flex-1 flex flex-col lg:flex-row gap-6 w-full overflow-hidden">
-        <div className="w-full lg:w-3/5 flex-1 flex flex-col overflow-hidden ">
+        <div className="w-full lg:w-3/5 flex-1 flex flex-col  overflow-auto">
           <div className="mb-4 sm:mb-6">
             <p className="text-black font-semibold text-2xl">Tune your chatbot</p>
             <p className="text-[#1E255EB2] font-normal mt-2 text-base">Add final tweaks to achieve better results.</p>
@@ -224,7 +224,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
           </div>
 
           <p className="text-black font-normal text-lg mb-3">Set up attributes</p>
-          <div className="flex flex-col !overflow-y-auto gap-3 flex-1">
+          <div className="flex flex-col gap-3 flex-1">
             {attributes.map((item, index) => (
               <div
                 key={index}
@@ -234,7 +234,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
                 onClick={() => handleDivClick(index)}
               >
                 <span className="text-[#1E255EB2] text-sm sm:text-base">{item.title}</span>
-                <div className="flex items-center !w-fit gap-2">
+                <div className="flex items-center gap-2">
                   <Input
                     ref={(el: HTMLInputElement | null) => {
                       if (el) {
@@ -284,7 +284,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
         </div>
       </div>
 
-      <div className="mt-6   sm:ms-auto flex items-center gap-4">
+      <div className="mt-6   sm:ms-auto flex flex-col xs:flex-row items-center gap-4">
         <AlertDialog
           botId={botId}
           trigger={
@@ -301,10 +301,17 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
         </Button>
       </div>
 
-      <div className="absolute lg:hidden bottom-20 right-3">
+      <div className="fixed lg:hidden bottom-4 right-4">
         <Sheet>
           <SheetTrigger>
-            <Image src="/images/bot-icon.svg" alt="bot" width={40} height={40} quality={100} />
+            <Image
+              src="/images/bot-icon.svg"
+              alt="bot"
+              className="rounded-full bg-white"
+              width={40}
+              height={40}
+              quality={100}
+            />
           </SheetTrigger>
           <SheetContent side="bottom" className="rounded-t-[30px]">
             <SheetHeader>
