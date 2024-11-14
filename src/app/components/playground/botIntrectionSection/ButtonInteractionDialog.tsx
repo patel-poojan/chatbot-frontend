@@ -47,22 +47,24 @@ const ButtonInteractionDialog = ({ trigger }: { trigger: React.ReactNode }) => {
             <label htmlFor="type" className="text-black font-normal text-sm">
               Button type
             </label>
-            <Select defaultValue="message">
-              <SelectTrigger className="p-2 ">
-                <SelectValue
-                  className="placeholder:text-xs"
-                  placeholder="select button type"
-                />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="message">Send message</SelectItem>
-                <SelectItem value="goto">Go to block</SelectItem>
-                <SelectItem value="url">Open url</SelectItem>
-                <SelectItem value="phone">Phone call</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="w-full !mt-1">
+              <Select defaultValue="message">
+                <SelectTrigger className="p-2  ">
+                  <SelectValue
+                    className="placeholder:text-xs"
+                    placeholder="select button type"
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="message">Send message</SelectItem>
+                  <SelectItem value="goto">Go to block</SelectItem>
+                  <SelectItem value="url">Open url</SelectItem>
+                  <SelectItem value="phone">Phone call</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          <Button className="text-xs bg-gradient-to-r mt-2 !h-fit !p-0 hover:from-[#53A7DD] hover:to-[#58C8DD]  from-[#58C8DD] to-[#53A7DD]  max-[500px]:h-8 md:text-lg text-white flex gap-2 items-center  rounded ">
+          <Button className="text-xs bg-gradient-to-r mt-2 !h-fit !p-1 md:!p-[1px] hover:from-[#53A7DD] hover:to-[#58C8DD]  from-[#58C8DD] to-[#53A7DD]  max-[500px]:h-8 md:text-lg text-white flex gap-2 items-center  rounded ">
             save
           </Button>
         </div>

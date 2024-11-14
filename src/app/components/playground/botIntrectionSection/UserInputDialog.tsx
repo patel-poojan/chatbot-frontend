@@ -89,7 +89,7 @@ const UserInputDialog = ({ trigger }: { trigger: React.ReactNode }) => {
             placeholder="Enter Your Message"
           />
         </div>
-        <div className="bg-[#F1F1F1] p-4 rounded-b-lg max-h-[74.5vh] sm:max-h-[70vh] overflow-y-auto">
+        <div className="bg-[#F1F1F1] p-4 rounded-b-lg max-h-[70vh] sm:max-h-[70vh] overflow-y-auto">
           <div className="flex items-center gap-2">
             <TooltipProvider>
               <Tooltip>
