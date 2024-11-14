@@ -18,7 +18,14 @@ const CommentCard = ({
         {message}
       </p>
       <div className="mt-4 sm:mt-6 flex items-center gap-4">
-        <Image src={imgSrc} alt="bot-icon" width={40} height={40} priority />
+        <Image
+          src={imgSrc}
+          alt="bot-icon"
+          width={40}
+          height={40}
+          priority
+          quality={100}
+        />
         <div>
           <p className="text-[#1E255E] font-semibold text-base sm:text-xl">
             {name}

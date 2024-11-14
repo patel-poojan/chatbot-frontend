@@ -6,7 +6,7 @@ import { BiLogoLinkedin } from "react-icons/bi";
 
 const BottomBar = () => {
   return (
-    <div className="bg-white px-6 py-8 md:px-12 md:py-12 flex flex-col md:flex-row items-center justify-between mt-12">
+    <div className="bg-white px-6 py-8 md:px-12 md:py-12 flex flex-col md:flex-row items-center justify-between ">
       <div className="text-center md:text-left mb-6 md:mb-0">
         <div className="flex items-center justify-center md:justify-start gap-2">
           <Image
@@ -15,6 +15,7 @@ const BottomBar = () => {
             width={30}
             height={30}
             priority
+            quality={100}
           />
           <p className="text-lg md:text-2xl font-medium text-[#1E255E]">
             ChatBot
