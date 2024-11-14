@@ -47,7 +47,7 @@ const UserInputDialog = ({ trigger }: { trigger: React.ReactNode }) => {
   return (
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="sm:-right-[10rem] shadow-none !bg-transparent fixed translate-y-0 !top-[4.9vh] sm:left-[unset] gap-0 rounded-lg transform w-[90vw] max-w-[25.5rem] border-none p-0">
+      <DialogContent className="sm:-right-[10rem] shadow-none !bg-transparent fixed translate-y-0 !top-[4.9dvh] sm:left-[unset] gap-0 rounded-lg transform w-[90vw] max-w-[25.5rem] border-none p-0">
         <DialogHeader>
           <DialogTitle className="sr-only text-lg font-semibold text-gray-800">
             User Input Node
@@ -124,12 +124,12 @@ const UserInputDialog = ({ trigger }: { trigger: React.ReactNode }) => {
                 />
                 <div
                   className={`${
-                    index === 0
+                    index === messageList.length - 1
                       ? "cursor-not-allowed opacity-50"
                       : "cursor-pointer"
                   } bg-white rounded-lg w-fit p-2`}
                   onClick={() =>
-                    index !== 0 &&
+                    index !== messageList.length - 1 &&
                     setMessageList(messageList.filter((_, i) => i !== index))
                   }
                 >
