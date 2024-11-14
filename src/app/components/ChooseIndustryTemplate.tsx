@@ -12,15 +12,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Loader } from "./Loader";
 import { axiosInstance } from "@/utils/axiosInstance";
 import { toast } from "sonner";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { Input } from "@/components/ui/input";
 import { IBDA } from "@/types/BDA";
@@ -166,7 +158,7 @@ const ChooseIndustryTemplate = ({
       toast.warning("Please enter atleast one question");
       return;
     }
-    const response = await axiosInstance.put(`/bda/categories/${category?.id}`, body).then(() => {
+    await axiosInstance.put(`/bda/categories/${category?.id}`, body).then(() => {
       toast.success("BDA Updated successfuly");
     });
   };

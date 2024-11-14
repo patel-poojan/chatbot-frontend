@@ -16,6 +16,8 @@ const BDA = () => {
   const [openBulkUpdate, setOpenBulkUpdate] = useState(false);
   const [csvData, setCsvData] = useState<unknown[]>([]);
 
+  console.log(industry, subIndustry);
+
   // Sample data for the CSV file
   const sampleData = [
     { category: "Healthcare", subcategory: "Primary Care", questions: "Question1?,Question2?,Question3?,Question4?" },
