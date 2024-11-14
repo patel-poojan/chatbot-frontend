@@ -101,7 +101,7 @@ const FAQDialog = ({ trigger }: { trigger: React.ReactNode }) => {
             placeholder="Enter your message"
           />
         </div>
-        <div className="bg-[#F1F1F1] p-4 rounded-b-lg max-h-[70dvh] sm:max-h-[70dvh] overflow-y-auto">
+        <div className="bg-[#F1F1F1] p-4 rounded-b-lg max-h-[74.5dvh] sm:max-h-[70dvh] overflow-y-auto">
           <div className="flex items-center gap-2">
             <TooltipProvider>
               <Tooltip>
