@@ -27,7 +27,7 @@ import {
   UserInputNode,
   CloseChatNode,
   DefaultBotResponseNode,
-} from "@/app/components/playground/CustomNode";
+} from "@/app/components/playground/playgroundArea/CustomNode";
 import { Button } from "@/components/ui/button";
 import { IoCode, IoFlashOutline } from "react-icons/io5";
 import { MdUpdate } from "react-icons/md";
@@ -37,18 +37,17 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import ActionDialog from "@/app/components/playground/ActionDialog";
+import ActionDialog from "@/app/components/playground/playgroundArea/ActionDialog";
 import {
   PlaygroundProvider,
   usePlayground,
-} from "@/app/components/playground/PlaygroundContext";
+} from "@/app/components/playground/playgroundArea/PlaygroundContext";
 import useWindowDimensions from "@/utils/windowSize";
-import ChatBotDialog from "@/app/components/playground/ChatBotDialog";
 import Image from "next/image";
 import AIKnowledge from "@/app/components/playground/AIKnowladge";
 import UpdateChatbotNameDialog from "@/app/components/playground/UpdateChatbotNameDialog";
 import DashboardLayout from "@/app/components/DashboardLayout";
-import CustomEdge from "@/app/components/playground/CustomEdge";
+import CustomEdge from "@/app/components/playground/playgroundArea/CustomEdge";
 import { axiosInstance } from "@/utils/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
 import { Loader } from "@/app/components/Loader";
@@ -56,6 +55,7 @@ import { useAddNode } from "@/utils/playground-api";
 import { toast } from "sonner";
 import { axiosError } from "@/types/axiosTypes";
 import AttributesDialog from "@/app/components/playground/AttributesDialog";
+import ChatBotDialog from "@/app/components/playground/chatbot/ChatBotDialog";
 
 const ReactFlow = dynamic(
   () => import("@xyflow/react").then((mod) => mod.ReactFlow),
@@ -161,12 +161,19 @@ const MainComponent = ({ botId }: { botId: string }) => {
         const nnn = updatedPlaygroundData?.diagram.nodes;
         const eee = updatedPlaygroundData?.diagram.edges;
 
-        const nodesKp = nnn.map((node) => ({
-          id: node.id,
-          type: node.type,
-          position: node.position,
-          data: node.data,
-        }));
+        const nodesKp = nnn
+          .map((node) => {
+            if (node.id && node.type && node.position && node.data) {
+              return {
+                id: node.id,
+                type: node.type,
+                position: node.position,
+                data: node.data,
+              };
+            }
+            return null;
+          })
+          .filter((node) => node !== null);
         setNodes(nodesKp);
         setEdges(eee);
       }

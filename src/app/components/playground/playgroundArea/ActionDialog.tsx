@@ -3,7 +3,6 @@ import { IoCloseOutline } from "react-icons/io5";
 import { usePlayground } from "./PlaygroundContext";
 import { IoIosSend } from "react-icons/io";
 import Image from "next/image";
-import { MdOutlineQuestionMark } from "react-icons/md";
 
 const ActionDialog = ({ actionHandler }: { actionHandler: () => void }) => {
   const { setType, setLabel } = usePlayground();
@@ -102,7 +101,7 @@ const ActionDialog = ({ actionHandler }: { actionHandler: () => void }) => {
           />
           <span className="text-black text-sm font-medium mt-1">FAQ</span>
         </div>
-        <div
+        {/* <div
           className="w-full cursor-pointer hover:bg-gray-100 px-2 py-3 rounded-lg transition  flex flex-col items-center justify-center"
           onDragStart={(event) =>
             onDragStart(event, "questionNode", "Question")
@@ -111,7 +110,7 @@ const ActionDialog = ({ actionHandler }: { actionHandler: () => void }) => {
         >
           <MdOutlineQuestionMark className="text-black text-3xl" />
           <span className="text-black text-sm font-medium mt-1">Question</span>
-        </div>
+        </div> */}
         <div
           className="w-full cursor-pointer hover:bg-gray-100 px-2 py-3 h-full rounded-lg transition  flex flex-col items-center justify-center"
           onDragStart={(event) =>

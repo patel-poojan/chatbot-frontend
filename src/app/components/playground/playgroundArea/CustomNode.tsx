@@ -13,7 +13,10 @@ import {
 import { MdCancel, MdCheckCircle, MdOutlineQuestionMark } from "react-icons/md";
 import AddNodePopup from "./AddNodePopup";
 import { usePlayground } from "./PlaygroundContext";
-import BotResponseDialog from "../BotResponseDialog";
+import BotResponseDialog from "../botIntrectionSection/BotResponseDialog";
+import UserInputDialog from "../botIntrectionSection/UserInputDialog";
+import GoToStepDialog from "../botIntrectionSection/GoToStepDialog";
+import FAQDialog from "../botIntrectionSection/FAQDialog";
 
 const NodeContainer = ({
   children,
@@ -196,7 +199,7 @@ export const BotResponseNode = ({
 
         <BotResponseDialog
           trigger={
-            <button>
+            <button onClick={() => setIsHovered(false)}>
               <NodeContainer
                 nodeCss="bg-white  w-[145px]"
                 shadow="0px 0px 12px 4px #00000014"
@@ -382,23 +385,27 @@ export const UserInputNode = ({
             </span>
           </PopoverContent>
         </Popover>
-        <div className="relative">
-          <div
-            className="relative flex items-center justify-center triangle_highlight w-12 h-12 bg-white border border-[#C9D3DE] rotate-45 mx-1 rounded-lg"
-            style={{ boxShadow: "0px 0px 12px 4px #00000014" }}
-          >
-            <Image
-              src="/images/user_input.svg"
-              className="absolute  rotate-[-45deg] "
-              alt="user input logo"
-              width={20}
-              height={20}
-              quality={100}
-            />
-          </div>
-          <CustomHandle type="target" position={Position.Left} />
-          <CustomHandle type="source" position={Position.Right} />
-        </div>
+        <UserInputDialog
+          trigger={
+            <div className="relative" onClick={() => setIsHovered(false)}>
+              <div
+                className="relative flex items-center justify-center triangle_highlight w-12 h-12 bg-white border border-[#C9D3DE] rotate-45 mx-1 rounded-lg"
+                style={{ boxShadow: "0px 0px 12px 4px #00000014" }}
+              >
+                <Image
+                  src="/images/user_input.svg"
+                  className="absolute  rotate-[-45deg] "
+                  alt="user input logo"
+                  width={20}
+                  height={20}
+                  quality={100}
+                />
+              </div>
+              <CustomHandle type="target" position={Position.Left} />
+              <CustomHandle type="source" position={Position.Right} />
+            </div>
+          }
+        />
       </div>
       {isHovered ? (
         <IoMdAdd
@@ -941,23 +948,27 @@ export const FaqNode = ({
             </span>
           </PopoverContent>
         </Popover>
-        <div className="relative">
-          <div
-            className="relative flex items-center justify-center w-12 h-12  triangle_highlight bg-orange-400 rotate-45 mx-1 rounded-lg"
-            style={{ boxShadow: "0px 0px 12px 4px #00000014" }}
-          >
-            <Image
-              src="/images/faq.svg"
-              className="absolute  rotate-[-45deg] "
-              alt="faq logo"
-              width={22}
-              height={22}
-              quality={100}
-            />
-          </div>
-          {data.label === "faq" && <></>}
-          <CustomHandle type="target" position={Position.Left} />
-        </div>
+        <FAQDialog
+          trigger={
+            <div className="relative" onClick={() => setIsHovered(false)}>
+              <div
+                className="relative flex items-center justify-center w-12 h-12  triangle_highlight bg-orange-400 rotate-45 mx-1 rounded-lg"
+                style={{ boxShadow: "0px 0px 12px 4px #00000014" }}
+              >
+                <Image
+                  src="/images/faq.svg"
+                  className="absolute  rotate-[-45deg] "
+                  alt="faq logo"
+                  width={22}
+                  height={22}
+                  quality={100}
+                />
+              </div>
+              {data.label === "faq" && <></>}
+              <CustomHandle type="target" position={Position.Left} />
+            </div>
+          }
+        />
       </div>
       {isHovered ? (
         <IoMdAdd
@@ -1060,20 +1071,26 @@ export const GoToStepNode = ({
             </span>
           </PopoverContent>
         </Popover>
-        <NodeContainer
-          nodeCss="bg-[#FFDC66]  w-[145px]"
-          shadow="0px 0px 12px 4px #00000014"
-        >
-          <Image
-            src="/images/go_to_step.svg"
-            alt="go to step logo"
-            width={18}
-            height={18}
-            quality={100}
-          />
-          <span className="text-black text-sm">{data.label}</span>
-          <CustomHandle type="target" position={Position.Left} />
-        </NodeContainer>
+        <GoToStepDialog
+          trigger={
+            <button onClick={() => setIsHovered(false)}>
+              <NodeContainer
+                nodeCss="bg-[#FFDC66]  w-[145px]"
+                shadow="0px 0px 12px 4px #00000014"
+              >
+                <Image
+                  src="/images/go_to_step.svg"
+                  alt="go to step logo"
+                  width={18}
+                  height={18}
+                  quality={100}
+                />
+                <span className="text-black text-sm">{data.label}</span>
+                <CustomHandle type="target" position={Position.Left} />
+              </NodeContainer>
+            </button>
+          }
+        />
       </div>
       {isHovered && (
         <IoMdAdd

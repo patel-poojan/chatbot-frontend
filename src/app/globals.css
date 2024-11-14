@@ -86,6 +86,7 @@ body,
 *::-webkit-scrollbar {
   display: none;
 }
+
 .show-scrollbar::-webkit-scrollbar {
   width: 5px;
   display: block !important;
