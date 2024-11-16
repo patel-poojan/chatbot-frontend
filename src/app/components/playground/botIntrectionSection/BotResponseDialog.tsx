@@ -76,7 +76,7 @@ const BotResponseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
             <NodeResponseList setResponseList={setResponseList} />
           </div>
 
-          <div className="flex-1">
+          <div className="flex-1 flex flex-col max-h-[90.2dvh] sm:max-h-[84dvh]">
             <div className="p-4 rounded-t-lg bg-white">
               <div className="flex items-center justify-between mb-4 mt-2">
                 <div className="flex items-center gap-2">
@@ -103,7 +103,7 @@ const BotResponseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
             {responseList.length > 0 && (
               <div
                 ref={scrollRef}
-                className="rounded-b-lg max-h-[74.63dvh] sm:max-h-[70dvh] overflow-y-auto"
+                className="rounded-b-lg flex-1  overflow-y-auto"
               >
                 <div className="flex flex-col gap-4 bg-[#F1F1F1] p-4">
                   {responseList.map((item, index) => (

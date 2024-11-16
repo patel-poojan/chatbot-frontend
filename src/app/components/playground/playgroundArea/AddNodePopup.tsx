@@ -5,7 +5,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import Image from "next/image";
-import { MdOutlineQuestionMark } from "react-icons/md";
 import { IoIosSend } from "react-icons/io";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
@@ -172,13 +171,13 @@ const AddNodePopup = ({
           />
           <span className="text-black text-sm font-medium">FAQ</span>
         </div>
-        <div
+        {/* <div
           className="flex items-center gap-2 hover:bg-gray-100 p-2 rounded-md cursor-pointer"
           onClick={() => onClickHandler("questionNode")}
         >
           <MdOutlineQuestionMark className="text-black text-lg" />
           <span className="text-black text-sm font-medium">Question</span>
-        </div>
+        </div> */}
         <div
           className="flex items-center gap-2 hover:bg-gray-100 p-2 rounded-md cursor-pointer"
           onClick={() => onClickHandler("closeChatNode")}
