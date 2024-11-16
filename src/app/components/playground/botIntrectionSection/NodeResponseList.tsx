@@ -37,15 +37,22 @@ export const ImageNodeResponse = () => {
 };
 
 export const GalleryNodeResponse = () => {
+  const [buttonList, setButtonList] = useState<
+    { title: string; type: string }[]
+  >([{ title: "Button", type: "message" }]);
+
+  const addNewButton = () => {
+    setButtonList((prev) => [...prev, { title: "Button", type: "message" }]);
+  };
+  const handleDeleteButton = (index: number) => {
+    setButtonList((prev) => prev.filter((_, i) => i !== index));
+  };
+
   return (
     <div className="w-8/12">
       <div>
         <label className="flex items-center justify-between rounded-md bg-gray-200 h-52 w-full  text-black hover:text-white hover:bg-[#57C0DD]  p-2 cursor-pointer">
-          <input
-            type="file"
-            className="hidden"
-            //  onChange={handleFileChange}
-          />
+          <input type="file" className="hidden" />
           <div className="mx-auto  flex flex-col items-center justify-center">
             <IoCameraSharp className="text-2xl" />
             <span className="text-sm sm:text-base w-full text-center ">
@@ -54,13 +61,12 @@ export const GalleryNodeResponse = () => {
           </div>
         </label>
       </div>
+
       <div>
         <div>
           <Input
-            // value={name}
-            // onChange={(e) => setName(e.target.value)}
             id="Message"
-            className="px-4 py-3 bg-white shadow-none rounded-none border-transparent  text-black  focus:outline-none focus-visible:ring-0 hover:border-[#57C0DD] focus-visible:border-[#57C0DD]  placeholder:text-base w-full"
+            className="px-4 py-3 bg-white shadow-none rounded-none border-transparent text-black focus:outline-none focus-visible:ring-0 hover:border-[#57C0DD] focus-visible:border-[#57C0DD] placeholder:text-base w-full"
             placeholder="Type card title"
           />
         </div>
@@ -69,22 +75,56 @@ export const GalleryNodeResponse = () => {
             placeholder="Type card description"
             rows={2}
             maxLength={80}
-            className="resize-none border-transparent bg-white p-3 rounded-md shadow-sm focus:outline-none focus-visible:ring-0 hover:border-[#57C0DD] focus-visible:border-[#57C0DD]   overflow-y-auto"
+            className="resize-none border-transparent bg-white p-3 rounded-md shadow-sm focus:outline-none focus-visible:ring-0 hover:border-[#57C0DD] focus-visible:border-[#57C0DD] overflow-y-auto"
           />
         </div>
       </div>
-      <ButtonInteractionDialog
-        trigger={
-          <div className="text-[#57C0DD] py-2 border cursor-pointer bg-white border-b-0 border-s-0 border-r-0 mx-auto text-center border-t ">
-            Button
+      <div>
+        {buttonList.map((button, index) => (
+          <div key={index} className="group relative">
+            <ButtonInteractionDialog
+              buttonList={buttonList}
+              setButtonList={setButtonList}
+              index={index}
+              trigger={
+                <div className="text-[#57C0DD] py-2 border cursor-pointer bg-white border-b-0 border-s-0 border-r-0 mx-auto text-center border-t">
+                  {button.title}
+                </div>
+              }
+            />
+            {index !== 0 ? (
+              <div
+                className="absolute top-1/2 -translate-y-1/2 right-[-12px] hidden group-hover:flex items-center justify-center bg-white rounded-full p-1 cursor-pointer shadow-md"
+                onClick={() => handleDeleteButton(index)}
+              >
+                <RiDeleteBinLine className="text-red-500 h-4 w-4" />
+              </div>
+            ) : null}
           </div>
-        }
-      />
+        ))}
+
+        <div
+          className="flex items-center text-sm justify-center mt-2 p-2 border border-dashed border-black text-black cursor-pointer"
+          onClick={addNewButton}
+        >
+          <span>+</span>
+          <span className="ml-2 ">Add Button</span>
+        </div>
+      </div>
     </div>
   );
 };
 
 export const ButtonNodeResponse = () => {
+  const [buttonList, setButtonList] = useState<
+    { title: string; type: string }[]
+  >([{ title: "Button", type: "message" }]);
+  const addNewButton = () => {
+    setButtonList((prev) => [...prev, { title: "Button", type: "message" }]);
+  };
+  const handleDeleteButton = (index: number) => {
+    setButtonList((prev) => prev.filter((_, i) => i !== index));
+  };
   return (
     <div className="w-8/12">
       <div>
@@ -95,13 +135,35 @@ export const ButtonNodeResponse = () => {
           className="resize-none border border-transparent bg-white p-3 rounded-md shadow-sm focus:outline-none focus-visible:ring-0 hover:border-[#57C0DD] focus-visible:border-[#57C0DD]  overflow-y-auto"
         />
       </div>
-      <ButtonInteractionDialog
-        trigger={
-          <div className="text-[#57C0DD] cursor-pointer py-2 border bg-white border-b-0 border-s-0 border-r-0 mx-auto text-center border-t ">
-            Button
-          </div>
-        }
-      />
+      {buttonList.map((button, index) => (
+        <div key={index} className="group relative">
+          <ButtonInteractionDialog
+            buttonList={buttonList}
+            setButtonList={setButtonList}
+            index={index}
+            trigger={
+              <div className="text-[#57C0DD] cursor-pointer py-2 border bg-white border-b-0 border-s-0 border-r-0 mx-auto text-center border-t ">
+                {button.title}
+              </div>
+            }
+          />
+          {index !== 0 ? (
+            <div
+              className="absolute top-1/2 -translate-y-1/2 right-[-12px] hidden group-hover:flex items-center justify-center bg-white rounded-full p-1 cursor-pointer shadow-md"
+              onClick={() => handleDeleteButton(index)}
+            >
+              <RiDeleteBinLine className="text-red-500 h-4 w-4" />
+            </div>
+          ) : null}
+        </div>
+      ))}
+      <div
+        className="flex items-center  justify-center mt-2 p-2 border border-dashed border-black text-sm text-black cursor-pointer"
+        onClick={addNewButton}
+      >
+        <span>+</span>
+        <span className="ml-2">Add Button</span>
+      </div>
     </div>
   );
 };
