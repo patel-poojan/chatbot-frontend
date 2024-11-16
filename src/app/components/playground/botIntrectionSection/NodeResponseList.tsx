@@ -2,6 +2,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { IoCameraSharp } from "react-icons/io5";
 import ButtonInteractionDialog from "./ButtonInteractionDialog";
+import { useState } from "react";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 export const TextNodeResponse = () => {
   return (
@@ -105,21 +107,58 @@ export const ButtonNodeResponse = () => {
 };
 
 export const QuickNodeResponse = () => {
+  const [buttonList, setButtonList] = useState<
+    { title: string; type: string }[]
+  >([{ title: "Button", type: "message" }]);
+
+  const handleAddButton = () => {
+    setButtonList((prev) => [...prev, { title: `Button`, type: "message" }]);
+  };
+
+  const handleDeleteButton = (index: number) => {
+    setButtonList((prev) => prev.filter((_, i) => i !== index));
+  };
+
   return (
     <div className="flex flex-col gap-2">
       <Textarea
-        placeholder="Entre Your message..."
+        placeholder="Enter Your message..."
         rows={3}
-        // maxLength={1024}
         className="resize-none border border-transparent bg-white p-3 rounded-md shadow-sm focus:outline-none hover:border-[#57C0DD] focus-visible:ring-0 overflow-y-auto"
       />
-      <ButtonInteractionDialog
-        trigger={
-          <div className="text-[#57C0DD] cursor-pointer py-1 px-3 border bg-white text-sm border-[#57C0DD]  w-fit text-center rounded-[30px] ">
-            Button
+      <div className="flex items-center flex-wrap gap-2">
+        {buttonList.map((item, index) => (
+          <div key={index} className="relative group">
+            <ButtonInteractionDialog
+              buttonList={buttonList}
+              index={index}
+              setButtonList={setButtonList}
+              trigger={
+                <div className="text-[#57C0DD] cursor-pointer py-1 px-4 border bg-white text-sm border-[#57C0DD] w-fit text-center rounded-[30px]">
+                  {item.title}
+                </div>
+              }
+            />
+            {index !== 0 ? (
+              <div
+                className="absolute -top-3 -right-1 hidden group-hover:flex items-center justify-center bg-white rounded-full p-1 cursor-pointer"
+                onClick={() => handleDeleteButton(index)}
+              >
+                <RiDeleteBinLine className="text-red-500 h-4 w-4" />
+              </div>
+            ) : (
+              <></>
+            )}
           </div>
-        }
-      />
+        ))}
+
+        <div
+          onClick={handleAddButton}
+          className="text-black cursor-pointer py-1 px-2 border text-sm border-black border-dashed w-fit text-center rounded-[30px]"
+        >
+          + Add button
+        </div>
+      </div>
     </div>
   );
 };

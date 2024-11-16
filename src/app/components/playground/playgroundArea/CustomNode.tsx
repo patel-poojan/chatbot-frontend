@@ -17,6 +17,7 @@ import BotResponseDialog from "../botIntrectionSection/BotResponseDialog";
 import UserInputDialog from "../botIntrectionSection/UserInputDialog";
 import GoToStepDialog from "../botIntrectionSection/GoToStepDialog";
 import FAQDialog from "../botIntrectionSection/FAQDialog";
+import useWindowDimensions from "@/utils/windowSize";
 
 const NodeContainer = ({
   children,
@@ -60,8 +61,8 @@ export const StartNode = ({
         </span>
       )}
       <NodeContainer
-        nodeCss="bg-[#424D50] w-[145px] "
-        shadow="0px 0px 12px 4px #00000014"
+        nodeCss="bg-[#424D50] w-[145px] hover:cursor-not-allowed "
+        shadow="0px 0px 12px 4px #00000014 "
       >
         <GoHomeFill className="text-white text-base" />
         <span className="text-white text-sm">{data.label}</span>
@@ -99,7 +100,7 @@ export const DefaultNode = ({
         </span>
       )}
       <NodeContainer
-        nodeCss="bg-[#9CA3A5] text-white text-sm w-[152px]"
+        nodeCss="bg-[#9CA3A5] text-white text-sm w-[152px] hover:cursor-not-allowed "
         shadow="0px 0px 12px 4px #00000014"
       >
         {data.label}
@@ -141,7 +142,7 @@ export const BotResponseNode = ({
   const nodes = getNodes();
   const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
   const currentNode = nodes.find((node) => node.id === id);
-
+  const { width: screenWidth } = useWindowDimensions();
   return (
     <div
       className="flex items-center gap-2"
@@ -214,7 +215,7 @@ export const BotResponseNode = ({
         />
       </div>
 
-      {isHovered && (
+      {(isHovered || screenWidth < 768) && (
         <IoMdAdd
           onClick={(e) => {
             e.stopPropagation();
@@ -252,15 +253,20 @@ export const DefaultBotResponseNode = ({
           {data.message}
         </span>
       )}
-
-      <NodeContainer
-        nodeCss="bg-white  w-[145px]"
-        shadow="0px 0px 12px 4px #00000014"
-      >
-        <IoIosSend className="text-black text-base " />
-        <span className="text-black text-sm">{data.label}</span>
-        <CustomHandle type="target" position={Position.Left} />
-      </NodeContainer>
+      <BotResponseDialog
+        trigger={
+          <button>
+            <NodeContainer
+              nodeCss="bg-white  w-[145px]"
+              shadow="0px 0px 12px 4px #00000014"
+            >
+              <IoIosSend className="text-black text-base " />
+              <span className="text-black text-sm">{data.label}</span>
+              <CustomHandle type="target" position={Position.Left} />
+            </NodeContainer>
+          </button>
+        }
+      />
     </div>
   );
 };
@@ -271,6 +277,7 @@ export const AiAssistNode = ({
 }) => {
   // const [isHovered, setIsHovered] = useState(false);
   // const { actionHandler } = usePlayground();
+
   return (
     <div
       className="relative flex gap-2 items-center "
@@ -283,7 +290,7 @@ export const AiAssistNode = ({
         </span>
       )}
       <NodeContainer
-        nodeCss="bg-[#1844F0] w-[145px]  "
+        nodeCss="bg-[#1844F0] w-[145px] hover:cursor-not-allowed  "
         shadow="0px 0px 12px 4px #00000014"
       >
         <Image
@@ -293,7 +300,7 @@ export const AiAssistNode = ({
           height={16}
           quality={100}
         />
-        <span className="text-white text-sm">{data.label}</span>
+        <span className="text-white text-sm ">{data.label}</span>
         <CustomHandle type="target" position={Position.Left} />
       </NodeContainer>
       {/* {isHovered && (
@@ -324,6 +331,7 @@ export const UserInputNode = ({
   const nodes = getNodes();
   const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
   const currentNode = nodes.find((node) => node.id === id);
+  const { width: screenWidth } = useWindowDimensions();
   return (
     <div
       className="relative flex items-center gap-2"
@@ -407,7 +415,7 @@ export const UserInputNode = ({
           }
         />
       </div>
-      {isHovered ? (
+      {isHovered || screenWidth < 768 ? (
         <IoMdAdd
           onClick={(e) => {
             e.stopPropagation();
@@ -449,6 +457,7 @@ export const QuestionNode = ({
   const nodes = getNodes();
   const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
   const currentNode = nodes.find((node) => node.id === id);
+  const { width: screenWidth } = useWindowDimensions();
   return (
     <div
       className="relative flex items-center gap-2"
@@ -518,7 +527,7 @@ export const QuestionNode = ({
           <CustomHandle type="source" position={Position.Right} />
         </NodeContainer>
       </div>
-      {isHovered && (
+      {(isHovered || screenWidth < 768) && (
         <IoMdAdd
           onClick={(e) => {
             e.stopPropagation();
@@ -557,6 +566,7 @@ export const SuccessNode = ({
   const nodes = getNodes();
   const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
   const currentNode = nodes.find((node) => node.id === id);
+  const { width: screenWidth } = useWindowDimensions();
   return (
     <div
       className="relative flex items-center gap-2"
@@ -626,7 +636,7 @@ export const SuccessNode = ({
           {/* <CustomHandle type="source" position={Position.Right} /> */}
         </NodeContainer>
       </div>
-      {isHovered && (
+      {(isHovered || screenWidth < 768) && (
         <IoMdAdd
           onClick={(e) => {
             e.stopPropagation();
@@ -665,6 +675,7 @@ export const FailureNode = ({
   const nodes = getNodes();
   const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
   const currentNode = nodes.find((node) => node.id === id);
+  const { width: screenWidth } = useWindowDimensions();
   return (
     <div
       className="relative flex items-center gap-2"
@@ -734,7 +745,7 @@ export const FailureNode = ({
           {/* <CustomHandle type="source" position={Position.Right} /> */}
         </NodeContainer>
       </div>
-      {isHovered && (
+      {(isHovered || screenWidth < 768) && (
         <IoMdAdd
           onClick={(e) => {
             e.stopPropagation();
@@ -773,6 +784,7 @@ export const CloseChatNode = ({
   const nodes = getNodes();
   const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
   const currentNode = nodes.find((node) => node.id === id);
+  const { width: screenWidth } = useWindowDimensions();
   return (
     <div
       className="relative flex items-center gap-2"
@@ -847,7 +859,7 @@ export const CloseChatNode = ({
           <CustomHandle type="target" position={Position.Left} />
         </NodeContainer>
       </div>
-      {isHovered && (
+      {(isHovered || screenWidth < 768) && (
         <IoMdAdd
           onClick={(e) => {
             e.stopPropagation();
@@ -887,13 +899,12 @@ export const FaqNode = ({
   const nodes = getNodes();
   const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
   const currentNode = nodes.find((node) => node.id === id);
+  const { width: screenWidth } = useWindowDimensions();
   return (
     <div
       className="relative flex items-center gap-2"
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => {
-        setIsHovered(false);
-      }}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <div className="relative flex  flex-col items-center justify-center">
         <Popover>
@@ -970,7 +981,7 @@ export const FaqNode = ({
           }
         />
       </div>
-      {isHovered ? (
+      {isHovered || screenWidth < 768 ? (
         <IoMdAdd
           onClick={(e) => {
             e.stopPropagation();
@@ -1012,6 +1023,7 @@ export const GoToStepNode = ({
   const nodes = getNodes();
   const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
   const currentNode = nodes.find((node) => node.id === id);
+  const { width: screenWidth } = useWindowDimensions();
   return (
     <div
       className="relative flex items-center gap-2"
@@ -1092,7 +1104,7 @@ export const GoToStepNode = ({
           }
         />
       </div>
-      {isHovered && (
+      {(isHovered || screenWidth < 768) && (
         <IoMdAdd
           onClick={(e) => {
             e.stopPropagation();

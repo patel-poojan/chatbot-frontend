@@ -60,19 +60,19 @@ const GoToStepDialog = ({ trigger }: { trigger: React.ReactNode }) => {
           </div>
           <Input
             id="Message"
-            className="px-4 py-3 mt-1 mb-2 rounded text-black hover:border-[#57C0DD] focus-visible:ring-0 focus-visible:border-[#57C0DD] placeholder:text-sm placeholder:font-light w-full"
+            className="p-3 mt-1 mb-2 border border-gray-200 bg-white hover:ring-1 hover:ring-[#57C0DD] rounded-md focus:outline-none focus-visible:border-[#57C0DD] focus-visible:ring-1 focus-visible:ring-[#57C0DD] shadow-sm transition duration-200"
             placeholder="Enter Your Message"
           />
         </div>
-        <div className="bg-[#F1F1F1] p-4 rounded-b-lg max-h-[72.5dvh] sm:max-h-[70dvh] overflow-y-auto">
+        <div className="bg-[#F1F1F1] p-4 rounded-b-lg max-h-[74.63dvh] sm:max-h-[70dvh] overflow-y-auto">
           <div className="w-full">
             <label htmlFor="type" className="text-black font-normal text-sm ">
               Block
             </label>
             <Select>
-              <SelectTrigger className="p-2 mt-2 border bg-white rounded-md hover:border-[#57C0DD] focus:outline-none focus:ring-1 focus:ring-[#57C0DD]">
+              <SelectTrigger className="p-2 mt-2 border bg-white placeholder:!text-[#6F7288B2] rounded-md hover:border-[#57C0DD] focus:outline-none focus:ring-1 focus:ring-[#57C0DD]">
                 <SelectValue
-                  className="placeholder:text-xs"
+                  className="placeholder:text-xs placeholder:!text-[#6F7288B2]"
                   placeholder="Choose target block"
                 />
               </SelectTrigger>

@@ -97,11 +97,11 @@ const FAQDialog = ({ trigger }: { trigger: React.ReactNode }) => {
           </div>
           <Input
             id="message"
-            className="px-4 py-3 mt-1 mb-2 rounded text-black hover:border-[#57C0DD] focus-visible:ring-0 focus-visible:border-[#57C0DD] placeholder:text-sm placeholder:font-light w-full"
+            className="p-3 mt-1 mb-2 border border-gray-200 bg-white hover:ring-1 hover:ring-[#57C0DD] rounded-md focus:outline-none focus-visible:border-[#57C0DD] focus-visible:ring-1 focus-visible:ring-[#57C0DD] shadow-sm transition duration-200"
             placeholder="Enter your message"
           />
         </div>
-        <div className="bg-[#F1F1F1] p-4 rounded-b-lg max-h-[72.5dvh] sm:max-h-[70dvh] overflow-y-auto">
+        <div className="bg-[#F1F1F1] p-4 rounded-b-lg max-h-[74.63dvh] sm:max-h-[70dvh] overflow-y-auto">
           <div className="flex items-center gap-2">
             <TooltipProvider>
               <Tooltip>
@@ -125,41 +125,49 @@ const FAQDialog = ({ trigger }: { trigger: React.ReactNode }) => {
           </div>
           <div className="flex flex-col gap-2 mt-2">
             {messageList.map((item, index) => (
-              <div className="flex items-center gap-2" key={index}>
-                <div className="flex flex-col items-center gap-2 w-full">
+              <div
+                className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
+                key={index}
+              >
+                <div className="flex flex-col w-full gap-3">
                   <Textarea
-                    placeholder="type question..."
+                    placeholder="Type your question..."
                     value={item.question}
                     onChange={(e) =>
                       handleMessageChange(index, "question", e.target.value)
                     }
                     rows={2}
                     maxLength={256}
-                    className="resize-none border-transparent bg-white p-3 rounded-md shadow-sm focus:outline-none focus-visible:ring-0 hover:border-[#57C0DD] focus-visible:border-[#57C0DD] overflow-y-auto"
+                    className="resize-none border border-gray-200 bg-white p-3 hover:ring-1 hover:ring-[#57C0DD] rounded-md focus:outline-none focus-visible:border-[#57C0DD] focus-visible:ring-1 focus-visible:ring-[#57C0DD] shadow-sm transition duration-200"
                   />
                   <Textarea
-                    placeholder="type answer..."
+                    placeholder="Type your answer..."
                     value={item.answer}
                     onChange={(e) =>
                       handleMessageChange(index, "answer", e.target.value)
                     }
                     rows={2}
                     maxLength={256}
-                    className="resize-none border-transparent bg-white p-3 rounded-md shadow-sm focus:outline-none focus-visible:ring-0 hover:border-[#57C0DD] focus-visible:border-[#57C0DD] overflow-y-auto"
+                    className="resize-none border border-gray-200 bg-white p-3 rounded-md hover:ring-1 hover:ring-[#57C0DD] focus:outline-none focus-visible:border-[#57C0DD] focus-visible:ring-1 focus-visible:ring-[#57C0DD] shadow-sm transition duration-200"
                   />
                 </div>
                 <div
                   className={`${
                     index === messageList.length - 1
                       ? "cursor-not-allowed opacity-50"
-                      : "cursor-pointer"
-                  } bg-white rounded-lg w-fit p-2`}
+                      : "cursor-pointer hover:bg-red-100"
+                  } flex items-center justify-center bg-white rounded-full w-10 h-10 p-2 transition-all duration-200`}
                   onClick={() =>
                     index !== messageList.length - 1 &&
                     setMessageList(messageList.filter((_, i) => i !== index))
                   }
+                  title={
+                    index !== messageList.length - 1
+                      ? "Delete"
+                      : "Cannot delete"
+                  }
                 >
-                  <RiDeleteBinLine className="text-red-500" />
+                  <RiDeleteBinLine className="text-red-500 text-xl" />
                 </div>
               </div>
             ))}

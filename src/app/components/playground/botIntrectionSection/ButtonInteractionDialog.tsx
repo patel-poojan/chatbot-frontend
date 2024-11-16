@@ -14,7 +14,19 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-const ButtonInteractionDialog = ({ trigger }: { trigger: React.ReactNode }) => {
+const ButtonInteractionDialog = ({
+  trigger,
+  buttonList,
+  index,
+  setButtonList,
+}: {
+  trigger: React.ReactNode;
+  buttonList?: { title: string; type: string }[];
+  setButtonList?: React.Dispatch<
+    React.SetStateAction<{ title: string; type: string }[]>
+  >;
+  index?: number;
+}) => {
   const { width: screenWidth } = useWindowDimensions();
   return (
     <Popover>
@@ -36,8 +48,15 @@ const ButtonInteractionDialog = ({ trigger }: { trigger: React.ReactNode }) => {
               Button title
             </label>
             <Input
-              // value={email}
-              // onChange={(e) => setEmail(e.target.value)}
+              value={buttonList?.[index || 0]?.title}
+              onChange={(e) =>
+                setButtonList &&
+                setButtonList((prev) =>
+                  prev.map((item, i) =>
+                    i === index ? { ...item, title: e.target.value } : item
+                  )
+                )
+              }
               id="title"
               className="p-2 mt-1 rounded   placeholder:text-xs placeholder:font-light w-full"
               placeholder="Enter button title"
@@ -48,7 +67,17 @@ const ButtonInteractionDialog = ({ trigger }: { trigger: React.ReactNode }) => {
               Button type
             </label>
             <div className="w-full !mt-1">
-              <Select defaultValue="message">
+              <Select
+                defaultValue={buttonList?.[index || 0]?.type}
+                onValueChange={(e) =>
+                  setButtonList &&
+                  setButtonList((prev) =>
+                    prev.map((item, i) =>
+                      i === index ? { ...item, type: e } : item
+                    )
+                  )
+                }
+              >
                 <SelectTrigger className="p-2  ">
                   <SelectValue
                     className="placeholder:text-xs"

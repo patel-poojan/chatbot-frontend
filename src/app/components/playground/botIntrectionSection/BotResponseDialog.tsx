@@ -103,7 +103,7 @@ const BotResponseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
             {responseList.length > 0 && (
               <div
                 ref={scrollRef}
-                className="rounded-b-lg max-h-[72.5dvh] sm:max-h-[70dvh] overflow-y-auto"
+                className="rounded-b-lg max-h-[74.63dvh] sm:max-h-[70dvh] overflow-y-auto"
               >
                 <div className="flex flex-col gap-4 bg-[#F1F1F1] p-4">
                   {responseList.map((item, index) => (
@@ -123,8 +123,14 @@ const BotResponseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
                         </div>
                         <div
                           className={`${
-                            index === 0 && "hidden"
-                          } bg-white rounded-lg cursor-pointer w-fit p-2`}
+                            index === 0
+                              ? "cursor-not-allowed opacity-50"
+                              : "cursor-pointer hover:bg-red-100"
+                          } flex items-center justify-center bg-white rounded-full w-10 h-10 p-2 transition-all duration-200`}
+                          // className={`${
+                          //   index === 0 && "hidden"
+                          // } bg-white rounded-lg cursor-pointer w-fit p-2`}
+                          title={index !== 0 ? "Delete" : "Cannot delete"}
                           onClick={() => {
                             index !== 0 && removeResponse(index);
                           }}
