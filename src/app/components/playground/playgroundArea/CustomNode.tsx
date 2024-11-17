@@ -117,7 +117,7 @@ export const BotResponseNode = ({
           <PopoverTrigger>
             {data.isDelete ? (
               <>
-                <div className="text-red-500 text-xs hidden group-hover:block w-[145px]  text-center cursor-pointer absolute -top-4 left-0">
+                <div className="text-red-500 text-xs hidden group-hover:block w-[145px]  text-center cursor-pointer absolute -top-5 left-0">
                   Delete
                 </div>
                 {data.message && (
@@ -132,7 +132,7 @@ export const BotResponseNode = ({
               </span>
             )}
           </PopoverTrigger>
-          <PopoverContent className="-mt-14  shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
+          <PopoverContent className="-mt-[60px]  shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
               className="text-red-500 text-center text-xs cursor-pointer"
               onClick={() =>
@@ -288,7 +288,7 @@ export const UserInputNode = ({
           <PopoverTrigger>
             {data.isDelete ? (
               <>
-                <div className="text-red-500 text-xs w-14  hidden group-hover:block  text-center cursor-pointer absolute -top-[22px] left-0">
+                <div className="text-red-500 text-xs w-14  hidden group-hover:block  text-center cursor-pointer absolute -top-6 left-0">
                   Delete
                 </div>
                 {data.message && (
@@ -305,7 +305,7 @@ export const UserInputNode = ({
               )
             )}
           </PopoverTrigger>
-          <PopoverContent className="-mt-[63px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
+          <PopoverContent className="-mt-[65px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
               className={`${
                 !outgoingEdge ? "text-red-500" : "text-red-100"
@@ -410,7 +410,7 @@ export const QuestionNode = ({
           <PopoverTrigger>
             {data.isDelete ? (
               <>
-                <div className="text-red-500 text-xs hidden group-hover:block w-[145px] text-center cursor-pointer absolute -top-4 left-0">
+                <div className="text-red-500 text-xs hidden group-hover:block w-[145px] text-center cursor-pointer absolute -top-5 left-0">
                   Delete
                 </div>
                 {data.message && (
@@ -427,7 +427,7 @@ export const QuestionNode = ({
               )
             )}
           </PopoverTrigger>
-          <PopoverContent className="-mt-14 -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
+          <PopoverContent className="-mt-[60px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
               className={`${
                 !outgoingEdge ? "text-red-500" : "text-red-100"
@@ -520,7 +520,7 @@ export const SuccessNode = ({
           <PopoverTrigger>
             {data.isDelete ? (
               <>
-                <div className="text-red-500 text-xs hidden group-hover:block  w-[145px] text-center cursor-pointer absolute -top-4 left-0">
+                <div className="text-red-500 text-xs hidden group-hover:block  w-[145px] text-center cursor-pointer absolute -top-5 left-0">
                   Delete
                 </div>
                 {data.message && (
@@ -537,7 +537,7 @@ export const SuccessNode = ({
               )
             )}
           </PopoverTrigger>
-          <PopoverContent className="-mt-14 -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
+          <PopoverContent className="-mt-[60px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
               className={`${
                 !outgoingEdge ? "text-red-500" : "text-red-100"
@@ -630,7 +630,7 @@ export const FailureNode = ({
           <PopoverTrigger>
             {data.isDelete ? (
               <>
-                <div className="text-red-500 hidden group-hover:block text-xs  w-[145px] text-center cursor-pointer absolute -top-4 left-0">
+                <div className="text-red-500 hidden group-hover:block text-xs  w-[145px] text-center cursor-pointer absolute -top-5 left-0">
                   Delete
                 </div>
                 {data.message && (
@@ -647,7 +647,7 @@ export const FailureNode = ({
               )
             )}
           </PopoverTrigger>
-          <PopoverContent className="-mt-14 -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
+          <PopoverContent className="-mt-[60px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
               className={`${
                 !outgoingEdge ? "text-red-500" : "text-red-100"
@@ -740,7 +740,7 @@ export const CloseChatNode = ({
           <PopoverTrigger>
             {data.isDelete ? (
               <>
-                <div className="text-red-500 text-xs hidden group-hover:block w-[130px] text-center cursor-pointer absolute -top-4 left-0">
+                <div className="text-red-500 text-xs hidden group-hover:block w-[130px] text-center cursor-pointer absolute -top-5 left-0">
                   Delete
                 </div>
                 {data.message && (
@@ -757,7 +757,7 @@ export const CloseChatNode = ({
               )
             )}
           </PopoverTrigger>
-          <PopoverContent className="-mt-14 -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
+          <PopoverContent className="-mt-[60px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
               className={`${
                 !outgoingEdge ? "text-red-500" : "text-red-100"
@@ -856,7 +856,7 @@ export const FaqNode = ({
           <PopoverTrigger>
             {data.isDelete ? (
               <>
-                <div className="text-red-500 text-xs w-14 hidden group-hover:block   text-center cursor-pointer absolute -top-[22px] left-0">
+                <div className="text-red-500 text-xs w-14 hidden group-hover:block   text-center cursor-pointer absolute -top-6 left-0">
                   Delete
                 </div>
                 <span className="text-black text-xs  opacity-70 block group-hover:hidden  w-14  text-center absolute -top-6 left-0">
@@ -871,7 +871,7 @@ export const FaqNode = ({
               )
             )}
           </PopoverTrigger>
-          <PopoverContent className="-mt-[63px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
+          <PopoverContent className="-mt-[65px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
               className={`${
                 !outgoingEdge ? "text-red-500" : "text-red-100"
@@ -976,7 +976,7 @@ export const GoToStepNode = ({
           <PopoverTrigger>
             {data.isDelete ? (
               <>
-                <div className="text-red-500 text-xs hidden group-hover:block w-[145px] text-center cursor-pointer absolute -top-4 left-0">
+                <div className="text-red-500 text-xs hidden group-hover:block w-[145px] text-center cursor-pointer absolute -top-5 left-0">
                   Delete
                 </div>
                 {data.message && (
@@ -993,7 +993,7 @@ export const GoToStepNode = ({
               )
             )}
           </PopoverTrigger>
-          <PopoverContent className="-mt-14 -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
+          <PopoverContent className="-mt-[60px] -ms-3 shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
             <span
               className={`${
                 !outgoingEdge ? "text-red-500" : "text-red-100"
