@@ -1,9 +1,9 @@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { IoCameraSharp } from "react-icons/io5";
 import ButtonInteractionDialog from "./ButtonInteractionDialog";
 import { useState } from "react";
 import { RiDeleteBinLine } from "react-icons/ri";
+import UploadImage from "./UploadImage";
 
 export const TextNodeResponse = () => {
   return (
@@ -11,27 +11,15 @@ export const TextNodeResponse = () => {
       placeholder="Entre bot response"
       rows={3}
       maxLength={1024}
-      className="resize-none border border-transparent bg-white p-3 rounded-md shadow-sm focus:outline-none hover:border-[#57C0DD] focus-visible:ring-0 overflow-y-auto"
+      className="resize-none border border-transparent bg-white p-3 rounded-md shadow-none focus:outline-none hover:border-[#57C0DD] focus-visible:ring-0 overflow-y-auto"
     />
   );
 };
 
-export const ImageNodeResponse = () => {
+export const ImageNodeResponse: React.FC = () => {
   return (
-    <div className="w-9/12">
-      <label className="flex items-center justify-between rounded-md bg-white text-black hover:text-white hover:bg-[#57C0DD] h-64 w-full  p-2 cursor-pointer">
-        <input
-          type="file"
-          className="hidden"
-          //  onChange={handleFileChange}
-        />
-        <div className="mx-auto  flex flex-col items-center justify-center">
-          <IoCameraSharp className="text-2xl" />
-          <span className="text-sm sm:text-base w-full text-center ">
-            Browse
-          </span>
-        </div>
-      </label>
+    <div className="w-9/12 h-64">
+      <UploadImage />
     </div>
   );
 };
@@ -50,16 +38,8 @@ export const GalleryNodeResponse = () => {
 
   return (
     <div className="w-8/12">
-      <div>
-        <label className="flex items-center justify-between rounded-md bg-gray-200 h-52 w-full  text-black hover:text-white hover:bg-[#57C0DD]  p-2 cursor-pointer">
-          <input type="file" className="hidden" />
-          <div className="mx-auto  flex flex-col items-center justify-center">
-            <IoCameraSharp className="text-2xl" />
-            <span className="text-sm sm:text-base w-full text-center ">
-              Browse
-            </span>
-          </div>
-        </label>
+      <div className="h-52">
+        <UploadImage bg="bg-gray-200" />
       </div>
 
       <div>
@@ -75,7 +55,7 @@ export const GalleryNodeResponse = () => {
             placeholder="Type card description"
             rows={2}
             maxLength={80}
-            className="resize-none border-transparent bg-white p-3 rounded-md shadow-sm focus:outline-none focus-visible:ring-0 hover:border-[#57C0DD] focus-visible:border-[#57C0DD] overflow-y-auto"
+            className="resize-none border-transparent bg-white p-3 rounded-md shadow-none focus:outline-none focus-visible:ring-0 hover:border-[#57C0DD] focus-visible:border-[#57C0DD] overflow-y-auto"
           />
         </div>
       </div>
@@ -94,7 +74,7 @@ export const GalleryNodeResponse = () => {
             />
             {index !== 0 ? (
               <div
-                className="absolute top-1/2 -translate-y-1/2 right-[-12px] hidden group-hover:flex items-center justify-center bg-white rounded-full p-1 cursor-pointer shadow-md"
+                className="absolute top-1/2 -translate-y-1/2 right-[-12px] md:hidden md:group-hover:flex items-center justify-center bg-white rounded-full p-1 cursor-pointer shadow-md"
                 onClick={() => handleDeleteButton(index)}
               >
                 <RiDeleteBinLine className="text-red-500 h-4 w-4" />
@@ -132,7 +112,7 @@ export const ButtonNodeResponse = () => {
           placeholder="Entre your message..."
           rows={4}
           maxLength={80}
-          className="resize-none border border-transparent bg-white p-3 rounded-md shadow-sm focus:outline-none focus-visible:ring-0 hover:border-[#57C0DD] focus-visible:border-[#57C0DD]  overflow-y-auto"
+          className="resize-none border border-transparent bg-white p-3 rounded-md shadow-none focus:outline-none focus-visible:ring-0 hover:border-[#57C0DD] focus-visible:border-[#57C0DD]  overflow-y-auto"
         />
       </div>
       {buttonList.map((button, index) => (
@@ -149,7 +129,7 @@ export const ButtonNodeResponse = () => {
           />
           {index !== 0 ? (
             <div
-              className="absolute top-1/2 -translate-y-1/2 right-[-12px] hidden group-hover:flex items-center justify-center bg-white rounded-full p-1 cursor-pointer shadow-md"
+              className="absolute top-1/2 -translate-y-1/2 right-[-12px] md:hidden md:group-hover:flex items-center justify-center bg-white rounded-full p-1 cursor-pointer shadow-md"
               onClick={() => handleDeleteButton(index)}
             >
               <RiDeleteBinLine className="text-red-500 h-4 w-4" />
@@ -186,7 +166,7 @@ export const QuickNodeResponse = () => {
       <Textarea
         placeholder="Enter Your message..."
         rows={3}
-        className="resize-none border border-transparent bg-white p-3 rounded-md shadow-sm focus:outline-none hover:border-[#57C0DD] focus-visible:ring-0 overflow-y-auto"
+        className="resize-none border border-transparent bg-white p-3 rounded-md shadow-none focus:outline-none hover:border-[#57C0DD] focus-visible:ring-0 overflow-y-auto"
       />
       <div className="flex items-center flex-wrap gap-2">
         {buttonList.map((item, index) => (
@@ -203,7 +183,7 @@ export const QuickNodeResponse = () => {
             />
             {index !== 0 ? (
               <div
-                className="absolute -top-3 -right-1 hidden group-hover:flex items-center justify-center bg-white rounded-full p-1 cursor-pointer"
+                className="absolute -top-3 -right-1 md:hidden md:group-hover:flex items-center justify-center bg-white rounded-full p-1 cursor-pointer"
                 onClick={() => handleDeleteButton(index)}
               >
                 <RiDeleteBinLine className="text-red-500 h-4 w-4" />

@@ -17,7 +17,6 @@ import BotResponseDialog from "../botIntrectionSection/BotResponseDialog";
 import UserInputDialog from "../botIntrectionSection/UserInputDialog";
 import GoToStepDialog from "../botIntrectionSection/GoToStepDialog";
 import FAQDialog from "../botIntrectionSection/FAQDialog";
-import useWindowDimensions from "@/utils/windowSize";
 
 const NodeContainer = ({
   children,
@@ -47,14 +46,8 @@ export const StartNode = ({
 }: {
   data: { label: string; message: string; actionHandler: () => void };
 }) => {
-  // const [isHovered, setIsHovered] = useState(false);
-  // const { actionHandler } = usePlayground();
   return (
-    <div
-      className="relative flex items-center gap-2"
-      // onMouseEnter={() => setIsHovered(true)}
-      // onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className="relative flex items-center gap-2">
       {data.message && (
         <span className="text-black text-xs opacity-70 w-[145px] text-center absolute -top-5 left-0">
           {data.message}
@@ -68,15 +61,6 @@ export const StartNode = ({
         <span className="text-white text-sm">{data.label}</span>
         <CustomHandle type="source" position={Position.Right} />
       </NodeContainer>
-      {/* {isHovered && (
-        <IoMdAdd
-          className="bg-[#fff] rounded-full hover:text-[#1844F0] h-6 w-6 p-1 cursor-pointer"
-          onClick={() => actionHandler()}
-          style={{
-            boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)",
-          }}
-        />
-      )} */}
     </div>
   );
 };
@@ -86,14 +70,8 @@ export const DefaultNode = ({
 }: {
   data: { label: string; message: string; actionHandler: () => void };
 }) => {
-  // const [isHovered, setIsHovered] = useState(false);
-  // const { actionHandler } = usePlayground();
   return (
-    <div
-      className="relative flex items-center gap-2"
-      // onMouseEnter={() => setIsHovered(true)}
-      // onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className="relative flex items-center gap-2">
       {data.message && (
         <span className="text-black text-xs opacity-70 w-[152px] text-center absolute -top-5 left-0">
           {data.message}
@@ -107,15 +85,6 @@ export const DefaultNode = ({
         <CustomHandle type="target" position={Position.Left} />
         <CustomHandle type="source" position={Position.Right} />
       </NodeContainer>
-      {/* {isHovered && (
-        <IoMdAdd
-          onClick={() => actionHandler()}
-          className="bg-[#fff] rounded-full hover:text-[#1844F0] h-6 w-6 p-1 cursor-pointer"
-          style={{
-            boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)",
-          }}
-        />
-      )} */}
     </div>
   );
 };
@@ -131,7 +100,6 @@ export const BotResponseNode = ({
   };
   id: string;
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const { getEdges, getNodes } = useReactFlow();
   const { deleteNodeHandler } = usePlayground();
@@ -142,26 +110,26 @@ export const BotResponseNode = ({
   const nodes = getNodes();
   const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
   const currentNode = nodes.find((node) => node.id === id);
-  const { width: screenWidth } = useWindowDimensions();
   return (
-    <div
-      className="flex items-center gap-2"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className="flex relative group items-center gap-2">
       <div className="relative flex  flex-col items-center justify-center">
         <Popover>
           <PopoverTrigger>
-            {isHovered && data.isDelete ? (
-              <div className="text-red-500 text-xs w-[145px]  text-center cursor-pointer absolute -top-4 left-0">
-                Delete
-              </div>
+            {data.isDelete ? (
+              <>
+                <div className="text-red-500 text-xs hidden group-hover:block w-[145px]  text-center cursor-pointer absolute -top-4 left-0">
+                  Delete
+                </div>
+                {data.message && (
+                  <span className="text-black text-xs block group-hover:hidden opacity-70 w-[145px] text-center absolute -top-5 left-0">
+                    {data.message}
+                  </span>
+                )}
+              </>
             ) : (
-              data.message && (
-                <span className="text-black text-xs  opacity-70 w-[145px] text-center absolute -top-5 left-0">
-                  {data.message}
-                </span>
-              )
+              <span className="text-black text-xs  opacity-70 w-[145px] text-center absolute -top-5 left-0">
+                {data.message}
+              </span>
             )}
           </PopoverTrigger>
           <PopoverContent className="-mt-14  shadow-lg flex flex-col w-40 p-1 z-50 rounded-lg">
@@ -200,7 +168,7 @@ export const BotResponseNode = ({
 
         <BotResponseDialog
           trigger={
-            <button onClick={() => setIsHovered(false)}>
+            <button>
               <NodeContainer
                 nodeCss="bg-white  w-[145px]"
                 shadow="0px 0px 12px 4px #00000014"
@@ -214,17 +182,14 @@ export const BotResponseNode = ({
           }
         />
       </div>
-
-      {(isHovered || screenWidth < 768) && (
-        <IoMdAdd
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsPopupVisible((prev) => !prev);
-          }}
-          className="bg-white text-black hover:text-[#1844F0] rounded-full h-6 w-6 p-1 cursor-pointer"
-          style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
-        />
-      )}
+      <IoMdAdd
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsPopupVisible((prev) => !prev);
+        }}
+        className="bg-white text-black hover:text-[#1844F0] rounded-full h-6 w-6 p-1 cursor-pointer md:hidden md:group-hover:block"
+        style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
+      />
       {isPopupVisible && (
         <AddNodePopup
           parentId={id}
@@ -275,15 +240,8 @@ export const AiAssistNode = ({
 }: {
   data: { label: string; message: string; actionHandler: () => void };
 }) => {
-  // const [isHovered, setIsHovered] = useState(false);
-  // const { actionHandler } = usePlayground();
-
   return (
-    <div
-      className="relative flex gap-2 items-center "
-      // onMouseEnter={() => setIsHovered(true)}
-      // onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className="relative flex gap-2 items-center ">
       {data.message && (
         <span className="text-black text-xs opacity-70 w-[145px] text-center absolute -top-5 left-0">
           {data.message}
@@ -303,13 +261,6 @@ export const AiAssistNode = ({
         <span className="text-white text-sm ">{data.label}</span>
         <CustomHandle type="target" position={Position.Left} />
       </NodeContainer>
-      {/* {isHovered && (
-        <IoMdAdd
-          onClick={() => actionHandler()}
-          className="bg-[#fff] hover:text-[#1844F0] rounded-full h-6 w-6 p-1 cursor-pointer"
-          style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
-        />
-      )} */}
     </div>
   );
 };
@@ -321,7 +272,6 @@ export const UserInputNode = ({
   data: { label: string; message: string; isDelete: boolean };
   id: string;
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const { getEdges, getNodes } = useReactFlow();
   const { deleteNodeHandler } = usePlayground();
@@ -331,22 +281,22 @@ export const UserInputNode = ({
   const nodes = getNodes();
   const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
   const currentNode = nodes.find((node) => node.id === id);
-  const { width: screenWidth } = useWindowDimensions();
   return (
-    <div
-      className="relative flex items-center gap-2"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => {
-        setIsHovered(false);
-      }}
-    >
+    <div className="relative group  flex items-center gap-2">
       <div className="relative flex  flex-col items-center justify-center">
         <Popover>
           <PopoverTrigger>
-            {isHovered && data.isDelete ? (
-              <div className="text-red-500 text-xs w-14   text-center cursor-pointer absolute -top-[22px] left-0">
-                Delete
-              </div>
+            {data.isDelete ? (
+              <>
+                <div className="text-red-500 text-xs w-14  hidden group-hover:block  text-center cursor-pointer absolute -top-[22px] left-0">
+                  Delete
+                </div>
+                {data.message && (
+                  <span className="text-black text-xs  opacity-70 block group-hover:hidden w-14  text-center absolute -top-6 left-0">
+                    {data.message}
+                  </span>
+                )}
+              </>
             ) : (
               data.message && (
                 <span className="text-black text-xs  opacity-70  w-14  text-center absolute -top-6 left-0">
@@ -395,7 +345,7 @@ export const UserInputNode = ({
         </Popover>
         <UserInputDialog
           trigger={
-            <div className="relative" onClick={() => setIsHovered(false)}>
+            <div className="relative">
               <div
                 className="relative flex items-center justify-center triangle_highlight w-12 h-12 bg-white border border-[#C9D3DE] rotate-45 mx-1 rounded-lg"
                 style={{ boxShadow: "0px 0px 12px 4px #00000014" }}
@@ -415,18 +365,15 @@ export const UserInputNode = ({
           }
         />
       </div>
-      {isHovered || screenWidth < 768 ? (
-        <IoMdAdd
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsPopupVisible((prev) => !prev);
-          }}
-          className="bg-[#fff] hover:text-[#1844F0] rounded-full h-6 w-6 p-1 cursor-pointer "
-          style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
-        />
-      ) : (
-        <></>
-      )}
+      <IoMdAdd
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsPopupVisible((prev) => !prev);
+        }}
+        className="bg-[#fff] hover:text-[#1844F0] md:hidden md:group-hover:block rounded-full h-6 w-6 p-1 cursor-pointer "
+        style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
+      />
+
       {isPopupVisible && (
         <AddNodePopup
           parentId={id}
@@ -447,7 +394,6 @@ export const QuestionNode = ({
   data: { label: string; message: string; isDelete: boolean };
   id: string;
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const { getEdges, getNodes } = useReactFlow();
   const { deleteNodeHandler } = usePlayground();
@@ -457,20 +403,22 @@ export const QuestionNode = ({
   const nodes = getNodes();
   const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
   const currentNode = nodes.find((node) => node.id === id);
-  const { width: screenWidth } = useWindowDimensions();
   return (
-    <div
-      className="relative flex items-center gap-2"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className="relative group flex items-center gap-2">
       <div className="relative flex  flex-col items-center justify-center">
         <Popover>
           <PopoverTrigger>
-            {isHovered && data.isDelete ? (
-              <div className="text-red-500 text-xs  w-[145px] text-center cursor-pointer absolute -top-4 left-0">
-                Delete
-              </div>
+            {data.isDelete ? (
+              <>
+                <div className="text-red-500 text-xs hidden group-hover:block w-[145px] text-center cursor-pointer absolute -top-4 left-0">
+                  Delete
+                </div>
+                {data.message && (
+                  <span className="text-black text-xs block group-hover:hidden  opacity-70 w-[145px] text-center absolute -top-5 left-0">
+                    {data.message}
+                  </span>
+                )}
+              </>
             ) : (
               data.message && (
                 <span className="text-black text-xs  opacity-70 w-[145px] text-center absolute -top-5 left-0">
@@ -527,16 +475,16 @@ export const QuestionNode = ({
           <CustomHandle type="source" position={Position.Right} />
         </NodeContainer>
       </div>
-      {(isHovered || screenWidth < 768) && (
-        <IoMdAdd
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsPopupVisible((prev) => !prev);
-          }}
-          className="bg-[#fff] hover:text-[#1844F0] rounded-full h-6 w-6 p-1 cursor-pointer"
-          style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
-        />
-      )}
+
+      <IoMdAdd
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsPopupVisible((prev) => !prev);
+        }}
+        className="bg-[#fff] hover:text-[#1844F0] md:hidden md:group-hover:block rounded-full h-6 w-6 p-1 cursor-pointer"
+        style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
+      />
+
       {isPopupVisible && (
         <AddNodePopup
           parentId={id}
@@ -556,7 +504,6 @@ export const SuccessNode = ({
   data: { label: string; message: string; isDelete: boolean };
   id: string;
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const { getEdges, getNodes } = useReactFlow();
   const { deleteNodeHandler } = usePlayground();
@@ -566,20 +513,22 @@ export const SuccessNode = ({
   const nodes = getNodes();
   const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
   const currentNode = nodes.find((node) => node.id === id);
-  const { width: screenWidth } = useWindowDimensions();
   return (
-    <div
-      className="relative flex items-center gap-2"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className="relative group flex items-center gap-2">
       <div className="relative flex  flex-col items-center justify-center">
         <Popover>
           <PopoverTrigger>
-            {isHovered && data.isDelete ? (
-              <div className="text-red-500 text-xs  w-[145px] text-center cursor-pointer absolute -top-4 left-0">
-                Delete
-              </div>
+            {data.isDelete ? (
+              <>
+                <div className="text-red-500 text-xs hidden group-hover:block  w-[145px] text-center cursor-pointer absolute -top-4 left-0">
+                  Delete
+                </div>
+                {data.message && (
+                  <span className="text-black text-xs block md:group-hover:hidden opacity-70 w-[145px] text-center absolute -top-5 left-0">
+                    {data.message}
+                  </span>
+                )}
+              </>
             ) : (
               data.message && (
                 <span className="text-black text-xs  opacity-70 w-[145px] text-center absolute -top-5 left-0">
@@ -636,16 +585,16 @@ export const SuccessNode = ({
           {/* <CustomHandle type="source" position={Position.Right} /> */}
         </NodeContainer>
       </div>
-      {(isHovered || screenWidth < 768) && (
-        <IoMdAdd
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsPopupVisible((prev) => !prev);
-          }}
-          className="bg-[#fff] hover:text-[#1844F0] rounded-full h-6 w-6 p-1 cursor-pointer"
-          style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
-        />
-      )}
+
+      <IoMdAdd
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsPopupVisible((prev) => !prev);
+        }}
+        className="bg-[#fff] hover:text-[#1844F0] md:hidden md:group-hover:block rounded-full h-6 w-6 p-1 cursor-pointer"
+        style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
+      />
+
       {isPopupVisible && (
         <AddNodePopup
           parentId={id}
@@ -665,7 +614,6 @@ export const FailureNode = ({
   data: { label: string; message: string; isDelete: boolean };
   id: string;
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const { getEdges, getNodes } = useReactFlow();
   const { deleteNodeHandler } = usePlayground();
@@ -675,20 +623,22 @@ export const FailureNode = ({
   const nodes = getNodes();
   const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
   const currentNode = nodes.find((node) => node.id === id);
-  const { width: screenWidth } = useWindowDimensions();
   return (
-    <div
-      className="relative flex items-center gap-2"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className="relative group flex items-center gap-2">
       <div className="relative flex  flex-col items-center justify-center">
         <Popover>
           <PopoverTrigger>
-            {isHovered && data.isDelete ? (
-              <div className="text-red-500 text-xs  w-[145px] text-center cursor-pointer absolute -top-4 left-0">
-                Delete
-              </div>
+            {data.isDelete ? (
+              <>
+                <div className="text-red-500 hidden group-hover:block text-xs  w-[145px] text-center cursor-pointer absolute -top-4 left-0">
+                  Delete
+                </div>
+                {data.message && (
+                  <span className="text-black text-xs block md:group-hover:hidden  opacity-70 w-[145px] text-center absolute -top-5 left-0">
+                    {data.message}
+                  </span>
+                )}
+              </>
             ) : (
               data.message && (
                 <span className="text-black text-xs  opacity-70 w-[145px] text-center absolute -top-5 left-0">
@@ -745,16 +695,16 @@ export const FailureNode = ({
           {/* <CustomHandle type="source" position={Position.Right} /> */}
         </NodeContainer>
       </div>
-      {(isHovered || screenWidth < 768) && (
-        <IoMdAdd
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsPopupVisible((prev) => !prev);
-          }}
-          className="bg-[#fff] hover:text-[#1844F0] rounded-full h-6 w-6 p-1 cursor-pointer"
-          style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
-        />
-      )}
+
+      <IoMdAdd
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsPopupVisible((prev) => !prev);
+        }}
+        className="bg-[#fff] md:hidden md:group-hover:block hover:text-[#1844F0] rounded-full h-6 w-6 p-1 cursor-pointer"
+        style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
+      />
+
       {isPopupVisible && (
         <AddNodePopup
           parentId={id}
@@ -774,7 +724,6 @@ export const CloseChatNode = ({
   data: { label: string; message: string; isDelete: boolean };
   id: string;
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const { getEdges, getNodes } = useReactFlow();
   const { deleteNodeHandler } = usePlayground();
@@ -784,20 +733,22 @@ export const CloseChatNode = ({
   const nodes = getNodes();
   const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
   const currentNode = nodes.find((node) => node.id === id);
-  const { width: screenWidth } = useWindowDimensions();
   return (
-    <div
-      className="relative flex items-center gap-2"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className="relative group flex items-center gap-2">
       <div className="relative flex  flex-col items-center justify-center">
         <Popover>
           <PopoverTrigger>
-            {isHovered && data.isDelete ? (
-              <div className="text-red-500 text-xs  w-[130px] text-center cursor-pointer absolute -top-4 left-0">
-                Delete
-              </div>
+            {data.isDelete ? (
+              <>
+                <div className="text-red-500 text-xs hidden group-hover:block w-[130px] text-center cursor-pointer absolute -top-4 left-0">
+                  Delete
+                </div>
+                {data.message && (
+                  <span className="text-black text-xs block group-hover:hidden  opacity-70 w-[130px] text-center absolute -top-5 left-0">
+                    {data.message}
+                  </span>
+                )}
+              </>
             ) : (
               data.message && (
                 <span className="text-black text-xs  opacity-70 w-[130px] text-center absolute -top-5 left-0">
@@ -859,16 +810,16 @@ export const CloseChatNode = ({
           <CustomHandle type="target" position={Position.Left} />
         </NodeContainer>
       </div>
-      {(isHovered || screenWidth < 768) && (
-        <IoMdAdd
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsPopupVisible((prev) => !prev);
-          }}
-          className="bg-[#fff] hover:text-[#1844F0] rounded-full h-6 w-6 p-1 cursor-pointer"
-          style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
-        />
-      )}
+
+      <IoMdAdd
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsPopupVisible((prev) => !prev);
+        }}
+        className="bg-[#fff] hover:text-[#1844F0] md:hidden md:group-hover:block rounded-full h-6 w-6 p-1 cursor-pointer"
+        style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
+      />
+
       {isPopupVisible && (
         <AddNodePopup
           parentId={id}
@@ -889,7 +840,6 @@ export const FaqNode = ({
   data: { label: string; message: string; isDelete: boolean };
   id: string;
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const { getEdges, getNodes } = useReactFlow();
   const { deleteNodeHandler } = usePlayground();
@@ -899,20 +849,20 @@ export const FaqNode = ({
   const nodes = getNodes();
   const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
   const currentNode = nodes.find((node) => node.id === id);
-  const { width: screenWidth } = useWindowDimensions();
   return (
-    <div
-      className="relative flex items-center gap-2"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className="relative group flex items-center gap-2">
       <div className="relative flex  flex-col items-center justify-center">
         <Popover>
           <PopoverTrigger>
-            {isHovered && data.isDelete ? (
-              <div className="text-red-500 text-xs w-14   text-center cursor-pointer absolute -top-[22px] left-0">
-                Delete
-              </div>
+            {data.isDelete ? (
+              <>
+                <div className="text-red-500 text-xs w-14 hidden group-hover:block   text-center cursor-pointer absolute -top-[22px] left-0">
+                  Delete
+                </div>
+                <span className="text-black text-xs  opacity-70 block group-hover:hidden  w-14  text-center absolute -top-6 left-0">
+                  {data.message}
+                </span>
+              </>
             ) : (
               data.message && (
                 <span className="text-black text-xs  opacity-70  w-14  text-center absolute -top-6 left-0">
@@ -961,7 +911,7 @@ export const FaqNode = ({
         </Popover>
         <FAQDialog
           trigger={
-            <div className="relative" onClick={() => setIsHovered(false)}>
+            <div className="relative">
               <div
                 className="relative flex items-center justify-center w-12 h-12  triangle_highlight bg-orange-400 rotate-45 mx-1 rounded-lg"
                 style={{ boxShadow: "0px 0px 12px 4px #00000014" }}
@@ -981,18 +931,15 @@ export const FaqNode = ({
           }
         />
       </div>
-      {isHovered || screenWidth < 768 ? (
-        <IoMdAdd
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsPopupVisible((prev) => !prev);
-          }}
-          className="bg-[#fff] hover:text-[#1844F0] rounded-full h-6 w-6 p-1 cursor-pointer "
-          style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
-        />
-      ) : (
-        <></>
-      )}
+      <IoMdAdd
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsPopupVisible((prev) => !prev);
+        }}
+        className="bg-[#fff] hover:text-[#1844F0] md:hidden md:group-hover:block rounded-full h-6 w-6 p-1 cursor-pointer "
+        style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
+      />
+
       {isPopupVisible && (
         <AddNodePopup
           parentId={id}
@@ -1013,7 +960,6 @@ export const GoToStepNode = ({
   data: { label: string; message: string; isDelete: boolean };
   id: string;
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const { getEdges, getNodes } = useReactFlow();
   const { deleteNodeHandler } = usePlayground();
@@ -1023,20 +969,22 @@ export const GoToStepNode = ({
   const nodes = getNodes();
   const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
   const currentNode = nodes.find((node) => node.id === id);
-  const { width: screenWidth } = useWindowDimensions();
   return (
-    <div
-      className="relative flex items-center gap-2"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className="relative flex group items-center gap-2">
       <div className="relative flex  flex-col items-center justify-center">
         <Popover>
           <PopoverTrigger>
-            {isHovered && data.isDelete ? (
-              <div className="text-red-500 text-xs  w-[145px] text-center cursor-pointer absolute -top-4 left-0">
-                Delete
-              </div>
+            {data.isDelete ? (
+              <>
+                <div className="text-red-500 text-xs hidden group-hover:block w-[145px] text-center cursor-pointer absolute -top-4 left-0">
+                  Delete
+                </div>
+                {data.message && (
+                  <span className="text-black text-xs block group-hover:hidden  opacity-70 w-[145px] text-center absolute -top-5 left-0">
+                    {data.message}
+                  </span>
+                )}
+              </>
             ) : (
               data.message && (
                 <span className="text-black text-xs  opacity-70 w-[145px] text-center absolute -top-5 left-0">
@@ -1085,7 +1033,7 @@ export const GoToStepNode = ({
         </Popover>
         <GoToStepDialog
           trigger={
-            <button onClick={() => setIsHovered(false)}>
+            <button>
               <NodeContainer
                 nodeCss="bg-[#FFDC66]  w-[145px]"
                 shadow="0px 0px 12px 4px #00000014"
@@ -1104,16 +1052,14 @@ export const GoToStepNode = ({
           }
         />
       </div>
-      {(isHovered || screenWidth < 768) && (
-        <IoMdAdd
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsPopupVisible((prev) => !prev);
-          }}
-          className="bg-[#fff] hover:text-[#1844F0] rounded-full h-6 w-6 p-1 cursor-pointer"
-          style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
-        />
-      )}
+      <IoMdAdd
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsPopupVisible((prev) => !prev);
+        }}
+        className="bg-[#fff] hover:text-[#1844F0] rounded-full md:hidden md:group-hover:block h-6 w-6 p-1 cursor-pointer"
+        style={{ boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)" }}
+      />
       {isPopupVisible && (
         <AddNodePopup
           parentId={id}
