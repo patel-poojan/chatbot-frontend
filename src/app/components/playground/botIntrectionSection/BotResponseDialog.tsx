@@ -29,27 +29,11 @@ import {
 } from '@/utils/nodeIntrection-api';
 import { toast } from 'sonner';
 import { axiosError } from '@/types/axiosTypes';
-import { TypeNodeInfo } from '@/types/node';
+import { TypeNodeInfo, TypeResponseList } from '@/types/node';
 import { usePlayground } from '../playgroundArea/PlaygroundContext';
 import { useParams } from 'next/navigation';
 import { Loader } from '../../Loader';
 
-interface ResponseInfo {
-  file?: string;
-  title?: string;
-  description?: string;
-  button?: {
-    title: string;
-    type: string;
-    navigationInfo: string;
-  }[];
-}
-
-interface TypeResponseList {
-  type: 'text' | 'image' | 'button' | 'quick' | 'gallery';
-  delay: number;
-  info: ResponseInfo;
-}
 const BotResponseDialog = ({
   trigger,
   nodeId,
@@ -63,13 +47,7 @@ const BotResponseDialog = ({
   const params = useParams();
   const playgroundId = params.id;
   const { refetchHandler } = usePlayground();
-  const [responseList, setResponseList] = useState<TypeResponseList[]>([
-    {
-      type: 'text',
-      delay: 2000,
-      info: { description: '' },
-    },
-  ]);
+  const [responseList, setResponseList] = useState<TypeResponseList[] | []>([]);
 
   const renderNodeResponse = (item: TypeResponseList, index: number) => {
     const type = item.type;
@@ -97,9 +75,27 @@ const BotResponseDialog = ({
           />
         );
       case 'quick':
-        return <QuickNodeResponse />;
+        return (
+          <QuickNodeResponse
+            info={{
+              description: item.info.description || '',
+              button: item.info.button || [],
+            }}
+            setResponseList={setResponseList}
+            index={index}
+          />
+        );
       case 'button':
-        return <ButtonNodeResponse />;
+        return (
+          <ButtonNodeResponse
+            info={{
+              description: item.info.description || '',
+              button: item.info.button || [],
+            }}
+            setResponseList={setResponseList}
+            index={index}
+          />
+        );
       default:
         return null;
     }
@@ -112,6 +108,7 @@ const BotResponseDialog = ({
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   };
+
   useEffect(() => {
     scroll();
   }, [responseList]);
@@ -121,6 +118,9 @@ const BotResponseDialog = ({
       onSuccess(data) {
         if (data.data.node) {
           setNodeInfo(data.data.node);
+          if (Array.isArray(data.data.node.response)) {
+            setResponseList(data.data.node.response);
+          }
         }
         // toast.success(data?.message);
       },
@@ -159,10 +159,14 @@ const BotResponseDialog = ({
   }, [fetchNodeInformation, isDialog, nodeId, playgroundId]);
   const updateHandler = () => {
     if (nodeInfo && nodeId && playgroundId && isDialog) {
+      const updatedNodeInfo: TypeNodeInfo = {
+        ...nodeInfo,
+        response: responseList,
+      };
       updateNodeInformation({
         nodeId,
         playgroundId: playgroundId as string,
-        data: nodeInfo,
+        data: updatedNodeInfo,
       });
     }
   };
@@ -179,6 +183,7 @@ const BotResponseDialog = ({
       })
     );
   };
+
   return (
     <Dialog open={isDialog} onOpenChange={setIsDialog}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
@@ -358,7 +363,7 @@ export const NodeResponseList = ({
           file: '',
           title: '',
           description: '',
-          button: [{ title: '', type: '', navigationInfo: '' }],
+          button: [{ title: 'button', type: 'message', navigationInfo: '' }],
         },
       },
     },
@@ -379,7 +384,7 @@ export const NodeResponseList = ({
         delay: 2000,
         info: {
           description: '',
-          button: [{ title: '', type: '', navigationInfo: '' }],
+          button: [{ title: 'button', type: 'message', navigationInfo: '' }],
         },
       },
     },
@@ -392,7 +397,7 @@ export const NodeResponseList = ({
         delay: 2000,
         info: {
           description: '',
-          button: [{ title: '', type: '', navigationInfo: '' }],
+          button: [{ title: 'button', type: 'message', navigationInfo: '' }],
         },
       },
     },

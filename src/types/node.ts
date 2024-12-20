@@ -1,3 +1,19 @@
+export interface ResponseInfo {
+  file?: string;
+  title?: string;
+  description?: string;
+  button?: {
+    title: string;
+    type: string;
+    navigationInfo: string;
+  }[];
+}
+
+export interface TypeResponseList {
+  type: 'text' | 'image' | 'button' | 'quick' | 'gallery';
+  delay: number;
+  info: ResponseInfo;
+}
 export interface TypeNodeInfo {
   id: string;
   type: string;
@@ -8,12 +24,5 @@ export interface TypeNodeInfo {
     x: number;
     y: number;
   };
-  response: {
-    delay: number;
-    title: string;
-    type: string;
-    filters: [];
-    matchAll: boolean;
-    buttons: [];
-  }[];
+  response: TypeResponseList[];
 }

@@ -1,25 +1,10 @@
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import ButtonInteractionDialog from './ButtonInteractionDialog';
-import { useState } from 'react';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import UploadImage from './UploadImage';
-interface ResponseInfo {
-  file?: string;
-  title?: string;
-  description?: string;
-  button?: {
-    title: string;
-    type: string;
-    navigationInfo: string;
-  }[];
-}
+import { ResponseInfo, TypeResponseList } from '@/types/node';
 
-interface TypeResponseList {
-  type: 'text' | 'image' | 'button' | 'quick' | 'gallery';
-  delay: number;
-  info: ResponseInfo;
-}
 export const TextNodeResponse = ({
   info,
   setResponseList,
@@ -64,28 +49,55 @@ export const GalleryNodeResponse = ({
   setResponseList: React.Dispatch<React.SetStateAction<TypeResponseList[]>>;
   index: number;
 }) => {
-  const [buttonList, setButtonList] = useState<
-    { title: string; type: string }[]
-  >([{ title: 'Button', type: 'message' }]);
-
   const addNewButton = () => {
-    setButtonList((prev) => [...prev, { title: 'Button', type: 'message' }]);
+    setResponseList((prev) => {
+      const prevList = [...prev];
+      const currentButtons = prevList[index].info.button || [];
+
+      prevList[index] = {
+        ...prevList[index],
+        info: {
+          ...prevList[index].info,
+          button: [
+            ...currentButtons,
+            {
+              title: 'button',
+              type: 'message',
+              navigationInfo: '',
+            },
+          ],
+        },
+      };
+
+      return prevList;
+    });
   };
-  const handleDeleteButton = (index: number) => {
-    setResponseList((prev) => prev.filter((_, i) => i !== index));
+
+  const handleDeleteButton = (buttonIndex: number) => {
+    setResponseList((prev) => {
+      const newList = [...prev];
+      if (newList[index].info.button) {
+        newList[index].info.button = newList[index].info.button.filter(
+          (_, i) => i !== buttonIndex
+        );
+      }
+      return newList;
+    });
   };
 
   return (
     <div className='w-8/12'>
       <div className='h-52'>
-        <UploadImage bg='bg-gray-200' />
+        <div className='bg-gray-200 h-full w-full flex items-center justify-center'>
+          Upload Image
+        </div>
       </div>
 
       <div>
         <div>
           <Input
             id='Title'
-            value={info.title}
+            value={info.title || ''}
             onChange={(event) => {
               setResponseList((prev) => {
                 const newList = [...prev];
@@ -100,7 +112,7 @@ export const GalleryNodeResponse = ({
         <div>
           <Textarea
             placeholder='Type card description'
-            value={info.description}
+            value={info.description || ''}
             onChange={(event) => {
               setResponseList((prev) => {
                 const newList = [...prev];
@@ -115,26 +127,27 @@ export const GalleryNodeResponse = ({
         </div>
       </div>
       <div>
-        {info?.button?.map((button, index) => (
-          <div key={index} className='group relative'>
+        {info?.button?.map((button, i) => (
+          <div key={i} className='group relative'>
             <ButtonInteractionDialog
-              buttonList={buttonList}
-              setButtonList={setButtonList}
-              index={index}
+              buttonList={info.button || []}
+              setResponseList={setResponseList}
+              index={i}
+              responseIndex={index}
               trigger={
                 <div className='text-[#57C0DD] py-2 border cursor-pointer bg-white border-b-0 border-s-0 border-r-0 mx-auto text-center border-t'>
                   {button.title}
                 </div>
               }
             />
-            {index !== 0 ? (
+            {i !== 0 && (
               <div
                 className='absolute top-1/2 -translate-y-1/2 right-[-12px] md:hidden md:group-hover:flex items-center justify-center bg-white rounded-full p-1 cursor-pointer shadow-md'
-                onClick={() => handleDeleteButton(index)}
+                onClick={() => handleDeleteButton(i)}
               >
                 <RiDeleteBinLine className='text-red-500 h-4 w-4' />
               </div>
-            ) : null}
+            )}
           </div>
         ))}
 
@@ -143,53 +156,95 @@ export const GalleryNodeResponse = ({
           onClick={addNewButton}
         >
           <span>+</span>
-          <span className='ml-2 '>Add Button</span>
+          <span className='ml-2'>Add Button</span>
         </div>
       </div>
     </div>
   );
 };
-
-export const ButtonNodeResponse = () => {
-  const [buttonList, setButtonList] = useState<
-    { title: string; type: string }[]
-  >([{ title: 'Button', type: 'message' }]);
+export const ButtonNodeResponse = ({
+  info,
+  setResponseList,
+  index,
+}: {
+  info: ResponseInfo;
+  setResponseList: React.Dispatch<React.SetStateAction<TypeResponseList[]>>;
+  index: number;
+}) => {
   const addNewButton = () => {
-    setButtonList((prev) => [...prev, { title: 'Button', type: 'message' }]);
+    setResponseList((prev) => {
+      const prevList = [...prev];
+      const currentButtons = prevList[index].info.button || [];
+
+      prevList[index] = {
+        ...prevList[index],
+        info: {
+          ...prevList[index].info,
+          button: [
+            ...currentButtons,
+            {
+              title: 'button',
+              type: 'message',
+              navigationInfo: '',
+            },
+          ],
+        },
+      };
+
+      return prevList;
+    });
   };
-  const handleDeleteButton = (index: number) => {
-    setButtonList((prev) => prev.filter((_, i) => i !== index));
+
+  const handleDeleteButton = (buttonIndex: number) => {
+    setResponseList((prev) => {
+      const newList = [...prev];
+      if (newList[index].info.button) {
+        newList[index].info.button = newList[index].info.button.filter(
+          (_, i) => i !== buttonIndex
+        );
+      }
+      return newList;
+    });
   };
   return (
     <div className='w-8/12'>
       <div>
         <Textarea
+          value={info.description || ''}
+          onChange={(event) => {
+            setResponseList((prev) => {
+              const newList = [...prev];
+              newList[index].info.description = event.target.value;
+              return newList;
+            });
+          }}
           placeholder='Entre your message...'
           rows={4}
           maxLength={80}
           className='resize-none border border-transparent bg-white p-3 rounded-md shadow-none focus:outline-none focus-visible:ring-0 hover:border-[#57C0DD] focus-visible:border-[#57C0DD]  overflow-y-auto'
         />
       </div>
-      {buttonList.map((button, index) => (
-        <div key={index} className='group relative'>
+      {info?.button?.map((button, i) => (
+        <div key={i} className='group relative'>
           <ButtonInteractionDialog
-            buttonList={buttonList}
-            setButtonList={setButtonList}
-            index={index}
+            buttonList={info.button || []}
+            setResponseList={setResponseList}
+            index={i}
+            responseIndex={index}
             trigger={
-              <div className='text-[#57C0DD] cursor-pointer py-2 border bg-white border-b-0 border-s-0 border-r-0 mx-auto text-center border-t '>
+              <div className='text-[#57C0DD] py-2 border cursor-pointer bg-white border-b-0 border-s-0 border-r-0 mx-auto text-center border-t'>
                 {button.title}
               </div>
             }
           />
-          {index !== 0 ? (
+          {i !== 0 && (
             <div
               className='absolute top-1/2 -translate-y-1/2 right-[-12px] md:hidden md:group-hover:flex items-center justify-center bg-white rounded-full p-1 cursor-pointer shadow-md'
-              onClick={() => handleDeleteButton(index)}
+              onClick={() => handleDeleteButton(i)}
             >
               <RiDeleteBinLine className='text-red-500 h-4 w-4' />
             </div>
-          ) : null}
+          )}
         </div>
       ))}
       <div
@@ -203,54 +258,93 @@ export const ButtonNodeResponse = () => {
   );
 };
 
-export const QuickNodeResponse = () => {
-  const [buttonList, setButtonList] = useState<
-    { title: string; type: string }[]
-  >([{ title: 'Button', type: 'message' }]);
+export const QuickNodeResponse = ({
+  info,
+  setResponseList,
+  index,
+}: {
+  info: ResponseInfo;
+  setResponseList: React.Dispatch<React.SetStateAction<TypeResponseList[]>>;
+  index: number;
+}) => {
+  const addNewButton = () => {
+    setResponseList((prev) => {
+      const prevList = [...prev];
+      const currentButtons = prevList[index].info.button || [];
 
-  const handleAddButton = () => {
-    setButtonList((prev) => [...prev, { title: `Button`, type: 'message' }]);
+      prevList[index] = {
+        ...prevList[index],
+        info: {
+          ...prevList[index].info,
+          button: [
+            ...currentButtons,
+            {
+              title: 'button',
+              type: 'message',
+              navigationInfo: '',
+            },
+          ],
+        },
+      };
+
+      return prevList;
+    });
   };
 
-  const handleDeleteButton = (index: number) => {
-    setButtonList((prev) => prev.filter((_, i) => i !== index));
+  const handleDeleteButton = (buttonIndex: number) => {
+    setResponseList((prev) => {
+      const newList = [...prev];
+      if (newList[index].info.button) {
+        newList[index].info.button = newList[index].info.button.filter(
+          (_, i) => i !== buttonIndex
+        );
+      }
+      return newList;
+    });
   };
 
   return (
     <div className='flex flex-col gap-2'>
       <Textarea
+        value={info.description || ''}
+        onChange={(event) => {
+          setResponseList((prev) => {
+            const newList = [...prev];
+            newList[index].info.description = event.target.value;
+            return newList;
+          });
+        }}
         placeholder='Enter Your message...'
         rows={3}
         className='resize-none border border-transparent bg-white p-3 rounded-md shadow-none focus:outline-none hover:border-[#57C0DD] focus-visible:ring-0 overflow-y-auto'
       />
       <div className='flex items-center flex-wrap gap-2'>
-        {buttonList.map((item, index) => (
-          <div key={index} className='relative group'>
+        {info?.button?.map((button, i) => (
+          <div key={i} className='group relative'>
             <ButtonInteractionDialog
-              buttonList={buttonList}
-              index={index}
-              setButtonList={setButtonList}
+              buttonList={info.button || []}
+              setResponseList={setResponseList}
+              index={i}
+              responseIndex={index}
               trigger={
                 <div className='text-[#57C0DD] cursor-pointer py-1 px-4 border bg-white text-sm border-[#57C0DD] w-fit text-center rounded-[30px]'>
-                  {item.title}
+                  {button.title}
                 </div>
               }
             />
-            {index !== 0 ? (
+            {i !== 0 && (
               <div
-                className='absolute -top-3 -right-1 md:hidden md:group-hover:flex items-center justify-center bg-white rounded-full p-1 cursor-pointer'
-                onClick={() => handleDeleteButton(index)}
+                className='absolute top-1/2 -translate-y-1/2 right-[-12px] md:hidden md:group-hover:flex items-center justify-center bg-white rounded-full p-1 cursor-pointer shadow-md'
+                onClick={() => handleDeleteButton(i)}
               >
                 <RiDeleteBinLine className='text-red-500 h-4 w-4' />
               </div>
-            ) : (
-              <></>
             )}
           </div>
         ))}
 
         <div
-          onClick={handleAddButton}
+          onClick={addNewButton}
           className='text-black cursor-pointer py-1 px-2 border text-sm border-black border-dashed w-fit text-center rounded-[30px]'
         >
           + Add button

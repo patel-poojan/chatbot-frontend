@@ -38,6 +38,12 @@ const GoToStepDialog = ({
 }) => {
   const [isDialog, setIsDialog] = useState(false);
   const [nodeInfo, setNodeInfo] = useState<TypeNodeInfo | null>(null);
+  const [response, setResponse] = useState({
+    targetBox: {
+      name: '',
+      id: '',
+    },
+  });
   const params = useParams();
   const playgroundId = params.id;
   const { refetchHandler } = usePlayground();
@@ -160,7 +166,17 @@ const GoToStepDialog = ({
               <label htmlFor='type' className='text-black font-normal text-sm '>
                 Block
               </label>
-              <Select>
+              <Select
+                value={response.targetBox.name}
+                onValueChange={(value) =>
+                  setResponse({
+                    targetBox: {
+                      name: value,
+                      id: '',
+                    },
+                  })
+                }
+              >
                 <SelectTrigger className='p-2 mt-2 border bg-white placeholder:!text-[#6F7288B2] rounded-md hover:border-[#57C0DD] focus:outline-none focus:ring-1 focus:ring-[#57C0DD]'>
                   <SelectValue
                     className='placeholder:text-xs placeholder:!text-[#6F7288B2]'
