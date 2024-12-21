@@ -19,6 +19,7 @@ type NodeResponse = {
   };
   success: boolean;
   message: string;
+  utterances?: string[] | [];
 };
 type GetNodeInformation = {
   nodeId: string;

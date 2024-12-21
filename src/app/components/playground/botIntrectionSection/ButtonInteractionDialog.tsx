@@ -27,7 +27,11 @@ const ButtonInteractionDialog = ({
   buttonList: {
     title: string;
     type: string;
-    navigationInfo: string;
+    id: string;
+    message?: string;
+    url?: string;
+    phoneNumber?: string;
+    goto?: string;
   }[];
   setResponseList: React.Dispatch<React.SetStateAction<TypeResponseList[]>>;
   index: number;
@@ -37,9 +41,15 @@ const ButtonInteractionDialog = ({
   const [open, setOpen] = useState(false);
 
   const [tempButton, setTempButton] = useState({
+    id: buttonList[index]?.id || '',
     title: buttonList[index]?.title || '',
     type: buttonList[index]?.type || 'message',
-    navigationInfo: buttonList[index]?.navigationInfo || '',
+    navigationInfo:
+      buttonList[index].url ||
+      buttonList[index].phoneNumber ||
+      buttonList[index].goto ||
+      buttonList[index].message ||
+      'message',
   });
 
   const handleTempUpdate = (field: string, value: string) => {
@@ -50,16 +60,25 @@ const ButtonInteractionDialog = ({
   };
 
   const handleSave = () => {
+    const updatedData = {
+      id: tempButton.id,
+      title: tempButton.title,
+      type: tempButton.type,
+      message: tempButton.type === 'message' ? tempButton.navigationInfo : '',
+      url: tempButton.type === 'url' ? tempButton.navigationInfo : '',
+      phoneNumber:
+        tempButton.type === 'phoneNumber' ? tempButton.navigationInfo : '',
+      goto: tempButton.type === 'goto' ? tempButton.navigationInfo : '',
+    };
     setResponseList((prev) => {
       const newList = [...prev];
       if (newList[responseIndex]?.info?.button?.[index]) {
-        newList[responseIndex].info.button[index] = tempButton;
+        newList[responseIndex].info.button[index] = updatedData;
       }
       return newList;
     });
     setOpen(false);
   };
-
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>{trigger}</PopoverTrigger>

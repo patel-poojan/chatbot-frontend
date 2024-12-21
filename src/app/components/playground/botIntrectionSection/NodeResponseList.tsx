@@ -4,7 +4,10 @@ import ButtonInteractionDialog from './ButtonInteractionDialog';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import UploadImage from './UploadImage';
 import { ResponseInfo, TypeResponseList } from '@/types/node';
-
+const generateShortId = (title: string) => {
+  const timestamp = Date.now();
+  return `Chatbot${(timestamp & 0xffffff).toString(16)}${title}`;
+};
 export const TextNodeResponse = ({
   info,
   setResponseList,
@@ -63,7 +66,8 @@ export const GalleryNodeResponse = ({
             {
               title: 'button',
               type: 'message',
-              navigationInfo: '',
+              message: 'message',
+              id: generateShortId('gallery'),
             },
           ],
         },
@@ -185,7 +189,8 @@ export const ButtonNodeResponse = ({
             {
               title: 'button',
               type: 'message',
-              navigationInfo: '',
+              message: 'message',
+              id: generateShortId('button'),
             },
           ],
         },
@@ -281,7 +286,8 @@ export const QuickNodeResponse = ({
             {
               title: 'button',
               type: 'message',
-              navigationInfo: '',
+              message: 'message',
+              id: generateShortId('button'),
             },
           ],
         },

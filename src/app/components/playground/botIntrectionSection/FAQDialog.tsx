@@ -111,7 +111,6 @@ const FAQDialog = ({
     });
   useEffect(() => {
     if (nodeId && playgroundId && isDialog) {
-      console.log('nodeInfo', nodeId, playgroundId, isDialog);
       fetchNodeInformation({
         nodeId,
         playgroundId: playgroundId as string,

@@ -30,6 +30,7 @@ import { useParams } from 'next/navigation';
 import { usePlayground } from '../playgroundArea/PlaygroundContext';
 import { TypeNodeInfo } from '@/types/node';
 import { Loader } from '../../Loader';
+
 const UserInputDialog = ({
   trigger,
   nodeId,
@@ -37,28 +38,26 @@ const UserInputDialog = ({
   trigger: React.ReactNode;
   nodeId: string;
 }) => {
-  const [messageList, setMessageList] = useState<{ message: string }[]>([
-    { message: '' },
-  ]);
+  const [messageList, setMessageList] = useState<string[]>(['']);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isDialog, setIsDialog] = useState(false);
   const [nodeInfo, setNodeInfo] = useState<TypeNodeInfo | null>(null);
   const params = useParams();
   const playgroundId = params.id;
   const { refetchHandler } = usePlayground();
+
   const handleMessageChange = (index: number, value: string) => {
     const newMessageList = [...messageList];
-    newMessageList[index].message = value;
+    newMessageList[index] = value;
     setMessageList(newMessageList);
 
     if (value.trim() !== '' && index === messageList.length - 1) {
-      setMessageList([...newMessageList, { message: '' }]);
+      setMessageList([...newMessageList, '']);
     }
 
     if (value.trim() === '' && messageList.length > 1) {
       const filteredList = newMessageList.filter(
-        (item, i) =>
-          i === newMessageList.length - 1 || item.message.trim() !== ''
+        (item, i) => i === newMessageList.length - 1 || item.trim() !== ''
       );
       setMessageList(filteredList);
     }
@@ -68,11 +67,14 @@ const UserInputDialog = ({
     useGetNodeInformation({
       onSuccess(data) {
         if (data.data.node) {
+          if (data.data.node?.utterances) {
+            setMessageList([...data.data.node?.utterances, '']);
+          } else {
+            setMessageList(['']);
+          }
           setNodeInfo(data.data.node);
         }
-        // toast.success(data?.message);
       },
-
       onError(error: axiosError) {
         const errorMessage =
           error?.response?.data?.errors?.message ||
@@ -81,6 +83,7 @@ const UserInputDialog = ({
         toast.error(errorMessage);
       },
     });
+
   const { mutate: updateNodeInformation, isPending: updatePending } =
     useUpdateNodeInformation({
       onSuccess(data) {
@@ -88,7 +91,6 @@ const UserInputDialog = ({
         refetchHandler();
         toast.success(data?.message);
       },
-
       onError(error: axiosError) {
         const errorMessage =
           error?.response?.data?.errors?.message ||
@@ -97,6 +99,7 @@ const UserInputDialog = ({
         toast.error(errorMessage);
       },
     });
+
   useEffect(() => {
     if (nodeId && playgroundId && isDialog) {
       fetchNodeInformation({
@@ -105,23 +108,31 @@ const UserInputDialog = ({
       });
     }
   }, [fetchNodeInformation, isDialog, nodeId, playgroundId]);
+
   const updateHandler = () => {
     if (nodeInfo && nodeId && playgroundId && isDialog) {
+      const updatedNodeInfo = {
+        ...nodeInfo,
+        utterances: messageList.slice(0, -1),
+      };
       updateNodeInformation({
         nodeId,
         playgroundId: playgroundId as string,
-        data: nodeInfo,
+        data: updatedNodeInfo,
       });
     }
   };
+
   const scroll = () => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   };
+
   useEffect(() => {
     scroll();
   }, [messageList]);
+
   return (
     <Dialog open={isDialog} onOpenChange={setIsDialog}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
@@ -214,11 +225,11 @@ const UserInputDialog = ({
             </div>
             {messageList.length > 0 && (
               <div className='flex flex-col gap-2 mt-2'>
-                {messageList.map((item, index) => (
+                {messageList.map((message, index) => (
                   <div className='flex items-center gap-2' key={index}>
                     <Textarea
                       placeholder='Enter user message...'
-                      value={item.message}
+                      value={message}
                       onChange={(e) =>
                         handleMessageChange(index, e.target.value)
                       }

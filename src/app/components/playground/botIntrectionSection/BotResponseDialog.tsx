@@ -32,8 +32,10 @@ import { axiosError } from '@/types/axiosTypes';
 import { TypeNodeInfo, TypeResponseList } from '@/types/node';
 import { usePlayground } from '../playgroundArea/PlaygroundContext';
 import { useParams } from 'next/navigation';
-import { Loader } from '../../Loader';
-
+type ValidationError = {
+  field: string;
+  message: string;
+};
 const BotResponseDialog = ({
   trigger,
   nodeId,
@@ -48,7 +50,6 @@ const BotResponseDialog = ({
   const playgroundId = params.id;
   const { refetchHandler } = usePlayground();
   const [responseList, setResponseList] = useState<TypeResponseList[] | []>([]);
-
   const renderNodeResponse = (item: TypeResponseList, index: number) => {
     const type = item.type;
     switch (type) {
@@ -108,6 +109,106 @@ const BotResponseDialog = ({
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   };
+  // Validation functions
+  const validateNodeInfo = (
+    nodeInfo: TypeNodeInfo | null
+  ): ValidationError[] => {
+    const errors: ValidationError[] = [];
+
+    if (!nodeInfo?.data?.message?.trim()) {
+      errors.push({
+        field: 'message',
+        message: 'Message field cannot be empty',
+      });
+    }
+
+    return errors;
+  };
+
+  const validateResponseList = (
+    responseList: TypeResponseList[]
+  ): ValidationError[] => {
+    const errors: ValidationError[] = [];
+
+    responseList.forEach((response, index) => {
+      switch (response.type) {
+        case 'text':
+          if (!response.info.description?.trim()) {
+            errors.push({
+              field: `response_${index}`,
+              message: `Text response at position ${index + 1} cannot be empty`,
+            });
+          }
+          break;
+
+        case 'gallery':
+          if (!response.info.title?.trim()) {
+            errors.push({
+              field: `response_${index}`,
+              message: `Gallery title at position ${index + 1} cannot be empty`,
+            });
+          }
+          if (!response.info.description?.trim()) {
+            errors.push({
+              field: `response_${index}`,
+              message: `Gallery description at position ${
+                index + 1
+              } cannot be empty`,
+            });
+          }
+          if (!response.info.button?.length) {
+            errors.push({
+              field: `response_${index}`,
+              message: `Gallery at position ${
+                index + 1
+              } must have at least one button`,
+            });
+          }
+          break;
+
+        case 'button':
+        case 'quick':
+          if (!response.info.description?.trim()) {
+            errors.push({
+              field: `response_${index}`,
+              message: `${
+                response.type === 'button' ? 'Button' : 'Quick reply'
+              } description at position ${index + 1} cannot be empty`,
+            });
+          }
+          if (!response.info.button?.length) {
+            errors.push({
+              field: `response_${index}`,
+              message: `${
+                response.type === 'button' ? 'Button' : 'Quick reply'
+              } at position ${index + 1} must have at least one button`,
+            });
+          }
+          response.info.button?.forEach((btn, btnIndex) => {
+            if (!btn.title?.trim() || !btn.message?.trim()) {
+              errors.push({
+                field: `response_${index}_button_${btnIndex}`,
+                message: `Button ${btnIndex + 1} at position ${
+                  index + 1
+                } must have both title and message`,
+              });
+            }
+          });
+          break;
+
+        case 'image':
+          if (!response.info.file) {
+            errors.push({
+              field: `response_${index}`,
+              message: `Image at position ${index + 1} must have a file`,
+            });
+          }
+          break;
+      }
+    });
+
+    return errors;
+  };
 
   useEffect(() => {
     scroll();
@@ -157,12 +258,35 @@ const BotResponseDialog = ({
       });
     }
   }, [fetchNodeInformation, isDialog, nodeId, playgroundId]);
+
+  const validateBeforeSave = (
+    nodeInfo: TypeNodeInfo | null,
+    responseList: TypeResponseList[]
+  ): ValidationError[] => {
+    const nodeInfoErrors = validateNodeInfo(nodeInfo);
+    const responseListErrors = validateResponseList(responseList);
+
+    return [...nodeInfoErrors, ...responseListErrors];
+  };
   const updateHandler = () => {
     if (nodeInfo && nodeId && playgroundId && isDialog) {
+      const validationErrors = validateBeforeSave(nodeInfo, responseList);
+
+      if (validationErrors.length > 0) {
+        validationErrors.forEach((error) => {
+          toast.error(error.message, {
+            className: 'bg-red-50 border-l-4 border-red-500',
+            duration: 4000,
+          });
+        });
+        return;
+      }
+
       const updatedNodeInfo: TypeNodeInfo = {
         ...nodeInfo,
         response: responseList,
       };
+
       updateNodeInformation({
         nodeId,
         playgroundId: playgroundId as string,
@@ -183,7 +307,6 @@ const BotResponseDialog = ({
       })
     );
   };
-
   return (
     <Dialog open={isDialog} onOpenChange={setIsDialog}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
@@ -205,84 +328,102 @@ const BotResponseDialog = ({
           </div>
 
           <div className='flex-1 flex flex-col max-h-[90.2dvh] sm:max-h-[84dvh]'>
-            {(fetchPending || updatePending) && <Loader />}
-            <div className='p-4 rounded-t-lg bg-white'>
-              <div className='flex items-center justify-between mb-4 mt-2'>
-                <div className='flex items-center gap-2'>
-                  <IoIosSend className='text-[#7A7A7A] text-lg' />
-                  <span className='text-[#7A7A7A] text-lg'>BOT RESPONSE</span>
-                </div>
-                <div className='flex items-center gap-2'>
-                  <DialogClose>
-                    <div className='p-1 bg-[#7A7A7A] rounded-sm'>
-                      <IoMdClose className='text-white' />
-                    </div>
-                  </DialogClose>
-                  <div
-                    className='p-1 bg-[#7A7A7A] rounded-sm cursor-pointer'
-                    onClick={updateHandler}
-                  >
-                    <IoMdCheckmark className='text-white' />
+            <div className='relative'>
+              {(fetchPending || updatePending) && (
+                <div className='absolute inset-0 z-50 flex items-center justify-center bg-[#a6dae41a] backdrop-blur-[3px]'>
+                  <div role='status' className='flex flex-col items-center'>
+                    <div className='w-10 h-10 border-4 border-gray-200 border-t-[#3bc5dd] rounded-full animate-spin'></div>
+                    <span className='sr-only'>Loading...</span>
                   </div>
                 </div>
+              )}
+              <div className='p-4 rounded-t-lg bg-white'>
+                <div className='flex items-center justify-between mb-4 mt-2'>
+                  <div className='flex items-center gap-2'>
+                    <IoIosSend className='text-[#7A7A7A] text-lg' />
+                    <span className='text-[#7A7A7A] text-lg'>BOT RESPONSE</span>
+                  </div>
+                  <div className='flex items-center gap-2'>
+                    <DialogClose>
+                      <div className='p-1 bg-[#7A7A7A] rounded-sm'>
+                        <IoMdClose className='text-white' />
+                      </div>
+                    </DialogClose>
+                    <div
+                      className='p-1 bg-[#7A7A7A] rounded-sm cursor-pointer'
+                      onClick={updateHandler}
+                    >
+                      <IoMdCheckmark className='text-white' />
+                    </div>
+                  </div>
+                </div>
+                <Input
+                  id='Message'
+                  value={nodeInfo?.data?.message ?? ''}
+                  onChange={(e) => {
+                    setNodeInfo((prev) => {
+                      if (prev === null) {
+                        return null;
+                      }
+                      return {
+                        ...prev,
+                        data: {
+                          ...prev.data,
+                          message: e.target.value,
+                        },
+                      };
+                    });
+                  }}
+                  className='px-4 py-3 mt-1 mb-2 rounded text-black  hover:border-[#57C0DD] focus-visible:ring-0 focus-visible:border-[#57C0DD] placeholder:text-sm placeholder:font-light w-full'
+                  placeholder='Enter Your Message'
+                />
               </div>
-              <Input
-                id='Message'
-                value={nodeInfo?.data?.message ?? ''}
-                onChange={(e) => {
-                  setNodeInfo((prev) => {
-                    if (prev === null) {
-                      return null;
-                    }
-                    return {
-                      ...prev,
-                      data: {
-                        ...prev.data,
-                        message: e.target.value,
-                      },
-                    };
-                  });
-                }}
-                className='px-4 py-3 mt-1 mb-2 rounded text-black  hover:border-[#57C0DD] focus-visible:ring-0 focus-visible:border-[#57C0DD] placeholder:text-sm placeholder:font-light w-full'
-                placeholder='Enter Your Message'
-              />
-            </div>
-            {responseList.length > 0 && (
+
               <div
                 ref={scrollRef}
                 className='rounded-b-lg flex-1  overflow-y-auto'
               >
-                <div className='flex flex-col gap-4 bg-[#F1F1F1] p-4'>
-                  {responseList.map((item, index) => (
-                    <div className='flex flex-col gap-4' key={index}>
-                      <div className='flex justify-between items-center'>
-                        <div className='flex gap-2 items-center '>
-                          <div className='flex items-center rounded-3xl gap-1 w-fit py-2 px-3 bg-[#424D50] min-w-[137.5px] '>
-                            <PiClockCounterClockwise className='text-white text-lg' />
-                            <span className='text-white text-sm'>
-                              {item?.delay / 1000} sec delay
-                            </span>
+                <div className='flex flex-col gap-4 bg-[#F1F1F1] p-4 min-h-[153px]'>
+                  {responseList.length > 0 ? (
+                    responseList.map((item, index) => (
+                      <div className='flex flex-col gap-4' key={index}>
+                        <div className='flex justify-between items-center'>
+                          <div className='flex gap-2 items-center '>
+                            <div className='flex items-center rounded-3xl gap-1 w-fit py-2 px-3 bg-[#424D50] min-w-[137.5px] '>
+                              <PiClockCounterClockwise className='text-white text-lg' />
+                              <span className='text-white text-sm'>
+                                {item?.delay / 1000} sec delay
+                              </span>
+                            </div>
+                            <div>
+                              <IoChevronUpOutline
+                                className={`cursor-pointer  ${
+                                  item?.delay < 6000
+                                    ? 'hover:text-[#57C0DD]'
+                                    : 'opacity-10'
+                                }`}
+                                onClick={() => updateDelay(index, true)}
+                              />
+                              <IoChevronDownOutline
+                                className={`cursor-pointer  ${
+                                  item?.delay > 1000
+                                    ? 'hover:text-[#57C0DD]'
+                                    : 'opacity-10'
+                                }`}
+                                onClick={() => updateDelay(index, false)}
+                              />
+                            </div>
                           </div>
-                          <div>
-                            <IoChevronUpOutline
-                              className={`cursor-pointer  ${
-                                item?.delay < 6000
-                                  ? 'hover:text-[#57C0DD]'
-                                  : 'opacity-10'
-                              }`}
-                              onClick={() => updateDelay(index, true)}
-                            />
-                            <IoChevronDownOutline
-                              className={`cursor-pointer  ${
-                                item?.delay > 1000
-                                  ? 'hover:text-[#57C0DD]'
-                                  : 'opacity-10'
-                              }`}
-                              onClick={() => updateDelay(index, false)}
-                            />
+                          <div
+                            className={`${'cursor-pointer hover:bg-red-100'} flex items-center justify-center bg-white rounded-full w-10 h-10 p-2 transition-all duration-200`}
+                            title={'Delete'}
+                            onClick={() => {
+                              removeResponse(index);
+                            }}
+                          >
+                            <RiDeleteBinLine className='text-red-500' />
                           </div>
-                        </div>
-                        <div
+                          {/* <div
                           className={`${
                             index === 0
                               ? 'cursor-not-allowed opacity-50'
@@ -294,17 +435,23 @@ const BotResponseDialog = ({
                           }}
                         >
                           <RiDeleteBinLine className='text-red-500' />
+                        </div> */}
                         </div>
+                        {renderNodeResponse(item, index)}
                       </div>
-                      {renderNodeResponse(item, index)}
+                    ))
+                  ) : (
+                    <div className='flex items-center justify-center  mt-auto mb-auto'>
+                      Not added any response
                     </div>
-                  ))}
+                  )}
                 </div>
+
                 <div className='bg-white block md:hidden'>
                   <NodeResponseList setResponseList={setResponseList} />
                 </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </DialogContent>
@@ -312,7 +459,10 @@ const BotResponseDialog = ({
   );
 };
 export default BotResponseDialog;
-
+const generateShortId = (title: string) => {
+  const timestamp = Date.now();
+  return `Chatbot${(timestamp & 0xffffff).toString(16)}${title}`;
+};
 export const NodeResponseList = ({
   setResponseList,
 }: {
@@ -363,7 +513,14 @@ export const NodeResponseList = ({
           file: '',
           title: '',
           description: '',
-          button: [{ title: 'button', type: 'message', navigationInfo: '' }],
+          button: [
+            {
+              id: generateShortId('gallery'),
+              title: 'button',
+              type: 'message',
+              message: 'message',
+            },
+          ],
         },
       },
     },
@@ -384,7 +541,14 @@ export const NodeResponseList = ({
         delay: 2000,
         info: {
           description: '',
-          button: [{ title: 'button', type: 'message', navigationInfo: '' }],
+          button: [
+            {
+              id: generateShortId('gallery'),
+              title: 'button',
+              type: 'message',
+              message: 'message',
+            },
+          ],
         },
       },
     },
@@ -397,12 +561,31 @@ export const NodeResponseList = ({
         delay: 2000,
         info: {
           description: '',
-          button: [{ title: 'button', type: 'message', navigationInfo: '' }],
+          button: [
+            {
+              id: generateShortId('gallery'),
+              title: 'button',
+              type: 'message',
+              message: 'message',
+            },
+          ],
         },
       },
     },
   ];
-
+  const addResponseWithUniqueIds = (content: TypeResponseList) => {
+    const contentWithUniqueIds = {
+      ...content,
+      info: {
+        ...content.info,
+        button: content.info.button?.map((btn) => ({
+          ...btn,
+          id: generateShortId(`${content.type}_btn`),
+        })),
+      },
+    };
+    setResponseList((prev) => [...prev, contentWithUniqueIds]);
+  };
   return (
     <div className='p-4 h-fit bg-white rounded-lg'>
       <div className='text-black text-lg font-semibold mb-2'>Response</div>
@@ -411,7 +594,7 @@ export const NodeResponseList = ({
           <div
             key={type}
             className='flex flex-col items-center gap-[1px] cursor-pointer'
-            onClick={() => setResponseList((prev) => [...prev, content])}
+            onClick={() => addResponseWithUniqueIds(content)}
           >
             <div className='border border-[#7A7A7A] py-3 px-7 h-[46px] flex items-center justify-center'>
               {icon}

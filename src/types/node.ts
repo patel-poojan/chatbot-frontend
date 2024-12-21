@@ -3,9 +3,13 @@ export interface ResponseInfo {
   title?: string;
   description?: string;
   button?: {
+    id: string;
     title: string;
     type: string;
-    navigationInfo: string;
+    message?: string;
+    url?: string;
+    phoneNumber?: string;
+    goto?: string;
   }[];
 }
 
@@ -25,4 +29,5 @@ export interface TypeNodeInfo {
     y: number;
   };
   response: TypeResponseList[];
+  utterances?: string[] | [];
 }
