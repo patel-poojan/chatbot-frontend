@@ -43,7 +43,7 @@ const UserInputDialog = ({
   const [isDialog, setIsDialog] = useState(false);
   const [nodeInfo, setNodeInfo] = useState<TypeNodeInfo | null>(null);
   const params = useParams();
-  const playgroundId = params.id;
+  const chatbotId = params.id;
   const { refetchHandler } = usePlayground();
 
   const handleMessageChange = (index: number, value: string) => {
@@ -101,23 +101,23 @@ const UserInputDialog = ({
     });
 
   useEffect(() => {
-    if (nodeId && playgroundId && isDialog) {
+    if (nodeId && chatbotId && isDialog) {
       fetchNodeInformation({
         nodeId,
-        playgroundId: playgroundId as string,
+        chatbotId: chatbotId as string,
       });
     }
-  }, [fetchNodeInformation, isDialog, nodeId, playgroundId]);
+  }, [fetchNodeInformation, isDialog, nodeId, chatbotId]);
 
   const updateHandler = () => {
-    if (nodeInfo && nodeId && playgroundId && isDialog) {
+    if (nodeInfo && nodeId && chatbotId && isDialog) {
       const updatedNodeInfo = {
         ...nodeInfo,
         utterances: messageList.slice(0, -1),
       };
       updateNodeInformation({
         nodeId,
-        playgroundId: playgroundId as string,
+        chatbotId: chatbotId as string,
         data: updatedNodeInfo,
       });
     }

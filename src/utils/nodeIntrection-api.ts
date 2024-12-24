@@ -23,7 +23,7 @@ type NodeResponse = {
 };
 type GetNodeInformation = {
   nodeId: string;
-  playgroundId: string;
+  chatbotId: string;
 };
 export const useGetNodeInformation = ({
   onSuccess,
@@ -36,7 +36,7 @@ export const useGetNodeInformation = ({
     mutationKey: ['node', 'information', 'get'],
     mutationFn: (data: GetNodeInformation): Promise<NodeResponse> => {
       return axiosInstance.get(
-        `/playground/${data.playgroundId}/node/${data.nodeId}`
+        `/playground/${data.chatbotId}/node/${data.nodeId}`
       );
     },
     onError,
@@ -45,7 +45,7 @@ export const useGetNodeInformation = ({
 
 type UpdateNodeInformation = {
   nodeId: string;
-  playgroundId: string;
+  chatbotId: string;
   data: TypeNodeInfo;
 };
 export const useUpdateNodeInformation = ({
@@ -59,7 +59,7 @@ export const useUpdateNodeInformation = ({
     mutationKey: ['node', 'information', 'update'],
     mutationFn: (data: UpdateNodeInformation): Promise<DefaultResponse> => {
       return axiosInstance.put(
-        `/playground/${data.playgroundId}/node/${data.nodeId}`,
+        `/playground/${data.chatbotId}/node/${data.nodeId}`,
         data.data
       );
     },

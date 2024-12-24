@@ -1,6 +1,6 @@
-"use client";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import dynamic from "next/dynamic";
+'use client';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
 import {
   Controls,
   useNodesState,
@@ -12,8 +12,8 @@ import {
   useReactFlow,
   XYPosition,
   ReactFlowProvider,
-} from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
+} from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
 import {
   AiAssistNode,
   BotResponseNode,
@@ -27,38 +27,38 @@ import {
   UserInputNode,
   CloseChatNode,
   DefaultBotResponseNode,
-} from "@/app/components/playground/playgroundArea/CustomNode";
-import { Button } from "@/components/ui/button";
-import { IoCode, IoFlashOutline } from "react-icons/io5";
-import { MdUpdate } from "react-icons/md";
+} from '@/app/components/playground/playgroundArea/CustomNode';
+import { Button } from '@/components/ui/button';
+import { IoCode, IoFlashOutline } from 'react-icons/io5';
+import { MdUpdate } from 'react-icons/md';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import ActionDialog from "@/app/components/playground/playgroundArea/ActionDialog";
+} from '@/components/ui/tooltip';
+import ActionDialog from '@/app/components/playground/playgroundArea/ActionDialog';
 import {
   PlaygroundProvider,
   usePlayground,
-} from "@/app/components/playground/playgroundArea/PlaygroundContext";
-import useWindowDimensions from "@/utils/windowSize";
-import Image from "next/image";
-import AIKnowledge from "@/app/components/playground/AIKnowladge";
-import UpdateChatbotNameDialog from "@/app/components/playground/UpdateChatbotNameDialog";
-import DashboardLayout from "@/app/components/DashboardLayout";
-import CustomEdge from "@/app/components/playground/playgroundArea/CustomEdge";
-import { axiosInstance } from "@/utils/axiosInstance";
-import { useQuery } from "@tanstack/react-query";
-import { Loader } from "@/app/components/Loader";
-import { useAddNode } from "@/utils/playground-api";
-import { toast } from "sonner";
-import { axiosError } from "@/types/axiosTypes";
-import AttributesDialog from "@/app/components/playground/AttributesDialog";
-import ChatBotDialog from "@/app/components/playground/chatbot/ChatBotDialog";
+} from '@/app/components/playground/playgroundArea/PlaygroundContext';
+import useWindowDimensions from '@/utils/windowSize';
+import Image from 'next/image';
+import AIKnowledge from '@/app/components/playground/AIKnowladge';
+import UpdateChatbotNameDialog from '@/app/components/playground/UpdateChatbotNameDialog';
+import DashboardLayout from '@/app/components/DashboardLayout';
+import CustomEdge from '@/app/components/playground/playgroundArea/CustomEdge';
+import { axiosInstance } from '@/utils/axiosInstance';
+import { useQuery } from '@tanstack/react-query';
+import { Loader } from '@/app/components/Loader';
+import { useAddNode } from '@/utils/playground-api';
+import { toast } from 'sonner';
+import { axiosError } from '@/types/axiosTypes';
+import AttributesDialog from '@/app/components/playground/AttributesDialog';
+import ChatBotDialog from '@/app/components/playground/chatbot/ChatBotDialog';
 
 const ReactFlow = dynamic(
-  () => import("@xyflow/react").then((mod) => mod.ReactFlow),
+  () => import('@xyflow/react').then((mod) => mod.ReactFlow),
   { ssr: false }
 );
 
@@ -134,14 +134,13 @@ const MainComponent = ({ botId }: { botId: string }) => {
       return response.data;
     }
   };
-
   const {
     data: playgroundData,
     isLoading: loadPlayground,
     isError: errorInPlayground,
     refetch: refetchPlayground,
   } = useQuery({
-    queryKey: ["playGround"],
+    queryKey: ['playGround'],
     queryFn: fetchInitialPlayground,
   });
 
@@ -185,7 +184,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
       const errorMessage =
         error?.response?.data?.errors?.message ||
         error?.response?.data?.message ||
-        "failed to add";
+        'failed to add';
       toast.error(errorMessage);
     },
   });
@@ -267,16 +266,16 @@ const MainComponent = ({ botId }: { botId: string }) => {
       const nodeElement = document.querySelector(`[data-id="${nodeId}"]`);
       if (nodeElement) {
         if (isHighlight) {
-          if (nodeType === "faqNode" || nodeType === "userInputNode") {
-            nodeElement.classList.add("shape_highlight");
+          if (nodeType === 'faqNode' || nodeType === 'userInputNode') {
+            nodeElement.classList.add('shape_highlight');
           } else {
-            nodeElement.classList.add("highlight");
+            nodeElement.classList.add('highlight');
           }
         } else {
-          nodeElement.classList.remove("shape_highlight");
-          nodeElement.classList.remove("highlight");
-          nodeElement.classList.remove("non-highlight");
-          nodeElement.classList.remove("shape_non-highlight");
+          nodeElement.classList.remove('shape_highlight');
+          nodeElement.classList.remove('highlight');
+          nodeElement.classList.remove('non-highlight');
+          nodeElement.classList.remove('shape_non-highlight');
         }
       }
     },
@@ -288,14 +287,14 @@ const MainComponent = ({ botId }: { botId: string }) => {
       const nodeElement = document.querySelector(`[data-id="${nodeId}"]`);
       if (nodeElement) {
         if (isNonHighlight) {
-          if (nodeType === "faqNode" || nodeType === "userInputNode") {
-            nodeElement.classList.add("shape_non-highlight");
+          if (nodeType === 'faqNode' || nodeType === 'userInputNode') {
+            nodeElement.classList.add('shape_non-highlight');
           } else {
-            nodeElement.classList.add("non-highlight");
+            nodeElement.classList.add('non-highlight');
           }
         } else {
-          nodeElement.classList.remove("non-highlight");
-          nodeElement.classList.remove("shape_non-highlight");
+          nodeElement.classList.remove('non-highlight');
+          nodeElement.classList.remove('shape_non-highlight');
         }
       }
     },
@@ -306,7 +305,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
     (event: React.DragEvent): void => {
       setActionDialog(false);
       event.preventDefault();
-      event.dataTransfer.dropEffect = "move";
+      event.dataTransfer.dropEffect = 'move';
 
       const position = screenToFlowPosition({
         x: event.clientX,
@@ -316,7 +315,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
       nodes.forEach((existingNode) => {
         const isNear = isNearRightEdge(position, existingNode);
         const hasSourceHandle = !notConnectableNode.includes(
-          existingNode!.type || ""
+          existingNode!.type || ''
         );
 
         if (hasSourceHandle) {
@@ -324,41 +323,41 @@ const MainComponent = ({ botId }: { botId: string }) => {
             existingNode &&
             existingNode !== null &&
             existingNode!.type &&
-            (type === "goToStepNode" ||
-              type === "faqNode" ||
-              type === "closeChatNode" ||
-              type === "userInputNode") &&
-            existingNode!.type !== "botResponseNode"
+            (type === 'goToStepNode' ||
+              type === 'faqNode' ||
+              type === 'closeChatNode' ||
+              type === 'userInputNode') &&
+            existingNode!.type !== 'botResponseNode'
           ) {
             nonHighlightDroppableArea(
-              existingNode.id || "",
+              existingNode.id || '',
               isNear,
-              existingNode.type || ""
+              existingNode.type || ''
             );
           } else if (
             existingNode &&
             existingNode !== null &&
-            type === "questionNode" &&
-            existingNode!.type !== "botResponseNode" &&
-            existingNode!.type !== "userInputNode"
+            type === 'questionNode' &&
+            existingNode!.type !== 'botResponseNode' &&
+            existingNode!.type !== 'userInputNode'
           ) {
             nonHighlightDroppableArea(
-              existingNode.id || "",
+              existingNode.id || '',
               isNear,
-              existingNode.type || ""
+              existingNode.type || ''
             );
           } else {
             highlightDroppableArea(
-              existingNode.id || "",
+              existingNode.id || '',
               isNear && hasSourceHandle,
-              existingNode.type || ""
+              existingNode.type || ''
             );
           }
         } else {
           nonHighlightDroppableArea(
-            existingNode.id || "",
+            existingNode.id || '',
             isNear,
-            existingNode.type || ""
+            existingNode.type || ''
           );
         }
       });
@@ -387,22 +386,22 @@ const MainComponent = ({ botId }: { botId: string }) => {
       const connectedNode = nodes.find(
         (existingNode) =>
           isNearRightEdge(position, existingNode) &&
-          !notConnectableNode.includes(existingNode.type || "")
+          !notConnectableNode.includes(existingNode.type || '')
       );
 
       if (
         connectedNode &&
         connectedNode.type &&
-        (((type === "goToStepNode" ||
-          type === "faqNode" ||
-          type === "closeChatNode" ||
-          type === "userInputNode") &&
-          connectedNode.type !== "botResponseNode") ||
-          (type === "questionNode" &&
-            connectedNode.type !== "botResponseNode" &&
-            connectedNode.type !== "userInputNode"))
+        (((type === 'goToStepNode' ||
+          type === 'faqNode' ||
+          type === 'closeChatNode' ||
+          type === 'userInputNode') &&
+          connectedNode.type !== 'botResponseNode') ||
+          (type === 'questionNode' &&
+            connectedNode.type !== 'botResponseNode' &&
+            connectedNode.type !== 'userInputNode'))
       ) {
-        nodes.forEach((node) => highlightDroppableArea(node.id, false, ""));
+        nodes.forEach((node) => highlightDroppableArea(node.id, false, ''));
         return;
       } else if (connectedNode) {
         const positionY = connectedNode?.position?.y ?? position.y;
@@ -422,14 +421,14 @@ const MainComponent = ({ botId }: { botId: string }) => {
           details: {
             type,
             nodeData: {
-              message: "",
+              message: '',
               position: {
                 x: position.x + 100,
                 y:
-                  type === "userInputNode" || type === "faqNode"
+                  type === 'userInputNode' || type === 'faqNode'
                     ? positionY - 7
-                    : connectedNode.type === "userInputNode" ||
-                      connectedNode.type === "faqNode"
+                    : connectedNode.type === 'userInputNode' ||
+                      connectedNode.type === 'faqNode'
                     ? positionY + 7
                     : positionY,
               },
@@ -517,7 +516,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
         // ]);
       }
 
-      nodes.forEach((node) => highlightDroppableArea(node.id, false, ""));
+      nodes.forEach((node) => highlightDroppableArea(node.id, false, ''));
     },
     [
       setActionDialog,
@@ -539,7 +538,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
           {
             ...connection,
             id: `${prevEdges.length + 1}`,
-            type: "customEdge",
+            type: 'customEdge',
           },
           prevEdges
         )
@@ -577,18 +576,18 @@ const MainComponent = ({ botId }: { botId: string }) => {
     <DashboardLayout>
       {(loadPlayground || pendingAddNode || isPageLoader) && <Loader />}
       {aiSection ? (
-        <div className="p-4 sm:p-6 flex flex-1 flex-col relative ">
+        <div className='p-4 sm:p-6 flex flex-1 flex-col relative '>
           <AIKnowledge setAiSection={setAiSection} />
         </div>
       ) : (
-        <div className=" sm:p-6 flex flex-1 flex-col relative bg-[#F6F6F6]">
-          <div className="absolute top-6 flex items-center justify-normal gap-3 flex-wrap-reverse md:justify-between w-full left-0 px-6 z-10">
-            <div className=" flex items-center gap-3">
+        <div className=' sm:p-6 flex flex-1 flex-col relative bg-[#F6F6F6]'>
+          <div className='absolute top-6 flex items-center justify-normal gap-3 flex-wrap-reverse md:justify-between w-full left-0 px-6 z-10'>
+            <div className=' flex items-center gap-3'>
               <UpdateChatbotNameDialog
                 trigger={
                   <div
-                    className="p-3 h-9  flex items-center cursor-pointer justify-center rounded-lg bg-white"
-                    style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
+                    className='p-3 h-9  flex items-center cursor-pointer justify-center rounded-lg bg-white'
+                    style={{ boxShadow: '0px 0px 4px 0px #0000001F' }}
                   >
                     www.chatbot.com
                   </div>
@@ -599,13 +598,13 @@ const MainComponent = ({ botId }: { botId: string }) => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div
-                      className="py-2 px-3 h-9 flex items-center justify-center bg-white rounded-lg cursor-pointer"
-                      style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
+                      className='py-2 px-3 h-9 flex items-center justify-center bg-white rounded-lg cursor-pointer'
+                      style={{ boxShadow: '0px 0px 4px 0px #0000001F' }}
                       onClick={() => setAiSection(true)}
                     >
                       <Image
-                        src="/images/vector.svg"
-                        alt="AI"
+                        src='/images/vector.svg'
+                        alt='AI'
                         width={17}
                         height={17}
                         priority
@@ -614,20 +613,20 @@ const MainComponent = ({ botId }: { botId: string }) => {
                     </div>
                   </TooltipTrigger>
                   <TooltipContent
-                    side="bottom"
-                    align="center"
-                    style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
-                    className=" mt-1  p-1 bg-[#57C0DD] text-white !z-50"
+                    side='bottom'
+                    align='center'
+                    style={{ boxShadow: '0px 0px 4px 0px #0000001F' }}
+                    className=' mt-1  p-1 bg-[#57C0DD] text-white !z-50'
                   >
                     Action
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <div className=" flex items-center gap-3">
+            <div className=' flex items-center gap-3'>
               <div
-                className="flex items-center py-2 px-4 bg-white gap-3 rounded-lg"
-                style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
+                className='flex items-center py-2 px-4 bg-white gap-3 rounded-lg'
+                style={{ boxShadow: '0px 0px 4px 0px #0000001F' }}
               >
                 <TooltipProvider>
                   <Tooltip>
@@ -635,17 +634,17 @@ const MainComponent = ({ botId }: { botId: string }) => {
                       <button>
                         <IoFlashOutline
                           className={`text-xl cursor-pointer ${
-                            actionDialog ? "text-[#57C0DD]" : ""
+                            actionDialog ? 'text-[#57C0DD]' : ''
                           } `}
                           onClick={actionHandler}
                         />
                       </button>
                     </TooltipTrigger>
                     <TooltipContent
-                      side="bottom"
-                      align="center"
-                      style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
-                      className=" mt-3 p-1 bg-[#57C0DD] text-white !z-50"
+                      side='bottom'
+                      align='center'
+                      style={{ boxShadow: '0px 0px 4px 0px #0000001F' }}
+                      className=' mt-3 p-1 bg-[#57C0DD] text-white !z-50'
                     >
                       Action
                     </TooltipContent>
@@ -654,14 +653,14 @@ const MainComponent = ({ botId }: { botId: string }) => {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button>
-                        <MdUpdate className="text-xl cursor-pointer" />
+                        <MdUpdate className='text-xl cursor-pointer' />
                       </button>
                     </TooltipTrigger>
                     <TooltipContent
-                      side="bottom"
-                      align="center"
-                      style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
-                      className=" mt-3 p-1 bg-[#57C0DD] text-white !z-50"
+                      side='bottom'
+                      align='center'
+                      style={{ boxShadow: '0px 0px 4px 0px #0000001F' }}
+                      className=' mt-3 p-1 bg-[#57C0DD] text-white !z-50'
                     >
                       Version History
                     </TooltipContent>
@@ -671,16 +670,16 @@ const MainComponent = ({ botId }: { botId: string }) => {
                       <button onClick={() => attributesHandler()}>
                         <IoCode
                           className={`text-xl cursor-pointer ${
-                            attributesDialog ? "text-[#57C0DD]" : ""
+                            attributesDialog ? 'text-[#57C0DD]' : ''
                           } `}
                         />
                       </button>
                     </TooltipTrigger>
                     <TooltipContent
-                      side="bottom"
-                      align="center"
-                      style={{ boxShadow: "0px 0px 4px 0px #0000001F" }}
-                      className=" mt-3 p-1 bg-[#57C0DD] text-white !z-50"
+                      side='bottom'
+                      align='center'
+                      style={{ boxShadow: '0px 0px 4px 0px #0000001F' }}
+                      className=' mt-3 p-1 bg-[#57C0DD] text-white !z-50'
                     >
                       Attributes
                     </TooltipContent>
@@ -690,20 +689,20 @@ const MainComponent = ({ botId }: { botId: string }) => {
               <Button
                 className={`p-3 border text-xs font-normal ${
                   chatBotDialog
-                    ? "border-[#57C0DD] text-[#57C0DD]"
-                    : "border-black text-black"
+                    ? 'border-[#57C0DD] text-[#57C0DD]'
+                    : 'border-black text-black'
                 } rounded-lg bg-white  hover:bg-transparent`}
                 onClick={() => chatBotHandler()}
               >
                 Test your bot
               </Button>
-              <Button className="py-3 px-5 bg-[#57C0DD] text-white rounded-lg hover:bg-[#57C0DD]">
+              <Button className='py-3 px-5 bg-[#57C0DD] text-white rounded-lg hover:bg-[#57C0DD]'>
                 Publish
               </Button>
             </div>
           </div>
           {errorInPlayground ? (
-            <div className="text-[red] m-auto">something went wrong</div>
+            <div className='text-[red] m-auto'>something went wrong</div>
           ) : (
             <ReactFlow
               nodes={nodes}
@@ -718,7 +717,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
               nodesDraggable={false}
               fitView={screenWidth < 768 ? true : false}
               defaultViewport={{ x: 0, y: 200, zoom: 1 }}
-              className="bg-[#F6F6F6]"
+              className='bg-[#F6F6F6]'
               proOptions={{ hideAttribution: true }}
               minZoom={0.8}
               maxZoom={1.5}

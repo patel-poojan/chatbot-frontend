@@ -149,7 +149,7 @@ const ChooseIndustryTemplate = ({
     const category = IndustryList?.find(
       (industry) => industry.category == body.category
     );
-    console.log('categoryID', category);
+
     if (body.category == '' && !category) {
       toast.warning('PLease enter correct data');
       return;

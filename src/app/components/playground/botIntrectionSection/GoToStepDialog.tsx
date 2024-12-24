@@ -45,7 +45,7 @@ const GoToStepDialog = ({
     },
   });
   const params = useParams();
-  const playgroundId = params.id;
+  const chatbotId = params.id;
   const { refetchHandler } = usePlayground();
   const { mutate: fetchNodeInformation, isPending: fetchPending } =
     useGetNodeInformation({
@@ -81,18 +81,18 @@ const GoToStepDialog = ({
       },
     });
   useEffect(() => {
-    if (nodeId && playgroundId && isDialog) {
+    if (nodeId && chatbotId && isDialog) {
       fetchNodeInformation({
         nodeId,
-        playgroundId: playgroundId as string,
+        chatbotId: chatbotId as string,
       });
     }
-  }, [fetchNodeInformation, isDialog, nodeId, playgroundId]);
+  }, [fetchNodeInformation, isDialog, nodeId, chatbotId]);
   const updateHandler = () => {
-    if (nodeInfo && nodeId && playgroundId && isDialog) {
+    if (nodeInfo && nodeId && chatbotId && isDialog) {
       updateNodeInformation({
         nodeId,
-        playgroundId: playgroundId as string,
+        chatbotId: chatbotId as string,
         data: nodeInfo,
       });
     }
