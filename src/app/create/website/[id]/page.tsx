@@ -1,20 +1,21 @@
-"use client";
-import BDAQuestion from "@/app/components/BDAQuestion";
-import ChooseIndustryTemplate from "@/app/components/ChooseIndustryTemplate";
-import OuterTemplate from "@/app/components/OuterTemplate";
+'use client';
+import BDAQuestion from '@/app/components/BDAQuestion';
+import ChooseIndustryTemplate from '@/app/components/ChooseIndustryTemplate';
+import OuterTemplate from '@/app/components/OuterTemplate';
 
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 const Page = ({ params }: { params: { id: string } }) => {
   const [step, setStep] = useState(0);
-  const [industry, setIndustry] = useState<string>("");
-  const [subIndustry, setSubIndustry] = useState<string>("");
+  const [industry, setIndustry] = useState<string>('');
+  const [subIndustry, setSubIndustry] = useState<string>('');
   const up = () => {
     setStep(step + 1);
   };
   const down = () => {
     setStep(step - 1);
   };
+
   return (
     <OuterTemplate>
       {step === 0 ? (
@@ -26,7 +27,7 @@ const Page = ({ params }: { params: { id: string } }) => {
       ) : (
         <BDAQuestion
           down={down}
-          type="website"
+          type='website'
           industry={industry}
           subIndustry={subIndustry}
           chatBotId={params.id}
