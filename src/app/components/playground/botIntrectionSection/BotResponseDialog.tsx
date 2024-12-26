@@ -132,8 +132,12 @@ const BotResponseDialog = ({
       onSuccess(data) {
         if (data.data.node) {
           setNodeInfo(data.data.node);
-          if (Array.isArray(data.data.node.response)) {
-            setResponseList(data.data.node.response);
+          if (
+            data.data.node.response &&
+            Array.isArray(data.data.node.response)
+          ) {
+            const response = data.data.node.response as TypeResponseList[];
+            setResponseList(response);
           }
         }
         // toast.success(data?.message);

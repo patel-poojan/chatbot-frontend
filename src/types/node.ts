@@ -28,6 +28,29 @@ export interface TypeNodeInfo {
     x: number;
     y: number;
   };
-  response: TypeResponseList[];
+  response:
+    | TypeResponseList[]
+    | { question: string; answer: string; delay?: number }[]
+    | [];
   utterances?: string[] | [];
+}
+export interface TypeBotResponse {
+  delay: number;
+  title?: string;
+  type: string;
+  filters?: [];
+  matchAll?: boolean;
+  buttons?:
+    | {
+        id: string;
+        title: string;
+        type: string;
+        message?: string;
+        url?: string;
+        phoneNumber?: string;
+        goto?: string;
+      }[]
+    | [];
+  info?: ResponseInfo;
+  userInput?: string;
 }

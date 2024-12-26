@@ -42,9 +42,9 @@ const FAQDialog = ({
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isDialog, setIsDialog] = useState(false);
   const [nodeInfo, setNodeInfo] = useState<TypeNodeInfo | null>(null);
-  const [messageList, setMessageList] = useState<
-    { question: string; answer: string }[]
-  >([{ question: '', answer: '' }]);
+  const [questionAnswerList, setQuestionAnswerList] = useState<
+    { question: string; answer: string }[] | []
+  >([]);
   const params = useParams();
   const chatbotId = params.id;
   const handleMessageChange = (
@@ -52,26 +52,29 @@ const FAQDialog = ({
     field: 'question' | 'answer',
     value: string
   ) => {
-    const newMessageList = [...messageList];
-    newMessageList[index][field] = value;
-    setMessageList(newMessageList);
+    const newQuestionAnswerList = [...questionAnswerList];
+    newQuestionAnswerList[index][field] = value;
+    setQuestionAnswerList(newQuestionAnswerList);
 
-    const lastItem = newMessageList[newMessageList.length - 1];
+    const lastItem = newQuestionAnswerList[newQuestionAnswerList.length - 1];
     if (
       lastItem.question.trim() !== '' &&
       lastItem.answer.trim() !== '' &&
-      index === newMessageList.length - 1
+      index === newQuestionAnswerList.length - 1
     ) {
-      setMessageList([...newMessageList, { question: '', answer: '' }]);
+      setQuestionAnswerList([
+        ...newQuestionAnswerList,
+        { question: '', answer: '' },
+      ]);
     }
 
     const isCurrentItemEmpty =
-      newMessageList[index].question.trim() === '' &&
-      newMessageList[index].answer.trim() === '';
-    if (isCurrentItemEmpty && newMessageList.length > 1) {
-      setMessageList(
-        newMessageList.filter(
-          (_, i) => i === newMessageList.length - 1 || i !== index
+      newQuestionAnswerList[index].question.trim() === '' &&
+      newQuestionAnswerList[index].answer.trim() === '';
+    if (isCurrentItemEmpty && newQuestionAnswerList.length > 1) {
+      setQuestionAnswerList(
+        newQuestionAnswerList.filter(
+          (_, i) => i === newQuestionAnswerList.length - 1 || i !== index
         )
       );
     }
@@ -81,6 +84,21 @@ const FAQDialog = ({
       onSuccess(data) {
         if (data.data.node) {
           setNodeInfo(data.data.node);
+          if (
+            data.data.node.response &&
+            Array.isArray(data.data.node.response)
+          ) {
+            const typedResponse = data.data.node.response as {
+              question: string;
+              answer: string;
+            }[];
+            setQuestionAnswerList([
+              ...typedResponse,
+              { question: '', answer: '' },
+            ]);
+          } else {
+            setQuestionAnswerList([{ question: '', answer: '' }]);
+          }
         }
         // toast.success(data?.message);
       },
@@ -119,10 +137,15 @@ const FAQDialog = ({
   }, [fetchNodeInformation, isDialog, nodeId, chatbotId]);
   const updateHandler = () => {
     if (nodeInfo && nodeId && chatbotId && isDialog) {
+      const updatedNodeInfo: TypeNodeInfo = {
+        ...nodeInfo,
+        response: questionAnswerList.slice(0, -1),
+      };
+
       updateNodeInformation({
         nodeId,
         chatbotId: chatbotId as string,
-        data: nodeInfo,
+        data: updatedNodeInfo,
       });
     }
   };
@@ -133,7 +156,7 @@ const FAQDialog = ({
   };
   useEffect(() => {
     scroll();
-  }, [messageList]);
+  }, [questionAnswerList]);
   return (
     <Dialog open={isDialog} onOpenChange={setIsDialog}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
@@ -225,7 +248,7 @@ const FAQDialog = ({
               <span>User Says</span>
             </div>
             <div className='flex flex-col gap-2 mt-2'>
-              {messageList.map((item, index) => (
+              {questionAnswerList.map((item, index) => (
                 <div
                   className='flex items-start gap-4 p-4 bg-gray-50 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300'
                   key={index}
@@ -254,16 +277,18 @@ const FAQDialog = ({
                   </div>
                   <div
                     className={`${
-                      index === messageList.length - 1
+                      index === questionAnswerList.length - 1
                         ? 'cursor-not-allowed opacity-50'
                         : 'cursor-pointer hover:bg-red-100'
                     } flex items-center justify-center bg-white rounded-full w-10 h-10 p-2 transition-all duration-200`}
                     onClick={() =>
-                      index !== messageList.length - 1 &&
-                      setMessageList(messageList.filter((_, i) => i !== index))
+                      index !== questionAnswerList.length - 1 &&
+                      setQuestionAnswerList(
+                        questionAnswerList.filter((_, i) => i !== index)
+                      )
                     }
                     title={
-                      index !== messageList.length - 1
+                      index !== questionAnswerList.length - 1
                         ? 'Delete'
                         : 'Cannot delete'
                     }

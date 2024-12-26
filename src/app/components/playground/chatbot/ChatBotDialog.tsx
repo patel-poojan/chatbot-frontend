@@ -8,99 +8,27 @@ import { useGetChatbotResponse } from '@/utils/chatbot-api';
 import { toast } from 'sonner';
 import { axiosError } from '@/types/axiosTypes';
 import { useParams } from 'next/navigation';
-
-const BotResponse = ({
-  data,
-  buttonSearch,
-}: {
-  data: { message: string; buttons?: string[] };
-  buttonSearch: (value: string) => void;
-}) => {
-  return (
-    <div className='flex flex-col gap-[10px]'>
-      <div className='flex items-center gap-1'>
-        <Image
-          src='/images/bot-icon.svg'
-          alt='User Input Icon'
-          width={18}
-          height={18}
-          quality={100}
-        />
-        <p className='text-[#1E255E] font-medium text-xs'>Chatbot</p>
-      </div>
-      <div className='bg-[white] p-3 rounded-lg text-black font-light w-full text-sm'>
-        {data?.message ?? ''}
-      </div>
-      {data?.buttons?.length && (
-        <div className='flex items-center w-full flex-wrap gap-2'>
-          {data?.buttons?.map((name, index) => (
-            <div
-              key={index}
-              onClick={() => buttonSearch(name)}
-              className=' border border-[#57C0DD] text-sm rounded-lg py-1 px-6 text-[#57C0DD] font-medium cursor-pointer bg-white'
-            >
-              {name}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-const UserInput = ({
-  data,
-}: {
-  data: { message: string; buttons?: string[] };
-}) => {
-  return (
-    <div className='flex flex-col gap-[10px] w-fit ms-auto'>
-      <div className='text-[#1E255E] font-medium text-xs ms-auto me-1'>You</div>
-      <div className='bg-[#57C0DD] p-3 rounded-lg text-white font-light  text-sm w-fit'>
-        {data?.message ?? ''}
-      </div>
-    </div>
-  );
-};
+import { TypeBotResponse } from '@/types/node';
+import {
+  ButtonResponse,
+  GalleryResponse,
+  ImageResponse,
+  QuickResponse,
+  TextResponse,
+  UserInput,
+} from './ChatBotResponseType';
 const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [inputText, setInputText] = useState<string>('');
   const params = useParams();
   const chatbotId = params.id;
-  const [ChatArray, setChatArray] = useState<
-    | {
-        type: 'user' | 'bot';
-        data: { message: string; buttons?: string[] };
-      }[]
-    | []
-  >([
-    {
-      type: 'bot',
-      data: {
-        message:
-          'Hey 👋, good to see you! I’m ChatBot, and I can answer your questions regarding ChatBot.',
-        buttons: ['Faq', 'About us'],
-      },
-    },
-  ]);
+  const [ChatArray, setChatArray] = useState<TypeBotResponse[] | []>([]);
   const scroll = () => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   };
 
-  const buttonSearch = (text: string) => {
-    if (text) {
-      setChatArray([
-        ...ChatArray,
-        {
-          type: 'user',
-          data: {
-            message: text,
-          },
-        },
-      ]);
-    }
-  };
   useEffect(() => {
     scroll();
   }, [ChatArray]);
@@ -109,6 +37,11 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
     useGetChatbotResponse({
       onSuccess(data) {
         toast.success(data?.message);
+        if (data?.response) {
+          data.response.forEach((response: TypeBotResponse) => {
+            setChatArray((prev) => [...prev, response]);
+          });
+        }
       },
       onError(error: axiosError) {
         const errorMessage =
@@ -118,32 +51,41 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
         toast.error(errorMessage);
       },
     });
+  const initialCallMade = useRef(false);
   useEffect(() => {
-    if (chatbotId) {
+    if (!initialCallMade.current && chatbotId) {
       fetchBotResponse({
         chatbotId: chatbotId as string,
-        type: 'welcome action',
+        type: 'welcome-action',
       });
+      initialCallMade.current = true;
     }
-  }, [fetchBotResponse, chatbotId]);
-  console.log('fetchPending', fetchPending);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatbotId]);
   const onTextSearch = () => {
     fetchBotResponse({
       chatbotId: chatbotId as string,
       userMessage: inputText,
-      type: 'text action',
+      type: 'text-action',
     });
     setChatArray((prev) => [
       ...prev,
-      {
-        type: 'user',
-        data: {
-          message: inputText,
-        },
-      },
+      { userInput: inputText, delay: 1000, type: 'user' },
     ]);
     setInputText('');
   };
+  const onButtonSearch = (buttonId: string, message: string) => {
+    fetchBotResponse({
+      chatbotId: chatbotId as string,
+      type: 'button-action',
+      buttonId,
+    });
+    setChatArray((prev) => [
+      ...prev,
+      { userInput: message, delay: 1000, type: 'user' },
+    ]);
+  };
+  console.log('pending', fetchPending);
   return (
     <div
       className='absolute  min-[425px]:right-6 top-32 min-[699px]:top-20 flex flex-col  min-[425px]:w-[375px] h-[65vh] max-[425px]:mx-6 min-[500px]:h-[60vh] rounded-lg overflow-hidden'
@@ -175,14 +117,31 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
         {ChatArray &&
           ChatArray?.map((item, index) => (
             <div key={index}>
-              {item.type === 'bot' ? (
-                <BotResponse data={item.data} buttonSearch={buttonSearch} />
-              ) : (
-                <UserInput data={item.data} />
-              )}
+              {item.type === 'user' ? (
+                <UserInput data={item} />
+              ) : item.type === 'text' && item.info ? (
+                <TextResponse info={item.info} />
+              ) : item.type === 'image' && item.info ? (
+                <ImageResponse info={item.info} />
+              ) : item.type === 'gallery' && item.info ? (
+                <GalleryResponse
+                  info={item.info}
+                  onButtonSearch={onButtonSearch}
+                />
+              ) : item.type === 'quick' && item.info ? (
+                <QuickResponse
+                  info={item.info}
+                  onButtonSearch={onButtonSearch}
+                />
+              ) : item.type === 'button' && item.info ? (
+                <ButtonResponse
+                  info={item.info}
+                  onButtonSearch={onButtonSearch}
+                />
+              ) : null}
             </div>
           ))}
-        <ChatLoader />
+        {fetchPending ? <ChatLoader /> : <></>}
       </div>
       <div className='p-4 bg-white flex gap-4 items-center'>
         <Input
