@@ -1,4 +1,4 @@
-import { ResponseInfo, TypeBotResponse } from '@/types/node';
+import { ResponseInfo, TypeBotResponse, TypeButton } from '@/types/node';
 import Image from 'next/image';
 
 export const TextResponse = ({ info }: { info: ResponseInfo }) => {
@@ -29,7 +29,7 @@ export const GalleryResponse = ({
   onButtonSearch,
 }: {
   info: ResponseInfo;
-  onButtonSearch: (buttonId: string, message: string) => void;
+  onButtonSearch: (info: TypeButton) => void;
 }) => {
   return (
     <div className='w-8/12'>
@@ -60,7 +60,7 @@ export const GalleryResponse = ({
         {info?.button?.map((button, i) => (
           <div
             key={i}
-            onClick={() => onButtonSearch(button.id, button.title)}
+            onClick={() => onButtonSearch(button)}
             className='text-[#57C0DD] py-2 border cursor-pointer bg-white border-b-0 border-s-0 border-r-0 mx-auto text-center border-t'
           >
             {button.title}
@@ -75,7 +75,7 @@ export const ButtonResponse = ({
   onButtonSearch,
 }: {
   info: ResponseInfo;
-  onButtonSearch: (buttonId: string, message: string) => void;
+  onButtonSearch: (info: TypeButton) => void;
 }) => {
   return (
     <div className='w-8/12'>
@@ -87,7 +87,7 @@ export const ButtonResponse = ({
       {info?.button?.map((button, i) => (
         <div
           key={i}
-          onClick={() => onButtonSearch(button.id, button.title)}
+          onClick={() => onButtonSearch(button)}
           className='text-[#57C0DD] py-2 border cursor-pointer bg-white border-b-0 border-s-0 border-r-0 mx-auto text-center border-t'
         >
           {button.title}
@@ -102,7 +102,7 @@ export const QuickResponse = ({
   onButtonSearch,
 }: {
   info: ResponseInfo;
-  onButtonSearch: (buttonId: string, message: string) => void;
+  onButtonSearch: (info: TypeButton) => void;
 }) => {
   return (
     <div className='flex flex-col gap-2'>
@@ -113,7 +113,7 @@ export const QuickResponse = ({
         {info?.button?.map((button, i) => (
           <div
             key={i}
-            onClick={() => onButtonSearch(button.id, button.title)}
+            onClick={() => onButtonSearch(button)}
             className='text-[#57C0DD] cursor-pointer py-1 px-4 border bg-white text-sm border-[#57C0DD] w-fit text-center rounded-[30px]'
           >
             {button.title}

@@ -92,9 +92,7 @@ export const GalleryNodeResponse = ({
   return (
     <div className='w-8/12'>
       <div className='h-52'>
-        <div className='bg-gray-200 h-full w-full flex items-center justify-center'>
-          Upload Image
-        </div>
+        <UploadImage bg='bg-gray-200' />
       </div>
 
       <div>

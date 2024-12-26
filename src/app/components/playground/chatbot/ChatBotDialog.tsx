@@ -8,7 +8,7 @@ import { useGetChatbotResponse } from '@/utils/chatbot-api';
 import { toast } from 'sonner';
 import { axiosError } from '@/types/axiosTypes';
 import { useParams } from 'next/navigation';
-import { TypeBotResponse } from '@/types/node';
+import { TypeBotResponse, TypeButton } from '@/types/node';
 import {
   ButtonResponse,
   GalleryResponse,
@@ -19,6 +19,7 @@ import {
 } from './ChatBotResponseType';
 const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [inputText, setInputText] = useState<string>('');
   const params = useParams();
   const chatbotId = params.id;
@@ -33,27 +34,29 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
     scroll();
   }, [ChatArray]);
 
-  const { mutate: fetchBotResponse, isPending: fetchPending } =
-    useGetChatbotResponse({
-      onSuccess(data) {
-        toast.success(data?.message);
-        if (data?.response) {
-          data.response.forEach((response: TypeBotResponse) => {
-            setChatArray((prev) => [...prev, response]);
-          });
-        }
-      },
-      onError(error: axiosError) {
-        const errorMessage =
-          error?.response?.data?.errors?.message ||
-          error?.response?.data?.message ||
-          'failed to fetch bot response';
-        toast.error(errorMessage);
-      },
-    });
+  const { mutate: fetchBotResponse } = useGetChatbotResponse({
+    onSuccess(data) {
+      toast.success(data?.message);
+      if (data?.response) {
+        data.response.forEach((response: TypeBotResponse) => {
+          setChatArray((prev) => [...prev, response]);
+        });
+      }
+      setIsLoading(false);
+    },
+    onError(error: axiosError) {
+      const errorMessage =
+        error?.response?.data?.errors?.message ||
+        error?.response?.data?.message ||
+        'failed to fetch bot response';
+      toast.error(errorMessage);
+      setIsLoading(false);
+    },
+  });
   const initialCallMade = useRef(false);
   useEffect(() => {
     if (!initialCallMade.current && chatbotId) {
+      setIsLoading(true);
       fetchBotResponse({
         chatbotId: chatbotId as string,
         type: 'welcome-action',
@@ -63,6 +66,7 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatbotId]);
   const onTextSearch = () => {
+    setIsLoading(true);
     fetchBotResponse({
       chatbotId: chatbotId as string,
       userMessage: inputText,
@@ -74,18 +78,25 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
     ]);
     setInputText('');
   };
-  const onButtonSearch = (buttonId: string, message: string) => {
-    fetchBotResponse({
-      chatbotId: chatbotId as string,
-      type: 'button-action',
-      buttonId,
-    });
+  const onButtonSearch = (info: TypeButton) => {
+    if (info.type === 'message' && info.message) {
+      setIsLoading(true);
+      fetchBotResponse({
+        chatbotId: chatbotId as string,
+        // type: 'button-action',
+        // buttonId: info.id,
+        userMessage: info.message,
+        type: 'text-action',
+      });
+    } else if (info.type === 'url' && info.url) {
+      window.open(info.url, '_blank');
+    }
     setChatArray((prev) => [
       ...prev,
-      { userInput: message, delay: 1000, type: 'user' },
+      { userInput: info.title, delay: 1000, type: 'user' },
     ]);
   };
-  console.log('pending', fetchPending);
+  console.log('chatArray', ChatArray);
   return (
     <div
       className='absolute  min-[425px]:right-6 top-32 min-[699px]:top-20 flex flex-col  min-[425px]:w-[375px] h-[65vh] max-[425px]:mx-6 min-[500px]:h-[60vh] rounded-lg overflow-hidden'
@@ -141,7 +152,7 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
               ) : null}
             </div>
           ))}
-        {fetchPending ? <ChatLoader /> : <></>}
+        {isLoading ? <ChatLoader /> : <></>}
       </div>
       <div className='p-4 bg-white flex gap-4 items-center'>
         <Input

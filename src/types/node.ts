@@ -2,15 +2,7 @@ export interface ResponseInfo {
   file?: string;
   title?: string;
   description?: string;
-  button?: {
-    id: string;
-    title: string;
-    type: string;
-    message?: string;
-    url?: string;
-    phoneNumber?: string;
-    goto?: string;
-  }[];
+  button?: TypeButton[];
 }
 
 export interface TypeResponseList {
@@ -53,4 +45,13 @@ export interface TypeBotResponse {
     | [];
   info?: ResponseInfo;
   userInput?: string;
+}
+export interface TypeButton {
+  id: string;
+  title: string;
+  type: string;
+  message?: string;
+  url?: string;
+  phoneNumber?: string;
+  goto?: string;
 }
