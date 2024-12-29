@@ -23,6 +23,9 @@ export interface TypeNodeInfo {
   response:
     | TypeResponseList[]
     | { question: string; answer: string; delay?: number }[]
+    | {
+        gotoNodeId: string;
+      }[]
     | [];
   utterances?: string[] | [];
 }
@@ -54,4 +57,22 @@ export interface TypeButton {
   url?: string;
   phoneNumber?: string;
   goto?: string;
+}
+
+export interface TypePlaygroundNode {
+  id: string;
+  type: string;
+  data: {
+    label: string;
+    message: string;
+    isDelete: boolean;
+  };
+  position: {
+    x: number;
+    y: number;
+  };
+}
+export interface TypeSimpleNode {
+  id: string;
+  label: string;
 }

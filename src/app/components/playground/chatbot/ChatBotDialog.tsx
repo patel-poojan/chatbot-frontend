@@ -83,20 +83,24 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
       setIsLoading(true);
       fetchBotResponse({
         chatbotId: chatbotId as string,
-        // type: 'button-action',
-        // buttonId: info.id,
         userMessage: info.message,
         type: 'text-action',
       });
     } else if (info.type === 'url' && info.url) {
       window.open(info.url, '_blank');
+    } else if (info.type === 'goto' && info.goto) {
+      setIsLoading(true);
+      fetchBotResponse({
+        chatbotId: chatbotId as string,
+        type: 'button-action',
+        buttonId: info.id,
+      });
     }
     setChatArray((prev) => [
       ...prev,
       { userInput: info.title, delay: 1000, type: 'user' },
     ]);
   };
-  console.log('chatArray', ChatArray);
   return (
     <div
       className='absolute  min-[425px]:right-6 top-32 min-[699px]:top-20 flex flex-col  min-[425px]:w-[375px] h-[65vh] max-[425px]:mx-6 min-[500px]:h-[60vh] rounded-lg overflow-hidden'

@@ -297,6 +297,7 @@ const BotResponseDialog = ({
   useEffect(() => {
     if (!isDialog) {
       setErrorComponents([]);
+      localStorage.removeItem('nodeId');
     }
   }, [isDialog]);
   const updateDelay = (index: number, increment: boolean) => {

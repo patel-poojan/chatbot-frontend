@@ -1,14 +1,15 @@
-import { useDeleteNode } from "@/utils/playground-api";
-import { usePathname } from "next/navigation";
+import { useDeleteNode } from '@/utils/playground-api';
+import { usePathname } from 'next/navigation';
 import React, {
   createContext,
   useContext,
   useState,
   ReactNode,
   useMemo,
-} from "react";
-import { toast } from "sonner";
-import { axiosError } from "@/types/axiosTypes";
+} from 'react';
+import { toast } from 'sonner';
+import { axiosError } from '@/types/axiosTypes';
+import { TypePlaygroundNode } from '@/types/node';
 
 interface PlaygroundContextType {
   type: string | null;
@@ -25,6 +26,10 @@ interface PlaygroundContextType {
     parentNodeId: string,
     currentNodeId: string
   ) => void;
+  listOfPlayGroundNode: TypePlaygroundNode[];
+  setListOfPlayGroundNode: React.Dispatch<
+    React.SetStateAction<TypePlaygroundNode[]>
+  >;
 }
 
 const PlaygroundContext = createContext<PlaygroundContextType | undefined>(
@@ -42,18 +47,20 @@ export const PlaygroundProvider: React.FC<PlaygroundProviderProps> = ({
   const [label, setLabel] = useState<string | null>(null);
   const [reFetch, setRefetch] = useState(false);
   const [isPageLoader, setIsPageLoader] = useState(false);
-
+  const [listOfPlayGroundNode, setListOfPlayGroundNode] = useState<
+    TypePlaygroundNode[] | []
+  >([]);
   const notConnectableNode = useMemo(
     () => [
-      "aiAssistNode",
-      "startNode",
-      "defaultNode",
-      "goToStepNode",
-      "faqNode",
-      "closeChatNode",
-      "successNode",
-      "failureNode",
-      "defaultBotResponseNode",
+      'aiAssistNode',
+      'startNode',
+      'defaultNode',
+      'goToStepNode',
+      'faqNode',
+      'closeChatNode',
+      'successNode',
+      'failureNode',
+      'defaultBotResponseNode',
     ],
     []
   );
@@ -63,7 +70,7 @@ export const PlaygroundProvider: React.FC<PlaygroundProviderProps> = ({
   };
 
   const pathname = usePathname();
-  const chatbotId = pathname?.split("/").pop();
+  const chatbotId = pathname?.split('/').pop();
   const { mutate: onDeleteNode } = useDeleteNode({
     onSuccess(data) {
       setIsPageLoader(false);
@@ -78,7 +85,7 @@ export const PlaygroundProvider: React.FC<PlaygroundProviderProps> = ({
       const errorMessage =
         error?.response?.data?.errors?.message ||
         error?.response?.data?.message ||
-        "failed to delete node";
+        'failed to delete node';
       toast.error(errorMessage);
     },
   });
@@ -96,7 +103,7 @@ export const PlaygroundProvider: React.FC<PlaygroundProviderProps> = ({
         isSingleNode,
       });
     } else {
-      toast.error("something went wrong");
+      toast.error('something went wrong');
     }
   };
 
@@ -113,6 +120,8 @@ export const PlaygroundProvider: React.FC<PlaygroundProviderProps> = ({
         isPageLoader,
         setIsPageLoader,
         deleteNodeHandler,
+        listOfPlayGroundNode,
+        setListOfPlayGroundNode,
       }}
     >
       {children}
@@ -123,7 +132,7 @@ export const PlaygroundProvider: React.FC<PlaygroundProviderProps> = ({
 export const usePlayground = (): PlaygroundContextType => {
   const context = useContext(PlaygroundContext);
   if (!context) {
-    throw new Error("usePlayground must be used within a PlaygroundProvider");
+    throw new Error('usePlayground must be used within a PlaygroundProvider');
   }
   return context;
 };

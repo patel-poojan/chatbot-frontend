@@ -56,50 +56,12 @@ import { toast } from 'sonner';
 import { axiosError } from '@/types/axiosTypes';
 import AttributesDialog from '@/app/components/playground/AttributesDialog';
 import ChatBotDialog from '@/app/components/playground/chatbot/ChatBotDialog';
+import { TypePlaygroundNode } from '@/types/node';
 
 const ReactFlow = dynamic(
   () => import('@xyflow/react').then((mod) => mod.ReactFlow),
   { ssr: false }
 );
-
-// const initialNodes: Node[] = [
-//   {
-//     id: "1",
-//     type: "startNode",
-//     data: { label: "Start Point", message: "" },
-//     position: { x: 10, y: 200 },
-//   },
-//   {
-//     id: "2",
-//     type: "defaultNode",
-//     data: { label: "Default Response", message: "" },
-//     position: { x: 230, y: 390 },
-//   },
-//   {
-//     id: "3",
-//     type: "botResponseNode",
-//     data: {
-//       label: "Bot Response",
-//       message: "Welcome message",
-//     },
-//     position: { x: 230, y: 10 },
-//   },
-//   {
-//     id: "4",
-//     type: "aiAssistNode",
-//     data: { label: "AI Assist", message: "Welcome message" },
-//     position: { x: 230, y: 200 },
-//   },
-// ];
-// const initialEdges: Edge[] = [
-//   { id: "1-2", source: "1", target: "2", type: "customEdge" },
-//   { id: "1-3", source: "1", target: "3", type: "customEdge" },
-//   { id: "1-4", source: "1", target: "4", type: "customEdge" },
-// ];
-
-// let idCounter = 5;
-// const getId = () => `${idCounter++}`;
-
 type FetchPlaygroundResponse = {
   statusCode: number;
   data: {
@@ -160,7 +122,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
         const nnn = updatedPlaygroundData?.diagram.nodes;
         const eee = updatedPlaygroundData?.diagram.edges;
 
-        const nodesKp = nnn
+        const nodesss = nnn
           .map((node) => {
             if (node.id && node.type && node.position && node.data) {
               return {
@@ -173,7 +135,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
             return null;
           })
           .filter((node) => node !== null);
-        setNodes(nodesKp);
+        setNodes(nodesss);
         setEdges(eee);
       }
 
@@ -195,7 +157,13 @@ const MainComponent = ({ botId }: { botId: string }) => {
   const [attributesDialog, setAttributesDialog] = useState(false);
   const { screenToFlowPosition } = useReactFlow();
   // const { type, label } = usePlayground();
-  const { type, reFetch, notConnectableNode, isPageLoader } = usePlayground();
+  const {
+    type,
+    reFetch,
+    notConnectableNode,
+    isPageLoader,
+    setListOfPlayGroundNode,
+  } = usePlayground();
   const { width: screenWidth } = useWindowDimensions();
   const nodeTypes = useMemo(
     () => ({
@@ -230,16 +198,28 @@ const MainComponent = ({ botId }: { botId: string }) => {
       const updatedNodes = playgroundData?.diagram.nodes;
       const updatedEdges = playgroundData?.diagram.edges;
 
-      const nodesKp = updatedNodes.map((node) => ({
+      const nodesss = updatedNodes.map((node) => ({
         id: node.id,
         type: node.type,
         position: node.position,
         data: node.data,
       }));
-      setNodes(nodesKp);
+      setNodes(nodesss);
       setEdges(updatedEdges);
     }
   }, [playgroundData, setEdges, setNodes]);
+
+  useEffect(() => {
+    if (nodes && nodes.length > 0) {
+      const typedNodes = nodes.map((node) => ({
+        id: node.id,
+        type: node.type || '', // Provide default value for optional type
+        data: node.data,
+        position: node.position,
+      })) as TypePlaygroundNode[];
+      setListOfPlayGroundNode(typedNodes);
+    }
+  }, [nodes, setListOfPlayGroundNode]);
 
   useEffect(() => {
     refetchPlayground();

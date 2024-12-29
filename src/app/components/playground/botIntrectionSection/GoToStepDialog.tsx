@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { TypeNodeInfo } from '@/types/node';
+import { TypeNodeInfo, TypeSimpleNode } from '@/types/node';
 import { useParams } from 'next/navigation';
 import { usePlayground } from '../playgroundArea/PlaygroundContext';
 import {
@@ -36,22 +36,43 @@ const GoToStepDialog = ({
   trigger: React.ReactNode;
   nodeId: string;
 }) => {
+  const { refetchHandler, listOfPlayGroundNode } = usePlayground();
   const [isDialog, setIsDialog] = useState(false);
   const [nodeInfo, setNodeInfo] = useState<TypeNodeInfo | null>(null);
   const [response, setResponse] = useState({
-    targetBox: {
-      name: '',
-      id: '',
-    },
+    gotoNodeId: '',
   });
   const params = useParams();
   const chatbotId = params.id;
-  const { refetchHandler } = usePlayground();
+  const goToOptions: TypeSimpleNode[] =
+    listOfPlayGroundNode && listOfPlayGroundNode.length > 0
+      ? listOfPlayGroundNode.map((node) => ({
+          id: node.id,
+          label: node.data.label,
+        }))
+      : [];
   const { mutate: fetchNodeInformation, isPending: fetchPending } =
     useGetNodeInformation({
       onSuccess(data) {
+        console.log('data.data.node', data.data.node);
         if (data.data.node) {
           setNodeInfo(data.data.node);
+        }
+        if (data.data.node.response && Array.isArray(data.data.node.response)) {
+          const typedResponse = data.data.node.response as {
+            gotoNodeId: string;
+          }[];
+          setResponse(typedResponse[0]);
+        } else {
+          setResponse(
+            goToOptions && goToOptions.length > 0
+              ? {
+                  gotoNodeId: goToOptions[0]?.id as string,
+                }
+              : {
+                  gotoNodeId: '',
+                }
+          );
         }
         // toast.success(data?.message);
       },
@@ -90,10 +111,14 @@ const GoToStepDialog = ({
   }, [fetchNodeInformation, isDialog, nodeId, chatbotId]);
   const updateHandler = () => {
     if (nodeInfo && nodeId && chatbotId && isDialog) {
+      const updatedNodeInfo: TypeNodeInfo = {
+        ...nodeInfo,
+        response: [response],
+      };
       updateNodeInformation({
         nodeId,
         chatbotId: chatbotId as string,
-        data: nodeInfo,
+        data: updatedNodeInfo,
       });
     }
   };
@@ -167,13 +192,10 @@ const GoToStepDialog = ({
                 Block
               </label>
               <Select
-                value={response.targetBox.name}
+                value={response.gotoNodeId}
                 onValueChange={(value) =>
                   setResponse({
-                    targetBox: {
-                      name: value,
-                      id: '',
-                    },
+                    gotoNodeId: value,
                   })
                 }
               >
@@ -183,11 +205,12 @@ const GoToStepDialog = ({
                     placeholder='Choose target block'
                   />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='message'>Send message</SelectItem>
-                  <SelectItem value='goto'>Go to block</SelectItem>
-                  <SelectItem value='url'>Open url</SelectItem>
-                  <SelectItem value='phone'>Phone call</SelectItem>
+                <SelectContent className='max-h-[200px] overflow-y-scroll'>
+                  {goToOptions.map((option) => (
+                    <SelectItem key={option.id} value={option.id}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

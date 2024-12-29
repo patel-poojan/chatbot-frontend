@@ -14,7 +14,9 @@ import {
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { TypeResponseList } from '@/types/node';
+import { TypeResponseList, TypeSimpleNode } from '@/types/node';
+import { usePlayground } from '../playgroundArea/PlaygroundContext';
+import { toast } from 'sonner';
 
 const ButtonInteractionDialog = ({
   trigger,
@@ -39,7 +41,7 @@ const ButtonInteractionDialog = ({
 }) => {
   const { width: screenWidth } = useWindowDimensions();
   const [open, setOpen] = useState(false);
-
+  const { listOfPlayGroundNode } = usePlayground();
   const [tempButton, setTempButton] = useState({
     id: buttonList[index]?.id || '',
     title: buttonList[index]?.title || '',
@@ -49,17 +51,33 @@ const ButtonInteractionDialog = ({
       buttonList[index].phoneNumber ||
       buttonList[index].goto ||
       buttonList[index].message ||
-      'message',
+      '',
   });
 
-  const handleTempUpdate = (field: string, value: string) => {
-    setTempButton((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
   const handleSave = () => {
+    if (tempButton.id === '') {
+      return;
+    }
+    if (tempButton.title === '') {
+      toast.warning('Please enter title');
+      return;
+    }
+    if (tempButton.type === '') {
+      toast.warning('Please select type');
+      return;
+    }
+    if (tempButton.type === 'goto' && tempButton.navigationInfo === '') {
+      toast.warning('Please select node');
+      return;
+    }
+    if (tempButton.type === 'message' && tempButton.navigationInfo === '') {
+      toast.warning('Please enter message');
+      return;
+    }
+    if (tempButton.type === 'url' && tempButton.navigationInfo === '') {
+      toast.warning('Please enter url');
+      return;
+    }
     const updatedData = {
       id: tempButton.id,
       title: tempButton.title,
@@ -78,6 +96,30 @@ const ButtonInteractionDialog = ({
       return newList;
     });
     setOpen(false);
+  };
+  const goToOptions: TypeSimpleNode[] =
+    listOfPlayGroundNode && listOfPlayGroundNode.length > 0
+      ? listOfPlayGroundNode.map((node) => ({
+          id: node.id,
+          label: node.data.label,
+        }))
+      : [];
+  const handleTempUpdate = (field: string, value: string) => {
+    if (field === 'type') {
+      setTempButton((prev) => ({
+        ...prev,
+        [field]: value,
+        navigationInfo: value === 'goto' ? goToOptions[0].id || '' : '',
+      }));
+      if (value === 'goto') {
+        localStorage.setItem('nodeId', goToOptions[0].id || '');
+      }
+    } else {
+      setTempButton((prev) => ({
+        ...prev,
+        [field]: value,
+      }));
+    }
   };
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -170,9 +212,10 @@ const ButtonInteractionDialog = ({
               <div className='w-full !mt-1'>
                 <Select
                   value={tempButton.navigationInfo}
-                  onValueChange={(value) =>
-                    handleTempUpdate('navigationInfo', value)
-                  }
+                  onValueChange={(value) => {
+                    localStorage.setItem('nodeId', value || '');
+                    handleTempUpdate('navigationInfo', value);
+                  }}
                 >
                   <SelectTrigger className='p-2 border bg-white placeholder:!text-[#6F7288B2] rounded-md hover:border-[#57C0DD] focus:outline-none focus:ring-1 focus:ring-[#57C0DD]'>
                     <SelectValue
@@ -180,10 +223,12 @@ const ButtonInteractionDialog = ({
                       placeholder='Select value'
                     />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value='message'>Send message</SelectItem>
-                    <SelectItem value='goto'>Go to block</SelectItem>
-                    <SelectItem value='url'>Open url</SelectItem>
+                  <SelectContent className='max-h-[200px] overflow-y-scroll'>
+                    {goToOptions.map((option) => (
+                      <SelectItem key={option.id} value={option.id}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

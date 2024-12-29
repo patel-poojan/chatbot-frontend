@@ -24,27 +24,38 @@ const NodeContainer = ({
   shadow,
   onMouseEnter,
   onMouseLeave,
+  nodeId,
 }: {
   children: React.ReactNode;
   nodeCss: string;
   shadow?: string;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
-}) => (
-  <div
-    className={`playground-node gap-1 ${nodeCss} relative`}
-    style={{ boxShadow: shadow }}
-    onMouseEnter={onMouseEnter}
-    onMouseLeave={onMouseLeave}
-  >
-    {children}
-  </div>
-);
+  nodeId: string;
+}) => {
+  const localStorageNodeId = localStorage.getItem('nodeId');
+
+  console.log('nodeId', localStorageNodeId, nodeId);
+  return (
+    <div
+      className={`playground-node gap-1 ${nodeCss} relative ${
+        localStorageNodeId === nodeId ? 'border-2 border-red-500 ' : ''
+      }`}
+      style={{ boxShadow: shadow }}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
+      {children}
+    </div>
+  );
+};
 
 export const StartNode = ({
   data,
+  id,
 }: {
   data: { label: string; message: string; actionHandler: () => void };
+  id: string;
 }) => {
   return (
     <div className='relative flex items-center gap-2'>
@@ -56,6 +67,7 @@ export const StartNode = ({
       <NodeContainer
         nodeCss='bg-[#424D50] w-[145px] hover:cursor-not-allowed '
         shadow='0px 0px 12px 4px #00000014 '
+        nodeId={id}
       >
         <GoHomeFill className='text-white text-base' />
         <span className='text-white text-sm'>{data.label}</span>
@@ -67,8 +79,10 @@ export const StartNode = ({
 
 export const DefaultNode = ({
   data,
+  id,
 }: {
   data: { label: string; message: string; actionHandler: () => void };
+  id: string;
 }) => {
   return (
     <div className='relative flex items-center gap-2'>
@@ -80,6 +94,7 @@ export const DefaultNode = ({
       <NodeContainer
         nodeCss='bg-[#9CA3A5] text-white text-sm w-[152px] hover:cursor-not-allowed '
         shadow='0px 0px 12px 4px #00000014'
+        nodeId={id}
       >
         {data.label}
         <CustomHandle type='target' position={Position.Left} />
@@ -173,6 +188,7 @@ export const BotResponseNode = ({
               <NodeContainer
                 nodeCss='bg-white  w-[145px]'
                 shadow='0px 0px 12px 4px #00000014'
+                nodeId={id}
               >
                 <IoIosSend className='text-black text-base ' />
                 <span className='text-black text-sm'>{data.label}</span>
@@ -226,6 +242,7 @@ export const DefaultBotResponseNode = ({
         trigger={
           <button>
             <NodeContainer
+              nodeId={id}
               nodeCss='bg-white  w-[145px]'
               shadow='0px 0px 12px 4px #00000014'
             >
@@ -241,8 +258,10 @@ export const DefaultBotResponseNode = ({
 };
 export const AiAssistNode = ({
   data,
+  id,
 }: {
   data: { label: string; message: string; actionHandler: () => void };
+  id: string;
 }) => {
   return (
     <div className='relative flex gap-2 items-center '>
@@ -252,6 +271,7 @@ export const AiAssistNode = ({
         </span>
       )}
       <NodeContainer
+        nodeId={id}
         nodeCss='bg-[#1844F0] w-[145px] hover:cursor-not-allowed  '
         shadow='0px 0px 12px 4px #00000014'
       >
@@ -471,6 +491,7 @@ export const QuestionNode = ({
           </PopoverContent>
         </Popover>
         <NodeContainer
+          nodeId={id}
           nodeCss='bg-orange-400  w-[145px]'
           shadow='0px 0px 12px 4px #00000014'
         >
@@ -581,6 +602,7 @@ export const SuccessNode = ({
           </PopoverContent>
         </Popover>
         <NodeContainer
+          nodeId={id}
           nodeCss='bg-orange-400 bg-white  w-[145px]'
           shadow='0px 0px 12px 4px #00000014'
         >
@@ -691,6 +713,7 @@ export const FailureNode = ({
           </PopoverContent>
         </Popover>
         <NodeContainer
+          nodeId={id}
           nodeCss='bg-white w-[145px]'
           shadow='0px 0px 12px 4px #00000014'
         >
@@ -801,6 +824,7 @@ export const CloseChatNode = ({
           </PopoverContent>
         </Popover>
         <NodeContainer
+          nodeId={id}
           nodeCss='bg-white  w-[145px]'
           shadow='0px 0px 12px 4px #00000014'
         >
@@ -1042,6 +1066,7 @@ export const GoToStepNode = ({
           trigger={
             <button>
               <NodeContainer
+                nodeId={id}
                 nodeCss='bg-[#FFDC66]  w-[145px]'
                 shadow='0px 0px 12px 4px #00000014'
               >
