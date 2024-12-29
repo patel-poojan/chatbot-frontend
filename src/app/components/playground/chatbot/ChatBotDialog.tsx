@@ -17,70 +17,112 @@ import {
   TextResponse,
   UserInput,
 } from './ChatBotResponseType';
+
 const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [inputText, setInputText] = useState<string>('');
   const params = useParams();
   const chatbotId = params.id;
-  const [ChatArray, setChatArray] = useState<TypeBotResponse[] | []>([]);
+  const [pendingMessages, setPendingMessages] = useState<TypeBotResponse[]>([]);
+  const [visibleMessages, setVisibleMessages] = useState<TypeBotResponse[]>([]);
+  const processingRef = useRef(false);
+
   const scroll = () => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      setTimeout(() => {
+        if (scrollRef.current) {
+          scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
+      }, 100);
     }
   };
 
   useEffect(() => {
     scroll();
-  }, [ChatArray]);
+  }, [visibleMessages]);
+
+  const processNextMessage = async () => {
+    if (processingRef.current || pendingMessages.length === 0) return;
+
+    processingRef.current = true;
+    setIsLoading(true);
+
+    const currentMessage = pendingMessages[0];
+
+    await new Promise((resolve) =>
+      setTimeout(resolve, currentMessage.delay || 0)
+    );
+
+    setVisibleMessages((prev) => [...prev, currentMessage]);
+    setPendingMessages((prev) => prev.slice(1));
+
+    processingRef.current = false;
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    if (pendingMessages.length > 0 && !processingRef.current) {
+      processNextMessage();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingMessages, visibleMessages]);
 
   const { mutate: fetchBotResponse } = useGetChatbotResponse({
     onSuccess(data) {
-      toast.success(data?.message);
-      if (data?.response) {
-        data.response.forEach((response: TypeBotResponse) => {
-          setChatArray((prev) => [...prev, response]);
-        });
+      if (data?.message) {
+        toast.success(data.message);
       }
-      setIsLoading(false);
+      if (data?.response) {
+        setPendingMessages((prev) => [...prev, ...data.response]);
+      }
     },
     onError(error: axiosError) {
       const errorMessage =
         error?.response?.data?.errors?.message ||
         error?.response?.data?.message ||
-        'failed to fetch bot response';
+        'Failed to fetch bot response';
       toast.error(errorMessage);
       setIsLoading(false);
+      processingRef.current = false;
     },
   });
+
   const initialCallMade = useRef(false);
   useEffect(() => {
     if (!initialCallMade.current && chatbotId) {
-      setIsLoading(true);
       fetchBotResponse({
         chatbotId: chatbotId as string,
         type: 'welcome-action',
       });
       initialCallMade.current = true;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatbotId]);
+  }, [chatbotId, fetchBotResponse]);
+
   const onTextSearch = () => {
-    setIsLoading(true);
+    if (!inputText.trim()) return;
+
+    setPendingMessages((prev) => [
+      ...prev,
+      { userInput: inputText, delay: 0, type: 'user' },
+    ]);
+
     fetchBotResponse({
       chatbotId: chatbotId as string,
       userMessage: inputText,
       type: 'text-action',
     });
-    setChatArray((prev) => [
-      ...prev,
-      { userInput: inputText, delay: 1000, type: 'user' },
-    ]);
+
     setInputText('');
   };
+
   const onButtonSearch = (info: TypeButton) => {
+    setPendingMessages((prev) => [
+      ...prev,
+      { userInput: info.title, delay: 0, type: 'user' },
+    ]);
+
     if (info.type === 'message' && info.message) {
-      setIsLoading(true);
       fetchBotResponse({
         chatbotId: chatbotId as string,
         userMessage: info.message,
@@ -89,21 +131,17 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
     } else if (info.type === 'url' && info.url) {
       window.open(info.url, '_blank');
     } else if (info.type === 'goto' && info.goto) {
-      setIsLoading(true);
       fetchBotResponse({
         chatbotId: chatbotId as string,
         type: 'button-action',
         buttonId: info.id,
       });
     }
-    setChatArray((prev) => [
-      ...prev,
-      { userInput: info.title, delay: 1000, type: 'user' },
-    ]);
   };
+
   return (
     <div
-      className='absolute  min-[425px]:right-6 top-32 min-[699px]:top-20 flex flex-col  min-[425px]:w-[375px] h-[65vh] max-[425px]:mx-6 min-[500px]:h-[60vh] rounded-lg overflow-hidden'
+      className='absolute min-[425px]:right-6 top-32 min-[699px]:top-20 flex flex-col min-[425px]:w-[375px] h-[65vh] max-[425px]:mx-6 min-[500px]:h-[60vh] rounded-lg overflow-hidden'
       style={{ boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)' }}
     >
       <div className='w-full p-6 bg-white justify-between flex items-center'>
@@ -115,7 +153,7 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
             height={40}
             quality={100}
           />
-          <div className='flex flex-col my-1 justify-between '>
+          <div className='flex flex-col my-1 justify-between'>
             <p className='text-[#1E255E] font-medium text-sm'>Chatbot</p>
             <p className='text-[#1E255EB2] font-light text-sm'>Online</p>
           </div>
@@ -129,41 +167,37 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
         className='flex-1 bg-[#F1F1F1] p-4 overflow-y-auto show-scrollbar flex flex-col gap-3'
         ref={scrollRef}
       >
-        {ChatArray &&
-          ChatArray?.map((item, index) => (
-            <div key={index}>
-              {item.type === 'user' ? (
-                <UserInput data={item} />
-              ) : item.type === 'text' && item.info ? (
-                <TextResponse info={item.info} />
-              ) : item.type === 'image' && item.info ? (
-                <ImageResponse info={item.info} />
-              ) : item.type === 'gallery' && item.info ? (
-                <GalleryResponse
-                  info={item.info}
-                  onButtonSearch={onButtonSearch}
-                />
-              ) : item.type === 'quick' && item.info ? (
-                <QuickResponse
-                  info={item.info}
-                  onButtonSearch={onButtonSearch}
-                />
-              ) : item.type === 'button' && item.info ? (
-                <ButtonResponse
-                  info={item.info}
-                  onButtonSearch={onButtonSearch}
-                />
-              ) : null}
-            </div>
-          ))}
-        {isLoading ? <ChatLoader /> : <></>}
+        {visibleMessages.map((item, index) => (
+          <div key={index}>
+            {item.type === 'user' ? (
+              <UserInput data={item} />
+            ) : item.type === 'text' && item.info ? (
+              <TextResponse info={item.info} />
+            ) : item.type === 'image' && item.info ? (
+              <ImageResponse info={item.info} />
+            ) : item.type === 'gallery' && item.info ? (
+              <GalleryResponse
+                info={item.info}
+                onButtonSearch={onButtonSearch}
+              />
+            ) : item.type === 'quick' && item.info ? (
+              <QuickResponse info={item.info} onButtonSearch={onButtonSearch} />
+            ) : item.type === 'button' && item.info ? (
+              <ButtonResponse
+                info={item.info}
+                onButtonSearch={onButtonSearch}
+              />
+            ) : null}
+          </div>
+        ))}
+        {isLoading && <ChatLoader />}
       </div>
       <div className='p-4 bg-white flex gap-4 items-center'>
         <Input
           onChange={(e) => setInputText(e.target.value)}
           value={inputText}
           onKeyDown={(e) => {
-            if (e.key === 'Enter' && inputText.length > 0) {
+            if (e.key === 'Enter' && inputText.trim().length > 0) {
               onTextSearch();
             }
           }}
@@ -172,9 +206,7 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
         />
         <IoSend
           className='text-[#7A7A7A] text-xl cursor-pointer'
-          onClick={() => {
-            onTextSearch();
-          }}
+          onClick={onTextSearch}
         />
       </div>
     </div>

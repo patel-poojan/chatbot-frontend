@@ -41,7 +41,7 @@ const ButtonInteractionDialog = ({
 }) => {
   const { width: screenWidth } = useWindowDimensions();
   const [open, setOpen] = useState(false);
-  const { listOfPlayGroundNode } = usePlayground();
+  const { listOfPlayGroundNode, setSelectedGotoNode } = usePlayground();
   const [tempButton, setTempButton] = useState({
     id: buttonList[index]?.id || '',
     title: buttonList[index]?.title || '',
@@ -112,7 +112,7 @@ const ButtonInteractionDialog = ({
         navigationInfo: value === 'goto' ? goToOptions[0].id || '' : '',
       }));
       if (value === 'goto') {
-        localStorage.setItem('nodeId', goToOptions[0].id || '');
+        setSelectedGotoNode(goToOptions[0].id || null);
       }
     } else {
       setTempButton((prev) => ({
@@ -213,7 +213,7 @@ const ButtonInteractionDialog = ({
                 <Select
                   value={tempButton.navigationInfo}
                   onValueChange={(value) => {
-                    localStorage.setItem('nodeId', value || '');
+                    setSelectedGotoNode(value || null);
                     handleTempUpdate('navigationInfo', value);
                   }}
                 >

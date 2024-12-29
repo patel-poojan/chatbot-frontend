@@ -36,7 +36,8 @@ const GoToStepDialog = ({
   trigger: React.ReactNode;
   nodeId: string;
 }) => {
-  const { refetchHandler, listOfPlayGroundNode } = usePlayground();
+  const { refetchHandler, listOfPlayGroundNode, setSelectedGotoNode } =
+    usePlayground();
   const [isDialog, setIsDialog] = useState(false);
   const [nodeInfo, setNodeInfo] = useState<TypeNodeInfo | null>(null);
   const [response, setResponse] = useState({
@@ -122,6 +123,11 @@ const GoToStepDialog = ({
       });
     }
   };
+  useEffect(() => {
+    if (!isDialog) {
+      setSelectedGotoNode(null);
+    }
+  }, [isDialog, setSelectedGotoNode]);
   return (
     <Dialog open={isDialog} onOpenChange={setIsDialog}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
@@ -193,11 +199,12 @@ const GoToStepDialog = ({
               </label>
               <Select
                 value={response.gotoNodeId}
-                onValueChange={(value) =>
+                onValueChange={(value) => {
+                  setSelectedGotoNode(value);
                   setResponse({
                     gotoNodeId: value,
-                  })
-                }
+                  });
+                }}
               >
                 <SelectTrigger className='p-2 mt-2 border bg-white placeholder:!text-[#6F7288B2] rounded-md hover:border-[#57C0DD] focus:outline-none focus:ring-1 focus:ring-[#57C0DD]'>
                   <SelectValue

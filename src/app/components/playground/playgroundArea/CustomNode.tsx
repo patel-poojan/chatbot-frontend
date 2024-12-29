@@ -17,7 +17,6 @@ import BotResponseDialog from '../botIntrectionSection/BotResponseDialog';
 import UserInputDialog from '../botIntrectionSection/UserInputDialog';
 import GoToStepDialog from '../botIntrectionSection/GoToStepDialog';
 import FAQDialog from '../botIntrectionSection/FAQDialog';
-
 const NodeContainer = ({
   children,
   nodeCss,
@@ -33,13 +32,11 @@ const NodeContainer = ({
   onMouseLeave?: () => void;
   nodeId: string;
 }) => {
-  const localStorageNodeId = localStorage.getItem('nodeId');
-
-  console.log('nodeId', localStorageNodeId, nodeId);
+  const { selectedGoToNode } = usePlayground();
   return (
     <div
       className={`playground-node gap-1 ${nodeCss} relative ${
-        localStorageNodeId === nodeId ? 'border-2 border-red-500 ' : ''
+        selectedGoToNode === nodeId ? 'border-2 border-red-500 w-full' : ''
       }`}
       style={{ boxShadow: shadow }}
       onMouseEnter={onMouseEnter}
@@ -305,6 +302,7 @@ export const UserInputNode = ({
   const nodes = getNodes();
   const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
   const currentNode = nodes.find((node) => node.id === id);
+  const { selectedGoToNode } = usePlayground();
   return (
     <div className='relative group  flex items-center gap-2'>
       <div className='relative flex  flex-col items-center justify-center'>
@@ -372,7 +370,11 @@ export const UserInputNode = ({
           trigger={
             <div className='relative'>
               <div
-                className='relative flex items-center justify-center triangle_highlight w-12 h-12 bg-white border border-[#C9D3DE] rotate-45 mx-1 rounded-lg'
+                className={`relative flex items-center justify-center triangle_highlight w-12 h-12 bg-white border ${
+                  selectedGoToNode === id
+                    ? 'border-2 border-red-500'
+                    : 'border-[#C9D3DE]'
+                }  rotate-45 mx-1 rounded-lg`}
                 style={{ boxShadow: '0px 0px 12px 4px #00000014' }}
               >
                 <Image
@@ -878,6 +880,7 @@ export const FaqNode = ({
   const nodes = getNodes();
   const parentNode = nodes.find((node) => node.id === incomingEdge?.source);
   const currentNode = nodes.find((node) => node.id === id);
+  const { selectedGoToNode } = usePlayground();
   return (
     <div className='relative group flex items-center gap-2'>
       <div className='relative flex  flex-col items-center justify-center'>
@@ -943,7 +946,9 @@ export const FaqNode = ({
           trigger={
             <div className='relative'>
               <div
-                className='relative flex items-center justify-center w-12 h-12  triangle_highlight bg-orange-400 rotate-45 mx-1 rounded-lg'
+                className={`relative flex items-center justify-center w-12 h-12 ${
+                  selectedGoToNode === id ? 'border-2 border-red-500' : ''
+                }  triangle_highlight bg-orange-400 rotate-45 mx-1 rounded-lg`}
                 style={{ boxShadow: '0px 0px 12px 4px #00000014' }}
               >
                 <Image

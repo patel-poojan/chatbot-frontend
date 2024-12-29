@@ -30,6 +30,8 @@ interface PlaygroundContextType {
   setListOfPlayGroundNode: React.Dispatch<
     React.SetStateAction<TypePlaygroundNode[]>
   >;
+  selectedGoToNode: string | null;
+  setSelectedGotoNode: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const PlaygroundContext = createContext<PlaygroundContextType | undefined>(
@@ -50,6 +52,7 @@ export const PlaygroundProvider: React.FC<PlaygroundProviderProps> = ({
   const [listOfPlayGroundNode, setListOfPlayGroundNode] = useState<
     TypePlaygroundNode[] | []
   >([]);
+  const [selectedGoToNode, setSelectedGotoNode] = useState<string | null>(null);
   const notConnectableNode = useMemo(
     () => [
       'aiAssistNode',
@@ -122,6 +125,8 @@ export const PlaygroundProvider: React.FC<PlaygroundProviderProps> = ({
         deleteNodeHandler,
         listOfPlayGroundNode,
         setListOfPlayGroundNode,
+        setSelectedGotoNode,
+        selectedGoToNode,
       }}
     >
       {children}

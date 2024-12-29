@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 export const TextResponse = ({ info }: { info: ResponseInfo }) => {
   return (
-    <div className='resize-none border border-transparent bg-white p-3 rounded-md shadow-none focus:outline-none  focus-visible:ring-0 overflow-y-auto'>
+    <div className='resize-none border border-transparent text-sm bg-white p-3  rounded-md shadow-none focus:outline-none  focus-visible:ring-0 overflow-y-auto'>
       {info.description}
     </div>
   );
@@ -46,12 +46,12 @@ export const GalleryResponse = ({
 
       <div>
         <div>
-          <div className='px-4 py-3 bg-white shadow-none rounded-none border-transparent text-black focus:outline-none focus-visible:ring-0    w-full'>
+          <div className='px-4 py-3 bg-white shadow-none rounded-none text-sm border-transparent text-black focus:outline-none focus-visible:ring-0    w-full'>
             {info.title}
           </div>
         </div>
         <div>
-          <div className='resize-none border-transparent bg-white p-3 rounded-md shadow-none focus:outline-none focus-visible:ring-0   overflow-y-auto'>
+          <div className='resize-none border-transparent bg-white text-sm p-3 rounded-md shadow-none focus:outline-none focus-visible:ring-0   overflow-y-auto'>
             {info.description}
           </div>
         </div>
@@ -61,7 +61,7 @@ export const GalleryResponse = ({
           <div
             key={i}
             onClick={() => onButtonSearch(button)}
-            className='text-[#57C0DD] py-2 border cursor-pointer bg-white border-b-0 border-s-0 border-r-0 mx-auto text-center border-t'
+            className='text-[#57C0DD] py-2 border text-sm cursor-pointer bg-white border-b-0 border-s-0 border-r-0 mx-auto text-center border-t'
           >
             {button.title}
           </div>
@@ -80,7 +80,7 @@ export const ButtonResponse = ({
   return (
     <div className='w-8/12'>
       <div>
-        <div className='resize-none border border-transparent bg-white p-3 rounded-md shadow-none focus:outline-none focus-visible:ring-0    overflow-y-auto'>
+        <div className='resize-none border border-transparent text-sm bg-white p-3 rounded-md shadow-none focus:outline-none focus-visible:ring-0    overflow-y-auto'>
           {info.description}
         </div>
       </div>
@@ -88,7 +88,7 @@ export const ButtonResponse = ({
         <div
           key={i}
           onClick={() => onButtonSearch(button)}
-          className='text-[#57C0DD] py-2 border cursor-pointer bg-white border-b-0 border-s-0 border-r-0 mx-auto text-center border-t'
+          className='text-[#57C0DD] py-2 border cursor-pointer text-sm bg-white border-b-0 border-s-0 border-r-0 mx-auto text-center border-t'
         >
           {button.title}
         </div>
@@ -106,7 +106,7 @@ export const QuickResponse = ({
 }) => {
   return (
     <div className='flex flex-col gap-2'>
-      <div className='resize-none border border-transparent bg-white p-3 rounded-md shadow-none focus:outline-none  focus-visible:ring-0 overflow-y-auto'>
+      <div className='resize-none border border-transparent bg-white p-3 text-sm rounded-md shadow-none focus:outline-none  focus-visible:ring-0 overflow-y-auto'>
         {info.description}
       </div>
       <div className='flex items-center flex-wrap gap-2'>
@@ -125,8 +125,8 @@ export const QuickResponse = ({
 };
 export const UserInput = ({ data }: { data: TypeBotResponse }) => {
   return (
-    <div className='flex flex-col gap-[10px] w-fit ms-auto'>
-      <div className='text-[#1E255E] font-medium text-xs ms-auto me-1'>You</div>
+    <div className='flex flex-col gap-[5px] w-fit ms-auto'>
+      {/* <div className='text-[#1E255E] font-medium text-xs ms-auto me-1'>You</div> */}
       <div className='bg-[#57C0DD] p-3 rounded-lg text-white font-light  text-sm w-fit'>
         {data?.userInput ?? ''}
       </div>

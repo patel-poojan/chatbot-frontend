@@ -48,7 +48,7 @@ const BotResponseDialog = ({
   const [nodeInfo, setNodeInfo] = useState<TypeNodeInfo | null>(null);
   const params = useParams();
   const chatbotId = params.id;
-  const { refetchHandler } = usePlayground();
+  const { refetchHandler, setSelectedGotoNode } = usePlayground();
   const [responseList, setResponseList] = useState<TypeResponseList[] | []>([]);
   const [errorComponents, setErrorComponents] = useState<number[]>([]);
   const renderNodeResponse = (item: TypeResponseList, index: number) => {
@@ -297,15 +297,15 @@ const BotResponseDialog = ({
   useEffect(() => {
     if (!isDialog) {
       setErrorComponents([]);
-      localStorage.removeItem('nodeId');
+      setSelectedGotoNode(null);
     }
-  }, [isDialog]);
+  }, [isDialog, setSelectedGotoNode]);
   const updateDelay = (index: number, increment: boolean) => {
     setResponseList((prev) =>
       prev.map((item, i) => {
         if (i === index) {
           const newDelay = increment ? item.delay + 500 : item.delay - 500;
-          if (newDelay >= 1000 && newDelay <= 60000) {
+          if (newDelay >= 500 && newDelay <= 60000) {
             return { ...item, delay: newDelay };
           }
         }
@@ -418,7 +418,7 @@ const BotResponseDialog = ({
                             />
                             <IoChevronDownOutline
                               className={`cursor-pointer  ${
-                                item?.delay > 1000
+                                item?.delay > 500
                                   ? 'hover:text-[#57C0DD]'
                                   : 'opacity-10'
                               }`}
