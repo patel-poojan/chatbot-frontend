@@ -197,7 +197,7 @@ const GoToStepDialog = ({
                 Block
               </label>
               <Select
-                value={response.gotoNodeId}
+                value={response?.gotoNodeId ?? ''}
                 onValueChange={(value) => {
                   setSelectedGotoNode(value);
                   setResponse({

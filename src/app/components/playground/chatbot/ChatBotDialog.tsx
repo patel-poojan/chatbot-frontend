@@ -118,7 +118,7 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
       ...prev,
       { userInput: inputText, delay: 0, type: 'user' },
     ]);
-
+    console.log('inputText', inputText);
     fetchBotResponse({
       chatbotId: chatbotId as string,
       userMessage: inputText,
@@ -129,20 +129,13 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
   };
 
   const onButtonSearch = (info: TypeButton) => {
-    setPendingMessages((prev) => [
-      ...prev,
-      { userInput: info.title, delay: 0, type: 'user' },
-    ]);
-
-    if (info.type === 'message' && info.message) {
-      fetchBotResponse({
-        chatbotId: chatbotId as string,
-        userMessage: info.message,
-        type: 'text-action',
-      });
-    } else if (info.type === 'url' && info.url) {
+    if (info.type === 'url' && info.url) {
       window.open(info.url, '_blank');
-    } else if (info.type === 'goto' && info.goto) {
+    } else if (info.id) {
+      setPendingMessages((prev) => [
+        ...prev,
+        { userInput: info.title, delay: 0, type: 'user' },
+      ]);
       fetchBotResponse({
         chatbotId: chatbotId as string,
         type: 'button-action',
@@ -150,13 +143,13 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
       });
     }
   };
-
+  console.log('isLoading', isLoading);
   return (
     <div
       className='absolute min-[425px]:right-6 top-32 min-[699px]:top-20 flex flex-col min-[425px]:w-[375px] h-[65vh] max-[425px]:mx-6 min-[500px]:h-[60vh] rounded-lg overflow-hidden'
       style={{ boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)' }}
     >
-      <div className='w-full p-6 bg-white justify-between flex items-center'>
+      <div className='w-full p-4 bg-white justify-between flex items-center'>
         <div className='flex gap-3'>
           <Image
             src='/images/online_bot.svg'
