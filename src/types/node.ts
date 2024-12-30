@@ -3,6 +3,7 @@ export interface ResponseInfo {
   title?: string;
   description?: string;
   button?: TypeButton[];
+  questionAnswer?: { question: string; answer: string }[];
 }
 
 export interface TypeResponseList {

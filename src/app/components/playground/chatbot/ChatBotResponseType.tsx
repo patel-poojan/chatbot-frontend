@@ -1,5 +1,7 @@
 import { ResponseInfo, TypeBotResponse, TypeButton } from '@/types/node';
+import { ChevronDown } from 'lucide-react';
 import Image from 'next/image';
+import { useState } from 'react';
 
 export const TextResponse = ({ info }: { info: ResponseInfo }) => {
   return (
@@ -129,6 +131,57 @@ export const UserInput = ({ data }: { data: TypeBotResponse }) => {
       {/* <div className='text-[#1E255E] font-medium text-xs ms-auto me-1'>You</div> */}
       <div className='bg-[#57C0DD] p-3 rounded-lg text-white font-light  text-sm w-fit'>
         {data?.userInput ?? ''}
+      </div>
+    </div>
+  );
+};
+export const FAQResponse = ({ info }: { info: ResponseInfo }) => {
+  const [openItems, setOpenItems] = useState<Set<number>>(new Set());
+
+  const toggleItem = (index: number) => {
+    const newOpenItems = new Set(openItems);
+    if (newOpenItems.has(index)) {
+      newOpenItems.delete(index);
+    } else {
+      newOpenItems.add(index);
+    }
+    setOpenItems(newOpenItems);
+  };
+
+  return (
+    <div className='w-10/12'>
+      <div className='bg-white rounded-md'>
+        {info.questionAnswer?.map((qa, index) => (
+          <div key={index} className='border-b last:border-b-0'>
+            <div
+              onClick={() => toggleItem(index)}
+              className='flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50'
+            >
+              <div className='flex gap-2 items-center'>
+                <span className='text-[#57C0DD] font-medium text-sm'>Q:</span>
+                <span className='text-[#1E255E] text-sm'>{qa.question}</span>
+              </div>
+              <ChevronDown
+                className={`text-[#57C0DD] transition-transform duration-300 ease-in-out ${
+                  openItems.has(index) ? 'transform rotate-180' : ''
+                }`}
+                size={20}
+              />
+            </div>
+            <div
+              className={`overflow-hidden transition-[max-height] duration-300 ease-in-out ${
+                openItems.has(index) ? 'max-h-96' : 'max-h-0'
+              }`}
+            >
+              <div className='px-4 pb-4'>
+                <div className='flex gap-2 items-start pl-6'>
+                  <span className='text-[#57C0DD] font-medium text-sm'>A:</span>
+                  <span className='text-gray-600 text-sm'>{qa.answer}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

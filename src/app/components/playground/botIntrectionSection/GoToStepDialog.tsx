@@ -55,7 +55,6 @@ const GoToStepDialog = ({
   const { mutate: fetchNodeInformation, isPending: fetchPending } =
     useGetNodeInformation({
       onSuccess(data) {
-        console.log('data.data.node', data.data.node);
         if (data.data.node) {
           setNodeInfo(data.data.node);
         }
