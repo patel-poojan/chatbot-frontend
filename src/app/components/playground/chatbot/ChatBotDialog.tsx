@@ -11,6 +11,7 @@ import { useParams } from 'next/navigation';
 import { TypeBotResponse, TypeButton } from '@/types/node';
 import {
   ButtonResponse,
+  ErrorResponse,
   FAQResponse,
   GalleryResponse,
   ImageResponse,
@@ -50,7 +51,6 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
       }, 100);
     }
   };
-
   useEffect(() => {
     scroll();
   }, [visibleMessages]);
@@ -92,6 +92,14 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
       }
     },
     onError(error: axiosError) {
+      setPendingMessages((prev) => [
+        ...prev,
+        {
+          info: { description: 'something went wrong' },
+          delay: 0,
+          type: 'error',
+        },
+      ]);
       const errorMessage =
         error?.response?.data?.errors?.message ||
         error?.response?.data?.message ||
@@ -147,7 +155,7 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
       });
     }
   };
-  console.log('isLoading', isLoading);
+
   return (
     <div
       className='absolute min-[425px]:right-6 top-32 min-[699px]:top-20 flex flex-col min-[425px]:w-[375px] h-[65vh] max-[425px]:mx-6 min-[500px]:h-[60vh] rounded-lg overflow-hidden'
@@ -198,6 +206,8 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
               />
             ) : item.type === 'faq' && item.info ? (
               <FAQResponse info={item.info} />
+            ) : item.type === 'error' && item.info ? (
+              <ErrorResponse info={item.info} />
             ) : null}
           </div>
         ))}

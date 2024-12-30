@@ -5,7 +5,14 @@ import { useState } from 'react';
 
 export const TextResponse = ({ info }: { info: ResponseInfo }) => {
   return (
-    <div className='resize-none border border-transparent text-sm bg-white p-3  rounded-md shadow-none focus:outline-none  focus-visible:ring-0 overflow-y-auto'>
+    <div className='resize-none w-10/12 border border-transparent text-sm bg-white p-3  rounded-md shadow-none focus:outline-none  focus-visible:ring-0 overflow-y-auto'>
+      {info.description}
+    </div>
+  );
+};
+export const ErrorResponse = ({ info }: { info: ResponseInfo }) => {
+  return (
+    <div className='resize-none border w-10/12 border-transparent text-sm bg-white p-3 text-[red] rounded-md shadow-none focus:outline-none  focus-visible:ring-0 overflow-y-auto'>
       {info.description}
     </div>
   );
@@ -127,10 +134,12 @@ export const QuickResponse = ({
 };
 export const UserInput = ({ data }: { data: TypeBotResponse }) => {
   return (
-    <div className='flex flex-col gap-[5px] w-fit ms-auto'>
-      {/* <div className='text-[#1E255E] font-medium text-xs ms-auto me-1'>You</div> */}
-      <div className='bg-[#57C0DD] p-3 rounded-lg text-white font-light  text-sm w-fit'>
-        {data?.userInput ?? ''}
+    <div className='w-full'>
+      <div className='flex flex-col gap-[5px] w-10/12  ms-auto '>
+        {/* <div className='text-[#1E255E] font-medium text-xs ms-auto me-1'>You</div> */}
+        <div className='bg-[#57C0DD] p-3 rounded-lg text-white font-light  text-sm'>
+          {data?.userInput ?? ''}
+        </div>
       </div>
     </div>
   );

@@ -30,7 +30,7 @@ export const TextNodeResponse = ({
       placeholder='Entre bot response'
       rows={3}
       maxLength={1024}
-      className='resize-none border border-transparent bg-white p-3 rounded-md shadow-none focus:outline-none hover:border-[#57C0DD] focus-visible:ring-0 overflow-y-auto'
+      className='resize-none w-10/12 border border-transparent bg-white p-3 rounded-md shadow-none focus:outline-none hover:border-[#57C0DD] focus-visible:ring-0 overflow-y-auto'
     />
   );
 };
@@ -308,7 +308,7 @@ export const QuickNodeResponse = ({
   };
 
   return (
-    <div className='flex flex-col gap-2'>
+    <div className='flex flex-col gap-2 w-10/12'>
       <Textarea
         value={info.description || ''}
         onChange={(event) => {
