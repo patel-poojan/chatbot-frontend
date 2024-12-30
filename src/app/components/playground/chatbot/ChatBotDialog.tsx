@@ -22,6 +22,7 @@ import {
 const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [apiLoading, setApiLoading] = useState(false);
   const [inputText, setInputText] = useState<string>('');
   const params = useParams();
   const chatbotId = params.id;
@@ -85,6 +86,7 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
       if (data?.message) {
         toast.success(data.message);
       }
+      setApiLoading(false);
       if (data?.response) {
         setPendingMessages((prev) => [...prev, ...data.response]);
       }
@@ -95,7 +97,7 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
         error?.response?.data?.message ||
         'Failed to fetch bot response';
       toast.error(errorMessage);
-      setIsLoading(false);
+      setApiLoading(false);
       processingRef.current = false;
     },
   });
@@ -103,6 +105,7 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
   const initialCallMade = useRef(false);
   useEffect(() => {
     if (!initialCallMade.current && chatbotId) {
+      setApiLoading(true);
       fetchBotResponse({
         chatbotId: chatbotId as string,
         type: 'welcome-action',
@@ -118,7 +121,7 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
       ...prev,
       { userInput: inputText, delay: 0, type: 'user' },
     ]);
-    console.log('inputText', inputText);
+    setApiLoading(true);
     fetchBotResponse({
       chatbotId: chatbotId as string,
       userMessage: inputText,
@@ -136,6 +139,7 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
         ...prev,
         { userInput: info.title, delay: 0, type: 'user' },
       ]);
+      setApiLoading(true);
       fetchBotResponse({
         chatbotId: chatbotId as string,
         type: 'button-action',
@@ -197,7 +201,7 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
             ) : null}
           </div>
         ))}
-        {isLoading && <ChatLoader />}
+        {isLoading || apiLoading ? <ChatLoader /> : <></>}
       </div>
       <div className='p-4 bg-white flex gap-4 items-center'>
         <Input
