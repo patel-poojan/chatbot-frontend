@@ -15,6 +15,7 @@ import {
   FAQResponse,
   GalleryResponse,
   ImageResponse,
+  LlmResponse,
   QuickResponse,
   TextResponse,
   UserInput,
@@ -83,9 +84,9 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
 
   const { mutate: fetchBotResponse } = useGetChatbotResponse({
     onSuccess(data) {
-      if (data?.message) {
-        toast.success(data.message);
-      }
+      // if (data?.message) {
+      //   toast.success(data.message);
+      // }
       setApiLoading(false);
       if (data?.response) {
         setPendingMessages((prev) => [...prev, ...data.response]);
@@ -155,7 +156,6 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
       });
     }
   };
-
   return (
     <div
       className='absolute min-[425px]:right-6 top-32 min-[699px]:top-20 flex flex-col min-[425px]:w-[375px] h-[65vh] max-[425px]:mx-6 min-[500px]:h-[60vh] rounded-lg overflow-hidden'
@@ -188,6 +188,8 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
           <div key={index}>
             {item.type === 'user' ? (
               <UserInput data={item} />
+            ) : item.type === 'llm' && item.info ? (
+              <LlmResponse info={item.info} />
             ) : item.type === 'text' && item.info ? (
               <TextResponse info={item.info} />
             ) : item.type === 'image' && item.info ? (
@@ -217,6 +219,7 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
         <Input
           onChange={(e) => setInputText(e.target.value)}
           value={inputText}
+          disabled={isLoading || apiLoading}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && inputText.trim().length > 0) {
               onTextSearch();

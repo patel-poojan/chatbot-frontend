@@ -10,29 +10,23 @@ import {
 } from '@/components/ui/dialog';
 import { MdAutorenew, MdOutlineFormatSize } from 'react-icons/md';
 import { IoIosSend, IoMdCheckmark, IoMdClose } from 'react-icons/io';
-import { Input } from '@/components/ui/input';
 import { PiClockCounterClockwise } from 'react-icons/pi';
 import { RiDeleteBinLine } from 'react-icons/ri';
+
+import { CiImageOn } from 'react-icons/ci';
+import Image from 'next/image';
+import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
+import { toast } from 'sonner';
+import { TypeResponseList } from '@/types/node';
+import { useParams } from 'next/navigation';
+import AWS from 'aws-sdk';
 import {
   ButtonNodeResponse,
   GalleryNodeResponse,
   ImageNodeResponse,
   QuickNodeResponse,
   TextNodeResponse,
-} from './NodeResponseList';
-import { CiImageOn } from 'react-icons/ci';
-import Image from 'next/image';
-import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
-import {
-  useGetNodeInformation,
-  useUpdateNodeInformation,
-} from '@/utils/nodeIntrection-api';
-import { toast } from 'sonner';
-import { axiosError } from '@/types/axiosTypes';
-import { TypeNodeInfo, TypeResponseList } from '@/types/node';
-import { usePlayground } from '../playgroundArea/PlaygroundContext';
-import { useParams } from 'next/navigation';
-import AWS from 'aws-sdk';
+} from './playground/botIntrectionSection/NodeResponseList';
 
 type ValidationError = {
   field: string;
@@ -44,24 +38,26 @@ AWS.config.update({
   secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
   region: process.env.NEXT_PUBLIC_AWS_REGION,
 });
-const BotResponseDialog = ({
+
+const TrainingDialog = ({
+  trainHandler,
+  pharaseId,
   trigger,
-  nodeId,
 }: {
+  pharaseId: string;
+  trainHandler: (id: string, response: TypeResponseList[]) => Promise<boolean>;
   trigger: React.ReactNode;
-  nodeId: string;
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isDialog, setIsDialog] = useState(false);
-  const [nodeInfo, setNodeInfo] = useState<TypeNodeInfo | null>(null);
   const params = useParams();
   const chatbotId = params.id;
-  const { refetchHandler, setSelectedGotoNode } = usePlayground();
   const [responseList, setResponseList] = useState<TypeResponseList[] | []>([]);
   const [errorComponents, setErrorComponents] = useState<number[]>([]);
   const [deletingIndices, setDeletingIndices] = useState<number[]>([]);
   const [pendingDeletions, setPendingDeletions] = useState<string[]>([]);
   const [isPendingS3Delete, setIsPendingS3Delete] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const renderNodeResponse = (item: TypeResponseList, index: number) => {
     const type = item.type;
     switch (type) {
@@ -144,56 +140,8 @@ const BotResponseDialog = ({
   useEffect(() => {
     scroll();
   }, [responseList.length]);
-  const { mutate: fetchNodeInformation, isPending: fetchPending } =
-    useGetNodeInformation({
-      onSuccess(data) {
-        if (data.data.node) {
-          setNodeInfo(data.data.node);
-          if (
-            data.data.node.response &&
-            Array.isArray(data.data.node.response)
-          ) {
-            const response = data.data.node.response as TypeResponseList[];
-            setResponseList(response);
-          }
-        }
-        // toast.success(data?.message);
-      },
 
-      onError(error: axiosError) {
-        const errorMessage =
-          error?.response?.data?.errors?.message ||
-          error?.response?.data?.message ||
-          'failed to fetch node information';
-        toast.error(errorMessage);
-      },
-    });
-  const { mutate: updateNodeInformation, isPending: updatePending } =
-    useUpdateNodeInformation({
-      onSuccess(data) {
-        setIsDialog(false);
-        refetchHandler();
-        toast.success(data?.message);
-      },
-
-      onError(error: axiosError) {
-        const errorMessage =
-          error?.response?.data?.errors?.message ||
-          error?.response?.data?.message ||
-          'failed to update node information';
-        toast.error(errorMessage);
-      },
-    });
-  useEffect(() => {
-    if (nodeId && chatbotId && isDialog) {
-      fetchNodeInformation({
-        nodeId,
-        chatbotId: chatbotId as string,
-      });
-    }
-  }, [fetchNodeInformation, isDialog, nodeId, chatbotId]);
   const validateBeforeSave = (
-    nodeInfo: TypeNodeInfo | null,
     responseList: TypeResponseList[]
   ): ValidationError[] => {
     const errors: ValidationError[] = [];
@@ -286,9 +234,8 @@ const BotResponseDialog = ({
   useEffect(() => {
     if (!isDialog) {
       setErrorComponents([]);
-      setSelectedGotoNode(null);
     }
-  }, [isDialog, setSelectedGotoNode]);
+  }, [isDialog]);
   const updateDelay = (index: number, increment: boolean) => {
     setResponseList((prev) =>
       prev.map((item, i) => {
@@ -390,43 +337,37 @@ const BotResponseDialog = ({
 
     return processedResponses;
   };
-  // Modified updateHandler
   const updateHandler = async () => {
-    if (nodeInfo && nodeId && chatbotId && isDialog) {
-      const validationErrors = validateBeforeSave(nodeInfo, responseList);
-      setIsPendingS3Delete(true);
-      if (validationErrors.length > 0) {
-        validationErrors.forEach((error) => {
-          toast.error(error.message);
-        });
-        return;
-      }
+    if (!pharaseId || !chatbotId || !isDialog) return;
 
-      try {
-        // Process all file operations
-        const processedResponses = await handleS3Operations(responseList);
+    const validationErrors = validateBeforeSave(responseList);
+    if (validationErrors.length > 0) {
+      validationErrors.forEach((error) => {
+        toast.error(error.message);
+      });
+      return;
+    }
 
-        // Update node info with processed responses
-        const updatedNodeInfo: TypeNodeInfo = {
-          ...nodeInfo,
-          response: processedResponses,
-        };
+    setIsSubmitting(true);
+    setIsPendingS3Delete(true);
 
-        // Call the update API
-        updateNodeInformation({
-          nodeId,
-          chatbotId: chatbotId as string,
-          data: updatedNodeInfo,
-        });
+    try {
+      const processedResponses = await handleS3Operations(responseList);
+      const success = await trainHandler(pharaseId, processedResponses);
 
-        // Clear pending deletions after successful update
+      if (success) {
         setPendingDeletions([]);
-      } catch (error) {
-        console.error('Error updating node:', error);
-        toast.error('Failed to update node');
-      } finally {
-        setIsPendingS3Delete(false);
+        setIsDialog(false);
+        toast.success('Training updated successfully');
+      } else {
+        toast.error('Failed to update training. Please try again.');
       }
+    } catch (error) {
+      console.error('Error updating node:', error);
+      toast.error('Failed to update training. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+      setIsPendingS3Delete(false);
     }
   };
 
@@ -479,7 +420,7 @@ const BotResponseDialog = ({
           </div>
 
           <div className='flex-1 relative flex flex-col max-h-[90.2dvh] sm:max-h-[84dvh]'>
-            {(fetchPending || updatePending || isPendingS3Delete) && (
+            {(isPendingS3Delete || isSubmitting) && (
               <div className='absolute inset-0 z-50 flex items-center justify-center bg-[#a6dae41a] backdrop-blur-[3px]'>
                 <div role='status' className='flex flex-col items-center'>
                   <div className='w-10 h-10 border-4 border-gray-200 border-t-[#3bc5dd] rounded-full animate-spin'></div>
@@ -488,10 +429,10 @@ const BotResponseDialog = ({
               </div>
             )}
             <div className='p-4 rounded-t-lg bg-white'>
-              <div className='flex items-center justify-between mb-4 mt-2'>
+              <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-2'>
                   <IoIosSend className='text-[#7A7A7A] text-lg' />
-                  <span className='text-[#7A7A7A] text-lg'>BOT RESPONSE</span>
+                  <span className='text-[#7A7A7A] text-lg'>Train RESPONSE</span>
                 </div>
                 <div className='flex items-center gap-2'>
                   <DialogClose>
@@ -507,26 +448,6 @@ const BotResponseDialog = ({
                   </div>
                 </div>
               </div>
-              <Input
-                id='Message'
-                value={nodeInfo?.data?.message ?? ''}
-                onChange={(e) => {
-                  setNodeInfo((prev) => {
-                    if (prev === null) {
-                      return null;
-                    }
-                    return {
-                      ...prev,
-                      data: {
-                        ...prev.data,
-                        message: e.target.value,
-                      },
-                    };
-                  });
-                }}
-                className='px-4 py-3 mt-1 mb-2 rounded text-black  hover:border-[#57C0DD] focus-visible:ring-0 focus-visible:border-[#57C0DD] placeholder:text-sm placeholder:font-light w-full'
-                placeholder='Enter Your Message'
-              />
             </div>
 
             <div
@@ -616,7 +537,7 @@ const BotResponseDialog = ({
     </Dialog>
   );
 };
-export default BotResponseDialog;
+export default TrainingDialog;
 const generateShortId = (title: string) => {
   const timestamp = Date.now();
   return `Chatbot${(timestamp & 0xffffff).toString(16)}${title}`;

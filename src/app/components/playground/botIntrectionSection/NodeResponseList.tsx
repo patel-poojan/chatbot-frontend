@@ -35,10 +35,22 @@ export const TextNodeResponse = ({
   );
 };
 
-export const ImageNodeResponse: React.FC = () => {
+export const ImageNodeResponse = ({
+  info,
+  setResponseList,
+  index,
+}: {
+  info: ResponseInfo;
+  setResponseList: React.Dispatch<React.SetStateAction<TypeResponseList[]>>;
+  index: number;
+}) => {
   return (
-    <div className='w-9/12 h-64'>
-      <UploadImage />
+    <div className='w-8/12 h-64 rounded-md overflow-hidden'>
+      <UploadImage
+        initialImage={info.file || ''}
+        setResponseList={setResponseList}
+        index={index}
+      />
     </div>
   );
 };
@@ -91,8 +103,13 @@ export const GalleryNodeResponse = ({
 
   return (
     <div className='w-8/12'>
-      <div className='h-52'>
-        <UploadImage bg='bg-gray-200' />
+      <div className='h-52 rounded-t-md overflow-hidden'>
+        <UploadImage
+          bg='bg-gray-200'
+          initialImage={info.file || ''}
+          setResponseList={setResponseList}
+          index={index}
+        />
       </div>
 
       <div>
@@ -137,7 +154,7 @@ export const GalleryNodeResponse = ({
               index={i}
               responseIndex={index}
               trigger={
-                <div className='text-[#57C0DD] py-2 border cursor-pointer bg-white border-b-0 border-s-0 border-r-0 mx-auto text-center border-t'>
+                <div className='text-[#57C0DD] py-2 border cursor-pointer bg-white border-b-0 border-s-0 border-r-0 mx-auto rounded-md text-center border-t'>
                   {button.title}
                 </div>
               }
@@ -235,7 +252,7 @@ export const ButtonNodeResponse = ({
             index={i}
             responseIndex={index}
             trigger={
-              <div className='text-[#57C0DD] py-2 border cursor-pointer bg-white border-b-0 border-s-0 border-r-0 mx-auto text-center border-t'>
+              <div className='text-[#57C0DD] py-2 rounded-md border cursor-pointer bg-white border-b-0 border-s-0 border-r-0 mx-auto text-center border-t'>
                 {button.title}
               </div>
             }

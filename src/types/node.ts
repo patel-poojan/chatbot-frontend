@@ -4,6 +4,8 @@ export interface ResponseInfo {
   description?: string;
   button?: TypeButton[];
   questionAnswer?: { question: string; answer: string }[];
+  pendingFile?: File | null; // Add this for tracking new files
+  previousFileUrl?: string | null; // Add this for tracking files to be replaced
 }
 
 export interface TypeResponseList {
