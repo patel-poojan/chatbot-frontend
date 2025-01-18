@@ -397,6 +397,10 @@ const BotResponseDialog = ({
   // Modified updateHandler
   const updateHandler = async () => {
     if (nodeInfo && nodeId && chatbotId && isDialog) {
+      if (!isAWSInitialized) {
+        toast.error('AWS is not properly configured');
+        return true;
+      }
       const validationErrors = validateBeforeSave(nodeInfo, responseList);
 
       if (validationErrors.length > 0) {
