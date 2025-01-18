@@ -141,7 +141,6 @@ const BotResponseDialog = ({
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   };
-
   useEffect(() => {
     scroll();
   }, [responseList.length]);
@@ -399,14 +398,14 @@ const BotResponseDialog = ({
   const updateHandler = async () => {
     if (nodeInfo && nodeId && chatbotId && isDialog) {
       const validationErrors = validateBeforeSave(nodeInfo, responseList);
-      setIsPendingS3Delete(true);
+
       if (validationErrors.length > 0) {
         validationErrors.forEach((error) => {
           toast.error(error.message);
         });
         return;
       }
-
+      setIsPendingS3Delete(true);
       try {
         // Process all file operations
         const processedResponses = await handleS3Operations(responseList);
