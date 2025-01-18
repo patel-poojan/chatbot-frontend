@@ -33,17 +33,13 @@ import { TypeNodeInfo, TypeResponseList } from '@/types/node';
 import { usePlayground } from '../playgroundArea/PlaygroundContext';
 import { useParams } from 'next/navigation';
 import AWS from 'aws-sdk';
+import { initializeAWS } from './S3Operation';
 
 type ValidationError = {
   field: string;
   message: string;
 };
-// Configure AWS
-AWS.config.update({
-  accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY,
-  secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
-  region: process.env.NEXT_PUBLIC_AWS_REGION,
-});
+
 const BotResponseDialog = ({
   trigger,
   nodeId,
@@ -51,6 +47,11 @@ const BotResponseDialog = ({
   trigger: React.ReactNode;
   nodeId: string;
 }) => {
+  const [isAWSInitialized, setIsAWSInitialized] = useState(false);
+  useEffect(() => {
+    const awsInitialized = initializeAWS();
+    setIsAWSInitialized(awsInitialized);
+  }, []);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isDialog, setIsDialog] = useState(false);
   const [nodeInfo, setNodeInfo] = useState<TypeNodeInfo | null>(null);
@@ -304,6 +305,10 @@ const BotResponseDialog = ({
   };
 
   const handleS3Operations = async (responses: TypeResponseList[]) => {
+    if (!isAWSInitialized) {
+      toast.error('AWS is not properly configured');
+      return responses;
+    }
     const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
     const bucket = process.env.NEXT_PUBLIC_AWS_BUCKET as string;
 
