@@ -57,6 +57,7 @@ import { axiosError } from '@/types/axiosTypes';
 import AttributesDialog from '@/app/components/playground/AttributesDialog';
 import ChatBotDialog from '@/app/components/playground/chatbot/ChatBotDialog';
 import { TypePlaygroundNode } from '@/types/node';
+import PublishDialog from '@/app/components/playground/PublishDialog';
 
 const ReactFlow = dynamic(
   () => import('@xyflow/react').then((mod) => mod.ReactFlow),
@@ -676,9 +677,14 @@ const MainComponent = ({ botId }: { botId: string }) => {
               >
                 Test your bot
               </Button>
-              <Button className='py-3 px-5 bg-[#57C0DD] text-white rounded-lg hover:bg-[#57C0DD]'>
-                Publish
-              </Button>
+              <PublishDialog
+                chatbotId={botId}
+                trigger={
+                  <Button className='py-3 px-5 bg-[#57C0DD] text-white rounded-lg hover:bg-[#57C0DD]'>
+                    Publish
+                  </Button>
+                }
+              />
             </div>
           </div>
           {errorInPlayground ? (
