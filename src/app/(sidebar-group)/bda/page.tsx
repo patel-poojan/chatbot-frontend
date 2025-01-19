@@ -96,12 +96,13 @@ const BDA = () => {
     <>
       <div className='flex flex-1 overflow-hidden flex-col max-[500px]:p-4 gap-4 sm:gap-6'>
         <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-3'>
-          <p className='text-xl sm:text-2xl font-semibold text-black'>
+          <p className='max-[500px]:text-xl text-2xl font-semibold text-black '>
             BDA Questions
           </p>
           <div className='flex gap-4 items-center'>
             <Button
-              className='hover:bg-primary'
+              type='button'
+              className='w-full text-white bg-gradient-to-r hover:from-[#53A7DD] hover:to-[#58C8DD]  from-[#58C8DD] to-[#53A7DD] py-3 rounded'
               onClick={() => {
                 setOpenBulkUpdate((pre) => !pre);
               }}

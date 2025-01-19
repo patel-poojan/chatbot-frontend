@@ -270,6 +270,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                       </p>
                     </div>
                   </Link>
+
                   {chatbotId && (
                     <Link href={`/training/${chatbotId}`}>
                       <div
@@ -306,6 +307,38 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                       </div>
                     </Link>
                   )}
+                  <Link href={'/bda'}>
+                    <div
+                      className={`flex gap-3 items-center   rounded-lg py-3 ${
+                        pathName === '/bda' ? 'px-3 blue-gradient' : ''
+                      }`}
+                    >
+                      <div
+                        className={
+                          pathName === '/bda'
+                            ? 'p-2 rounded-md bg-[#3D3D4A33] '
+                            : ''
+                        }
+                      >
+                        <PiNotepadBold
+                          className={
+                            pathName === '/bda'
+                              ? 'text-white text-xl'
+                              : 'text-2xl text-[#1e255eb2]'
+                          }
+                        />
+                      </div>
+                      <p
+                        className={`text-base  ${
+                          pathName === '/bda'
+                            ? 'text-white'
+                            : 'text-[#1e255eb2]'
+                        }  font-medium`}
+                      >
+                        BDA
+                      </p>
+                    </div>
+                  </Link>
                 </div>
                 <Popover>
                   <PopoverTrigger>

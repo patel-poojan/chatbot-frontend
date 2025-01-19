@@ -8,8 +8,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
-import { IoSearchSharp } from 'react-icons/io5';
+// import { Input } from '@/components/ui/input';
+// import { IoSearchSharp } from 'react-icons/io5';
 import { FaQuoteLeft } from 'react-icons/fa';
 import DashboardLayout from '@/app/components/DashboardLayout';
 import { axiosInstance } from '@/utils/axiosInstance';
@@ -212,13 +212,13 @@ const Page = () => {
               <p className='text-xl sm:text-2xl font-semibold text-black'>
                 Training
               </p>
-              <div className='flex items-center py-0 md:py-1 px-3 gap-2 rounded-xl bg-[#F8F8F8] w-full sm:w-auto'>
+              {/* <div className='flex items-center py-0 md:py-1 px-3 gap-2 rounded-xl bg-[#F8F8F8] w-full sm:w-auto'>
                 <IoSearchSharp className='text-lg' />
                 <Input
                   className='w-full sm:w-32 border-none placeholder:text-[#1E255E] p-0 shadow-none focus-visible:ring-0'
                   placeholder='Search'
                 />
-              </div>
+              </div> */}
             </div>
 
             <div className='flex items-center gap-4'>
@@ -226,8 +226,8 @@ const Page = () => {
                 onClick={() => setTab(0)}
                 className={`cursor-pointer ${
                   tab === 0
-                    ? 'text-base sm:text-lg text-[#1E255E] font-medium underline underline-offset-8 decoration-2 decoration-[#57C0DD]'
-                    : 'text-sm sm:text-base text-black font-light'
+                    ? 'text-sm sm:text-lg text-[#1E255E] font-medium underline underline-offset-8 decoration-2 decoration-[#57C0DD]'
+                    : 'text-xs sm:text-base text-black font-light'
                 }`}
               >
                 Unmatched Phrases
@@ -236,8 +236,8 @@ const Page = () => {
                 onClick={() => setTab(1)}
                 className={`cursor-pointer ${
                   tab === 1
-                    ? 'text-base sm:text-lg text-[#1E255E] font-medium underline underline-offset-8 decoration-2 decoration-[#57C0DD]'
-                    : 'text-sm sm:text-base text-black font-light'
+                    ? 'text-sm sm:text-lg text-[#1E255E] font-medium underline underline-offset-8 decoration-2 decoration-[#57C0DD]'
+                    : 'text-xs sm:text-base text-black font-light'
                 }`}
               >
                 Ignored
@@ -246,8 +246,8 @@ const Page = () => {
                 onClick={() => setTab(2)}
                 className={`cursor-pointer ${
                   tab === 2
-                    ? 'text-base sm:text-lg text-[#1E255E] font-medium underline underline-offset-8 decoration-2 decoration-[#57C0DD]'
-                    : 'text-sm sm:text-base text-black font-light'
+                    ? 'text-sm sm:text-lg text-[#1E255E] font-medium underline underline-offset-8 decoration-2 decoration-[#57C0DD]'
+                    : 'text-xs sm:text-base text-black font-light'
                 }`}
               >
                 Trained Phrases
