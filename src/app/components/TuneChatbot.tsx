@@ -34,9 +34,10 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
     { title: 'Company Name', value: '' },
     { title: 'Company Address', value: '' },
     { title: 'About Us', value: '' },
+    { title: 'Domain Name', value: '' },
   ]);
   const [AboutUs, setAboutUs] = useState(true);
-  const [welcomeMessage, setwelcomeMessage] = useState(
+  const [welcomeMessage, setWelcomeMessage] = useState(
     `👋 Welcome to Chatbot! I'm ChatBot, your AI assistant 🤖. What can I do for you?`
   );
   const {
@@ -102,6 +103,8 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
       toast.warning('Please enter company address');
     } else if (!attributes[3].value) {
       toast.warning('Please enter about us');
+    } else if (!attributes[4].value) {
+      toast.warning('Please enter domain name');
     } else if (!welcomeMessage) {
       toast.warning('Please enter welcome message');
     } else if (!botId) {
@@ -112,6 +115,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
         details: {
           name: attributes[0].value ?? 'chatbot',
           aboutAs: attributes[3].value,
+          domainName: attributes[4].value,
           welcomeMessage: welcomeMessage,
           configuredButtons: [
             {
@@ -213,7 +217,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
             </p>
             <Textarea
               value={welcomeMessage}
-              onChange={(e) => setwelcomeMessage(e.target.value)}
+              onChange={(e) => setWelcomeMessage(e.target.value)}
               className='my-3 bg-[#FAFAFA] text-black font-light border border-transparent hover:border-[#57C0DD] focus-visible:border-[#57C0DD] text-base w-full p-3  sm:p-4 md:p-6'
               style={{ boxShadow: '0px 0px 4px 0px #0000001F' }}
             ></Textarea>
