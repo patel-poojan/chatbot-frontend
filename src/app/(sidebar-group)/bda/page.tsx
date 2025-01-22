@@ -11,7 +11,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import React, { useState } from 'react';
-import { IoSearchSharp } from 'react-icons/io5';
+// import { IoSearchSharp } from 'react-icons/io5';
 import Papa from 'papaparse';
 import { axiosInstance } from '@/utils/axiosInstance';
 import { toast } from 'sonner';
@@ -99,7 +99,7 @@ const BDA = () => {
           <p className='max-[500px]:text-xl text-2xl font-semibold text-black '>
             BDA Questions
           </p>
-          <div className='flex gap-4 items-center'>
+          <div className='hidden md:flex gap-4 items-center '>
             <Button
               type='button'
               className='w-full text-white bg-gradient-to-r hover:from-[#53A7DD] hover:to-[#58C8DD]  from-[#58C8DD] to-[#53A7DD] py-3 rounded'
@@ -109,13 +109,13 @@ const BDA = () => {
             >
               Bulk Update
             </Button>
-            <div className='flex items-center py-0 md:py-1 px-3 gap-2 rounded-xl bg-[#F8F8F8] w-full sm:w-auto'>
+            {/* <div className='flex items-center py-0 md:py-1 px-3 gap-2 rounded-xl bg-[#F8F8F8] w-full sm:w-auto'>
               <IoSearchSharp className='text-lg' />
               <Input
                 className='w-full sm:w-32 border-none placeholder:text-[#1E255E] p-0 shadow-none focus-visible:ring-0'
                 placeholder='Search'
               />
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -126,6 +126,24 @@ const BDA = () => {
             setSubIndustry={setSubIndustry}
             adminAction={true}
           />
+          <div className='flex md:hidden gap-4 items-center '>
+            <Button
+              type='button'
+              className='w-full text-white bg-gradient-to-r hover:from-[#53A7DD] hover:to-[#58C8DD]  from-[#58C8DD] to-[#53A7DD] py-3 rounded'
+              onClick={() => {
+                setOpenBulkUpdate((pre) => !pre);
+              }}
+            >
+              Bulk Update
+            </Button>
+            {/* <div className='flex items-center py-0 md:py-1 px-3 gap-2 rounded-xl bg-[#F8F8F8] w-full sm:w-auto'>
+              <IoSearchSharp className='text-lg' />
+              <Input
+                className='w-full sm:w-32 border-none placeholder:text-[#1E255E] p-0 shadow-none focus-visible:ring-0'
+                placeholder='Search'
+              />
+            </div> */}
+          </div>
         </div>
       </div>
 
