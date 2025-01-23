@@ -23,7 +23,11 @@ export const useGetChatbotResponse = ({
   useMutation({
     mutationKey: ['get', 'bot', 'response'],
     mutationFn: (data: GetBotResponseRequest): Promise<GetBotResponse> => {
-      return axiosInstance.post(`/chatbot-interact`, data);
+      return axiosInstance.post(`/chatbot-interact`, data, {
+        headers: {
+          'x-playground': 'true',
+        },
+      });
     },
     onError,
     onSuccess,

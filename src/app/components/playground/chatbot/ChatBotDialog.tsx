@@ -28,18 +28,7 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
   const [inputText, setInputText] = useState<string>('');
   const params = useParams();
   const chatbotId = params.id;
-  const [pendingMessages, setPendingMessages] = useState<TypeBotResponse[]>([
-    {
-      type: 'faq',
-      delay: 0,
-      info: {
-        questionAnswer: [
-          { question: 'Hiii', answer: 'Hello' },
-          { question: 'How Are you?', answer: 'I am fine' },
-        ],
-      },
-    },
-  ]);
+  const [pendingMessages, setPendingMessages] = useState<TypeBotResponse[]>([]);
   const [visibleMessages, setVisibleMessages] = useState<TypeBotResponse[]>([]);
   const processingRef = useRef(false);
 
