@@ -16,7 +16,6 @@ import useWindowDimensions from "@/utils/windowSize";
 import { Textarea } from "@/components/ui/textarea";
 
 import { Input } from "@/components/ui/input";
-import { BiSolidEditAlt } from "react-icons/bi";
 import { useSetupPlayground, useUpdateChatbot } from "@/utils/botCreation-api";
 import { toast } from "sonner";
 import { axiosError } from "../../types/axiosTypes";
