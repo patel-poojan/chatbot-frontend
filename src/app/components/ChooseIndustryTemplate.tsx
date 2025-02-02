@@ -246,7 +246,7 @@ const ChooseIndustryTemplate = ({
         } flex-1 mx-auto h-auto flex flex-col`}
       >
         {loadIndustryList && <Loader />}
-        <div className='flex justify-between items-center gap-3'>
+        <div className='flex justify-between items-center gap-3 mb-2'>
           <div className='flex justify-between flex-col'>
             <div className='text-lg md:text-xl font-semibold text-black'>
               Select your industry
