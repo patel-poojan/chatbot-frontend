@@ -38,7 +38,13 @@ const Page = () => {
   const [updatedName, setUpdatedName] = useState<string>('');
   const [currentName, setCurrentName] = useState<string>('');
   const titleInputRef = useRef<HTMLInputElement>(null);
-
+  const userName = localStorage.getItem('username');
+  const [greeting] = useState(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
+  });
   const handleEditClick = (chatbotId: string, name: string) => {
     setEditingId(chatbotId);
     setUpdatedName(name);
@@ -118,6 +124,15 @@ const Page = () => {
   return (
     <div className='flex-1 flex flex-col max-[500px]:p-4 overflow-auto'>
       {loadChatbotList || updatePending || deletePending ? <Loader /> : <></>}
+      <div className='mb-8'>
+        <h1 className='text-2xl font-medium text-gray-700'>
+          {greeting},
+          <span className='capitalize'>
+            {userName ? ` ${userName}! 👋` : ''}
+          </span>
+        </h1>
+        <p className='text-gray-500 mt-1'>Here are your chatbots</p>
+      </div>
       <div className='max-[500px]:text-xl text-2xl font-semibold text-black mb-6 max-[500px]:mb-4'>
         ChatBots
       </div>

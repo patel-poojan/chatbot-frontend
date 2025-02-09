@@ -118,7 +118,9 @@ const BDAQuestion = ({
       <div className='flex flex-col min-[830px]:flex-row justify-between items-start min-[830px]:items-center gap-3'>
         <div className='text-lg flex-wrap sm:text-2xl font-semibold text-black flex items-center gap-2'>
           Your selected industry is
-          <span className='text-[#57C0DD] '>Real Estate</span>
+          <span className='text-[#57C0DD] capitalize'>
+            {industry} - {subIndustry},
+          </span>
         </div>
         <Button
           className='text-xs bg-gradient-to-r hover:from-[#53A7DD] hover:to-[#58C8DD] from-[#58C8DD] to-[#53A7DD] max-[500px]:h-8 md:text-lg text-white flex gap-2 items-center py-2 px-4 md:py-4 md:px-9 rounded my-1 md:my-3'

@@ -46,7 +46,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       {isPending ? <Loader /> : <></>}
       <div className='pr-3 hidden min-[500px]:flex flex-col justify-between py-3  lg:items-center'>
         <div className='flex flex-col gap-3 items-center'>
-          <Link href={'/'}>
+          <Link href={'/chatbotlist'}>
             <Image
               className='bg-white rounded-full cursor-pointer'
               src='/images/bot-icon.svg'
