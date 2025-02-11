@@ -11,3 +11,12 @@ const passwordRegex =
 export const isPasswordValid = (password: string) => {
   return passwordRegex.test(password);
 };
+
+export const isValidUrl = (url: string) => {
+  try {
+    new URL(url);
+    return true;
+  } catch (error) {
+    return false;
+  }
+};

@@ -11,6 +11,7 @@ import { IoIosArrowDown, IoIosArrowUp, IoMdCheckmark } from 'react-icons/io';
 import { TfiWorld } from 'react-icons/tfi';
 import AlertDialog from './AlertDialog';
 import { toast } from 'sonner';
+import { isValidUrl } from '@/utils/validator';
 
 const ChooseWebsiteTemplate = ({
   websiteStepHandler,
@@ -31,6 +32,8 @@ const ChooseWebsiteTemplate = ({
   const continueHandler = () => {
     if (websiteUrl.length === 0) {
       toast.warning('Please enter website url');
+    } else if (!isValidUrl(websiteUrl)) {
+      toast.warning('Please enter a valid website url');
     } else if (scanType.length === 0) {
       toast.warning('Please select scan type');
     } else {
