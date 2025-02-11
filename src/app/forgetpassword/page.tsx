@@ -51,7 +51,9 @@ const ForgetPassword = () => {
     },
   });
   const validateEmail = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
+    (
+      e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>
+    ) => {
       e.preventDefault();
 
       if (!email) {
@@ -175,7 +177,8 @@ const ForgetPassword = () => {
           </Button>
         </form>
       ) : (
-        <div
+        <form
+          onSubmit={validateEmail}
           className='flex flex-col items-center justify-center gap-4 sm:gap-6 p-6 sm:p-8 max-w-lg w-full bg-white rounded-3xl text-center '
           style={{ boxShadow: '0px 0px 12px 4px #00000014' }}
         >
@@ -196,13 +199,12 @@ const ForgetPassword = () => {
             />
           </div>
           <Button
-            type='button'
+            type='submit'
             className='w-full py-3 mt-1 rounded-md text-white bg-gradient-to-r from-[#58C8DD] to-[#53A7DD] hover:from-[#53A7DD] hover:to-[#58C8DD] transition-colors'
-            onClick={validateEmail}
           >
             Send Reset Link
           </Button>
-        </div>
+        </form>
       )}
     </div>
   );

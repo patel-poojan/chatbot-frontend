@@ -45,7 +45,6 @@ import {
 import useWindowDimensions from '@/utils/windowSize';
 import Image from 'next/image';
 import AIKnowledge from '@/app/components/playground/AIKnowladge';
-import UpdateChatbotNameDialog from '@/app/components/playground/UpdateChatbotNameDialog';
 import DashboardLayout from '@/app/components/DashboardLayout';
 import CustomEdge from '@/app/components/playground/playgroundArea/CustomEdge';
 import { axiosInstance } from '@/utils/axiosInstance';
@@ -67,6 +66,7 @@ type FetchPlaygroundResponse = {
   statusCode: number;
   data: {
     _id: string;
+    chatbotName: string;
     chatbotId: string;
     createdAt: string;
     updatedAt: string;
@@ -564,16 +564,14 @@ const MainComponent = ({ botId }: { botId: string }) => {
         <div className=' sm:p-6 flex flex-1 flex-col relative bg-[#F6F6F6]'>
           <div className='absolute top-6 flex items-center justify-normal gap-3 flex-wrap-reverse md:justify-between w-full left-0 px-6 z-10'>
             <div className=' flex items-center gap-3'>
-              <UpdateChatbotNameDialog
-                trigger={
-                  <div
-                    className='p-3 h-9  flex items-center cursor-pointer justify-center rounded-lg bg-white'
-                    style={{ boxShadow: '0px 0px 4px 0px #0000001F' }}
-                  >
-                    www.chatbot.com
-                  </div>
-                }
-              />
+              {playgroundData?.chatbotName ? (
+                <div
+                  className='p-3 h-9  flex items-center cursor-pointer justify-center rounded-lg bg-white'
+                  style={{ boxShadow: '0px 0px 4px 0px #0000001F' }}
+                >
+                  {playgroundData?.chatbotName}
+                </div>
+              ) : null}
 
               <TooltipProvider>
                 <Tooltip>

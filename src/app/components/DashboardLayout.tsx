@@ -161,7 +161,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         </div>
         <Popover>
           <PopoverTrigger>
-            <BsPersonFill className='text-black text-4xl cursor-pointer p-1 rounded-full bg-white' />
+            <BsPersonFill className='text-black text-4xl cursor-pointer p-1 rounded-full bg-white ms-auto' />
           </PopoverTrigger>
           <PopoverContent
             className='mb-1 ms-3 border border-[#EFEFEF] rounded-xl w-fit p-1'
