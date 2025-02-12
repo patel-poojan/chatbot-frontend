@@ -110,6 +110,7 @@ type TrainBotRequest = {
     type: string;
     websiteUrl?: string;
     scanType?: string;
+    urls_to_scrape?: string[];
   };
 };
 
@@ -260,6 +261,35 @@ export const useSetupPlayground = ({
         `/playground/setup/${data.chatbotId}`,
         data.details
       );
+    },
+    onError,
+    onSuccess,
+  });
+
+type fetchURLRequest = {
+  websiteUrl: string;
+  scanType: string;
+};
+type fetchURLResponse = {
+  statusCode: number;
+  data: {
+    domain: string;
+    urls: string[];
+  };
+  message: string;
+  success: boolean;
+};
+export const useFetchURLForTraining = ({
+  onSuccess,
+  onError,
+}: {
+  onSuccess: (data: fetchURLResponse) => void;
+  onError: (error: axiosError) => void;
+}) =>
+  useMutation({
+    mutationKey: ['fetch', 'urls', 'training'],
+    mutationFn: (data: fetchURLRequest): Promise<fetchURLResponse> => {
+      return axiosInstance.post(`/chatbot/getURLs`, data);
     },
     onError,
     onSuccess,
