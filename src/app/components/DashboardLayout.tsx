@@ -356,7 +356,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                       <div className='flex items-center gap-3'>
                         <BsPersonFill className='text-white text-4xl cursor-pointer p-2 rounded-full bg-black' />
                         <div className='text-start'>
-                          <p className='text-[#1e255eb2] font-medium text-base'>
+                          <p className='text-[#1e255eb2] font-medium text-base capitalize'>
                             {userName ?? 'User'}
                           </p>
                           <p className='text-[#1e255eb2] font-light text-base'>
