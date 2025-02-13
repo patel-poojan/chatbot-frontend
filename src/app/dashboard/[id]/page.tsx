@@ -43,7 +43,6 @@ import {
   usePlayground,
 } from '@/app/components/playground/playgroundArea/PlaygroundContext';
 import useWindowDimensions from '@/utils/windowSize';
-import Image from 'next/image';
 import AIKnowledge from '@/app/components/playground/AIKnowladge';
 import DashboardLayout from '@/app/components/DashboardLayout';
 import CustomEdge from '@/app/components/playground/playgroundArea/CustomEdge';
@@ -573,7 +572,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
                 </div>
               ) : null}
 
-              <TooltipProvider>
+              {/* <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div
@@ -600,7 +599,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
                     Action
                   </TooltipContent>
                 </Tooltip>
-              </TooltipProvider>
+              </TooltipProvider> */}
             </div>
             <div className=' flex items-center gap-3'>
               <div
