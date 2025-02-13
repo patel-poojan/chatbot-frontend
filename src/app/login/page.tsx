@@ -27,6 +27,7 @@ const Page = () => {
       if (token) {
         if (data.data.user.username) {
           localStorage.setItem('username', data.data.user.username);
+          localStorage.setItem('email', data.data.user.email);
         }
         Cookies.set('authToken', token, {
           path: '/',

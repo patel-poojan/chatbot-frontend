@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/tooltip';
 import Image from 'next/image';
 import Link from 'next/link';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BsPersonFill } from 'react-icons/bs';
 import { IoGrid } from 'react-icons/io5';
 import {
@@ -31,6 +31,8 @@ import { toast } from 'sonner';
 import { Loader } from './Loader';
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const pathName = usePathname();
+  const [userName, setUserName] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
   // const [isOpenPopup, setIsOpenPopup] = useState<boolean>(false);
   const router = useRouter();
   const params = useParams();
@@ -41,6 +43,14 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       router.push('/');
     },
   });
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedUsername = localStorage.getItem('username');
+      setUserName(storedUsername);
+      const storedEmail = localStorage.getItem('email');
+      setEmail(storedEmail);
+    }
+  }, []);
   return (
     <div className='min-[500px]:bg-[#1B1B20] h-dvh  flex  p-0 min-[500px]:p-3'>
       {isPending ? <Loader /> : <></>}
@@ -347,10 +357,10 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                         <BsPersonFill className='text-white text-4xl cursor-pointer p-2 rounded-full bg-black' />
                         <div className='text-start'>
                           <p className='text-[#1e255eb2] font-medium text-base'>
-                            User Name
+                            {userName ?? 'User'}
                           </p>
                           <p className='text-[#1e255eb2] font-light text-base'>
-                            useremail123@gmail.com
+                            {email ?? 'Email'}
                           </p>
                         </div>
                       </div>

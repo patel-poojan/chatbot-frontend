@@ -52,8 +52,10 @@ const Page = () => {
     return 'Good evening';
   });
   useEffect(() => {
-    const storedUsername = localStorage.getItem('username');
-    setUserName(storedUsername);
+    if (typeof window !== 'undefined') {
+      const storedUsername = localStorage.getItem('username');
+      setUserName(storedUsername);
+    }
   }, []);
   const handleEditClick = (chatbotId: string, name: string) => {
     setEditingId(chatbotId);
