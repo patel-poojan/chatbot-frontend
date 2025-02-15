@@ -1,9 +1,4 @@
-import Axios, {
-  AxiosError,
-  AxiosHeaders,
-  AxiosResponse,
-  InternalAxiosRequestConfig,
-} from "axios";
+import Axios, { AxiosError, AxiosHeaders, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
 
@@ -12,12 +7,7 @@ const authRequestInterceptor = (config: InternalAxiosRequestConfig) => {
   const requestUrl = config.url || "";
 
   // Define the api routes where the token should NOT be passed
-  const noAuthPages = [
-    "/register",
-    "/verify-email",
-    "/resend-verification-email",
-    "/login",
-  ];
+  const noAuthPages = ["/register", "/verify-email", "/resend-verification-email", "/login"];
 
   // Check if the request URL matches any of the noAuthPages
   const shouldSkipAuth = noAuthPages.some((page) => requestUrl.includes(page));
@@ -68,14 +58,13 @@ const errorInterceptor = (error: AxiosError) => {
 
 const paramsSerializer = (params: { [key: string]: string }) => {
   return Object.keys(params)
-    .map(
-      (key) => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`
-    )
+    .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
     .join("&");
 };
 
 export const axiosInstance = Axios.create({
   baseURL: process.env.NEXT_PUBLIC_LOCAL_SERVER_URL,
+  timeout: 300000, // Set timeout to 5 minutes (300,000 milliseconds)
 });
 
 axiosInstance.defaults.paramsSerializer = paramsSerializer;
