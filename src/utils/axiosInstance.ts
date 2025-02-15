@@ -65,6 +65,7 @@ const paramsSerializer = (params: { [key: string]: string }) => {
 export const axiosInstance = Axios.create({
   baseURL: process.env.NEXT_PUBLIC_LOCAL_SERVER_URL,
   timeout: 300000, // Set timeout to 5 minutes (300,000 milliseconds)
+  timeoutErrorMessage: "timeoutErrorMessage: Request took too long to complete",
 });
 
 axiosInstance.defaults.paramsSerializer = paramsSerializer;
