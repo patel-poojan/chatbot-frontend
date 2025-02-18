@@ -153,17 +153,22 @@ const ChooseDocumentTemplate: React.FC<DocumentTemplateProps> = ({
   const [activeTrainingURLS, setActiveTrainingURLS] = useState<string[]>([]);
 
   const validateFiles = (files: File[]) => {
+    if (files.length > 4) {
+      toast.warning('Please upload no more than 4 files');
+      return false;
+    }
     for (const file of files) {
       if (!file.type.includes('pdf')) {
-        toast.error(`${file.name} must be a PDF file`);
+        toast.warning(`${file.name} must be a PDF file`);
         return false;
       }
       const maxSize = 3 * 1024 * 1024;
       if (file.size > maxSize) {
-        toast.error(`${file.name} must be less than 3MB`);
+        toast.warning(`${file.name} must be less than 3MB`);
         return false;
       }
     }
+
     return true;
   };
 
@@ -244,6 +249,9 @@ const ChooseDocumentTemplate: React.FC<DocumentTemplateProps> = ({
       }
     } else if (type === 'website' && botId) {
       if (scanType && websiteUrl) {
+        if (files.length > 0 && !validateFiles(files)) {
+          return;
+        }
         const details = {
           websiteUrl,
           scanType,
@@ -252,12 +260,10 @@ const ChooseDocumentTemplate: React.FC<DocumentTemplateProps> = ({
           ...(files.length > 0 && { document: files }),
         };
 
-        if (files.length === 0 || validateFiles(files)) {
-          onTrainBot({
-            chatbotId: botId,
-            details,
-          });
-        }
+        onTrainBot({
+          chatbotId: botId,
+          details,
+        });
       } else {
         toast.error('please select scan type and website url');
       }
@@ -350,6 +356,8 @@ const ChooseDocumentTemplate: React.FC<DocumentTemplateProps> = ({
                 activeUrls={activeTrainingURLS}
                 onToggle={handleToggleURL}
               />
+            ) : isPendingToFetchURLs ? (
+              <div>loading...</div>
             ) : (
               <div className='text-[red]'>something went wrong</div>
             )}
@@ -372,6 +380,8 @@ const ChooseDocumentTemplate: React.FC<DocumentTemplateProps> = ({
             if (step === 0 && type === 'website') {
               if (files.length === 0) {
                 toast.warning('Please select document');
+              } else if (!validateFiles(files)) {
+                return;
               } else {
                 setStep(1);
               }
