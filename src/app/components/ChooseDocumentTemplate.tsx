@@ -102,12 +102,15 @@ const UploadCard: React.FC<{
 );
 
 const WebsiteURLGrid: React.FC<{
-  urls: string[];
+  urls: {
+    url: string;
+    label: string;
+  }[];
   activeUrls: string[];
   onToggle: (url: string) => void;
 }> = ({ urls, activeUrls, onToggle }) => (
   <div className='grid overflow-y-auto gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
-    {urls.map((url, index) => (
+    {urls.map((urlObj, index) => (
       <div
         key={index}
         className='bg-[#f5f5f5] rounded-lg p-4 flex items-center justify-between gap-2'
@@ -117,19 +120,19 @@ const WebsiteURLGrid: React.FC<{
             <Tooltip>
               <TooltipTrigger asChild>
                 <h3 className='text-sm font-medium text-gray-900 truncate break-all cursor-pointer'>
-                  {url}
+                  {urlObj?.label}
                 </h3>
               </TooltipTrigger>
               <TooltipContent className='text-xs max-w-[300px] break-all bg-[#57C0DD] mb-1 '>
-                {url}
+                {urlObj?.label}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
         <div className='flex-shrink-0 ml-2'>
           <Switch
-            checked={activeUrls.includes(url)}
-            onCheckedChange={() => onToggle(url)}
+            checked={activeUrls.includes(urlObj.url)}
+            onCheckedChange={() => onToggle(urlObj.url)}
             className='data-[state=checked]:bg-[#57C0DD]'
           />
         </div>
@@ -210,7 +213,7 @@ const ChooseDocumentTemplate: React.FC<DocumentTemplateProps> = ({
   } = useFetchURLForTraining({
     onSuccess(data) {
       if (data.data.urls) {
-        setActiveTrainingURLS(data.data.urls);
+        setActiveTrainingURLS(data.data.urls.map((url) => url.url));
       }
       toast.success(data?.message);
     },
