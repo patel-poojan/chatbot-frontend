@@ -12,6 +12,7 @@ import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import { toast } from "sonner";
 import { axiosError } from "@/types/axiosTypes";
 import { Loader } from "../components/Loader";
+import Link from "next/link";
 
 const SignupForm = () => {
   const [passwordType, setPasswordType] = useState<string>("password");
@@ -36,10 +37,7 @@ const SignupForm = () => {
     },
 
     onError(error: axiosError) {
-      const errorMessage =
-        error?.response?.data?.errors?.message ||
-        error?.response?.data?.message ||
-        "signup failed";
+      const errorMessage = error?.response?.data?.errors?.message || error?.response?.data?.message || "signup failed";
       toast.error(errorMessage);
     },
   });
@@ -77,17 +75,8 @@ const SignupForm = () => {
 
       <div className="flex flex-col gap-4 md:gap-6 w-full max-w-lg px-4">
         <div className="flex flex-col gap-1 md:gap-2 justify-center items-center">
-          <Image
-            src="/images/bot-icon.svg"
-            alt="chatbot logo"
-            width={45}
-            height={45}
-            priority
-            quality={100}
-          />
-          <p className="text-black font-medium text-2xl md:text-[32px]">
-            ChatBot
-          </p>
+          <Image src="/images/bot-icon.svg" alt="chatbot logo" width={45} height={45} priority quality={100} />
+          <p className="text-black font-medium text-2xl md:text-[32px]">ChatBot</p>
         </div>
         <div className="w-full">
           <label htmlFor="fullName" className="text-black font-normal text-lg">
@@ -127,11 +116,7 @@ const SignupForm = () => {
               placeholder="Enter Your Password"
             />
             <div className="cursor-pointer" onClick={togglePassword}>
-              {passwordType === "password" ? (
-                <IoEyeOffOutline />
-              ) : (
-                <IoEyeOutline />
-              )}
+              {passwordType === "password" ? <IoEyeOffOutline /> : <IoEyeOutline />}
             </div>
           </div>
         </div>
@@ -143,9 +128,13 @@ const SignupForm = () => {
             className="me-2 h-4 w-4"
           />
           I Agree to
-          <a className="text-[#57C0DD]  mx-1">Term of Use</a>
+          <Link href="/document/privacy-policy.pdf" className="text-[#57C0DD] cursor-pointer mx-1">
+            Term of Use
+          </Link>
           and
-          <a className="text-[#57C0DD]  mx-1">Privacy Policy</a>
+          <Link href="/document/terms-of-use.pdf" className="text-[#57C0DD] cursor-pointer mx-1">
+            Privacy Policy
+          </Link>
         </div>
         <Button
           type="button"
@@ -156,10 +145,7 @@ const SignupForm = () => {
         </Button>
         <div className="text-center text-[#1E255EB2] font-normal text-sm sm:text-lg">
           Already have an account?
-          <a
-            href="/login"
-            className="text-[#57C0DD] ms-1 hover:text-[#45A9B8] underline-offset-2 hover:underline"
-          >
+          <a href="/login" className="text-[#57C0DD] ms-1 hover:text-[#45A9B8] underline-offset-2 hover:underline">
             Log in
           </a>
         </div>

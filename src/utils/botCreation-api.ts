@@ -298,7 +298,7 @@ export const useFetchURLForTraining = ({
     mutationKey: ["fetch", "urls", "training"],
     mutationFn: async (data: fetchURLRequest): Promise<fetchURLResponse> => {
       const response: fetchURLResponse = await axiosInstance.post(`/chatbot/getURLs`, data);
-      const sortedURLs = sortByUrlLevels(response.data.urls);
+      const sortedURLs = sortByUrlLevels(response?.data?.urls);
       response.data.urls = sortedURLs;
       return response;
     },
