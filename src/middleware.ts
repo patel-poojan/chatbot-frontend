@@ -3,12 +3,19 @@ import { NextResponse, NextRequest } from "next/server";
 
 export default function middleware(request: NextRequest) {
   const pathName = request.nextUrl.pathname;
+
+  // Allow access to specific routes without authentication
+  const publicPaths = ["/document/privacy-policy.pdf", "/document/terms-of-use.pdf"];
+
+  if (publicPaths.includes(pathName)) {
+    return NextResponse.next();
+  }
+
   try {
     // Retrieve the token from cookies
-
     const token = request.cookies.get("authToken")?.value || "";
-    // If no token is found, redirect to the home page
 
+    // If no token is found, redirect to the home page
     if (pathName === "/login" && !token) {
       return NextResponse.next();
     }
@@ -16,6 +23,7 @@ export default function middleware(request: NextRequest) {
     if (!token) {
       return NextResponse.redirect(new URL("/", request.url));
     }
+
     // Decode the token and check its expiration
     const decoded = jwtDecode<{ exp: number }>(token);
 
@@ -36,7 +44,6 @@ export default function middleware(request: NextRequest) {
     }
   } catch (error) {
     // If there's an error (e.g., invalid token), redirect to the home page
-
     if (pathName === "/login") {
       return NextResponse.next();
     }
