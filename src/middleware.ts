@@ -5,7 +5,7 @@ export default function middleware(request: NextRequest) {
   const pathName = request.nextUrl.pathname;
 
   // Allow access to specific routes without authentication
-  const publicPaths = ["/document/privacy-policy.pdf", "/document/terms-of-use.pdf"];
+  const publicPaths = ["/privacy-policy.pdf", "/terms-of-use.pdf"];
 
   if (publicPaths.includes(pathName)) {
     return NextResponse.next();
