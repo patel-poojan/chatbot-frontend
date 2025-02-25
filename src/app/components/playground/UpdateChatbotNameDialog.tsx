@@ -18,9 +18,9 @@ const UpdateChatbotNameDialog = ({ trigger }: { trigger: React.ReactNode }) => {
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className='max-w-[87vw] gap-0  sm:max-w-[425px] rounded-lg'>
         <DialogHeader>
-          <DialogTitle className='sr-only'>Rename Chatbot</DialogTitle>
+          <DialogTitle className='sr-only'>Rename chatAgent</DialogTitle>
           <DialogDescription id='dialog-description' className='sr-only'>
-            Rename Chatbot
+            Rename chatAgent
           </DialogDescription>
         </DialogHeader>
         {/* {isPending && <Loader />} */}
@@ -28,7 +28,7 @@ const UpdateChatbotNameDialog = ({ trigger }: { trigger: React.ReactNode }) => {
           <div className='flex items-center justify-between'>
             <div></div>
             <div className='text-primary  text-xl font-medium'>
-              Edit Chatbot name
+              Edit chatAgent name
             </div>
             <DialogClose>
               <IoCloseOutline className='text-lg' />

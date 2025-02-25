@@ -99,7 +99,7 @@ const Page = () => {
 
   useEffect(() => {
     if (errorInChatbotList) {
-      toast.error('Failed to fetch chatbot list, something went wrong');
+      toast.error('Failed to fetch ChatAgent list, something went wrong');
     }
   }, [errorInChatbotList]);
 
@@ -143,10 +143,10 @@ const Page = () => {
             {userName ? ` ${userName}! 👋` : ''}
           </span>
         </h1>
-        <p className='text-gray-500 mt-1'>Here are your chatbots</p>
+        <p className='text-gray-500 mt-1'>Here are your chatAgents</p>
       </div>
       <div className='max-[500px]:text-xl text-2xl font-semibold text-black mb-6 max-[500px]:mb-4'>
-        ChatBots
+        ChatAgents
       </div>
       <div className='flex-1 overflow-y-auto'>
         <div className='grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'>
@@ -159,7 +159,7 @@ const Page = () => {
               <MdAdd className='text-xl sm:text-2xl text-[#58C8DD]' />
             </div>
             <div className='text-white mt-1 font-medium text-sm sm:text-base'>
-              Add chatbot
+              Add chatAgent
             </div>
           </div>
           {!errorInChatbotList &&

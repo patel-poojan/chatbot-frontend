@@ -31,7 +31,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
   const { width: screenWidth } = useWindowDimensions();
   const [FAQ, setFAQ] = useState(true);
   const [attributes, setAttributes] = useState([
-    { title: 'Chatbot Name', value: 'Chatbot' },
+    { title: 'ChatAgent Name', value: 'ChatAgent' },
     { title: 'Company Name', value: '' },
     { title: 'Company Address', value: '' },
     { title: 'About Us', value: '' },
@@ -39,7 +39,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
   ]);
   const [AboutUs, setAboutUs] = useState(true);
   const [welcomeMessage, setWelcomeMessage] = useState(
-    `👋 Welcome to Chatbot! I'm ChatBot, your AI assistant 🤖. What can I do for you?`
+    `👋 Welcome to ChatAgent! I'm ChatAgent, your AI assistant 🤖. What can I do for you?`
   );
   const {
     mutate: onUpdateBot,
@@ -53,7 +53,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
       const errorMessage =
         error?.response?.data?.errors?.message ||
         error?.response?.data?.message ||
-        'chatbot training failed';
+        'ChatAgent training failed';
       toast.error(errorMessage);
     },
   });
@@ -69,7 +69,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
       const errorMessage =
         error?.response?.data?.errors?.message ||
         error?.response?.data?.message ||
-        'chatbot training failed';
+        'chatAgent training failed';
       toast.error(errorMessage);
     },
   });
@@ -91,14 +91,14 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
   });
   useEffect(() => {
     if (isUpdateSuccess && isAddSuccess && isSetupPlaygroundSuccess) {
-      toast.success('Chatbot configured successfully');
+      toast.success('ChatAgent configured successfully');
       router.replace(`/dashboard/${botId}`);
     }
   }, [botId, isAddSuccess, isSetupPlaygroundSuccess, isUpdateSuccess, router]);
 
   const continueHandler = () => {
     if (!attributes[0].value) {
-      toast.warning('Please enter chatbot name');
+      toast.warning('Please enter chatAgent name');
     } else if (!attributes[1].value) {
       toast.warning('Please enter company name');
     } else if (!attributes[2].value) {
@@ -117,7 +117,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
       onUpdateBot({
         chatbotId: botId,
         details: {
-          name: attributes[0].value ?? 'chatbot',
+          name: attributes[0].value ?? 'chatAgent',
           aboutAs: attributes[3].value,
           domainName: attributes[4].value,
           welcomeMessage: welcomeMessage,
@@ -208,7 +208,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
         <div className='w-full lg:w-3/5 flex-1 flex flex-col h-full overflow-y-auto overflow-x-hidden'>
           <div className='mb-4 sm:mb-6'>
             <h2 className='text-black font-semibold text-2xl'>
-              Tune your chatbot
+              Tune your chatAgent
             </h2>
             <p className='text-[#1E255EB2] font-normal mt-2 text-base'>
               Add final tweaks to achieve better results.
@@ -244,7 +244,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
                 } border bg-transparent hover:bg-transparent border-[#57C0DD] py-2 px-4 md:px-8 rounded-xl text-[#57C0DD] text-sm md:text-base`}
                 onClick={() => setAboutUs(!AboutUs)}
               >
-                About Chatbot
+                About ChatAgent
               </Button>
             </div>
           </div>
@@ -319,7 +319,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
             )}
             {AboutUs && (
               <div className='text-center px-6 py-2 border rounded-xl border-[#57C0DD] text-[#57C0DD]'>
-                About Chatbot
+                About ChatAgent
               </div>
             )}
           </div>
@@ -391,7 +391,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
                   )}
                   {AboutUs && (
                     <div className='text-center px-6 py-2 border rounded-xl border-[#57C0DD] text-[#57C0DD]'>
-                      About Chatbot
+                      About ChatAgent
                     </div>
                   )}
                 </div>
@@ -463,7 +463,7 @@ style={{
           } border bg-transparent hover:bg-transparent border-[#57C0DD] py-2 px-4 md:px-8 rounded-xl text-[#57C0DD] text-sm md:text-base`}
           onClick={() => setAboutUs(!AboutUs)}
         >
-          About Chatbot
+          About ChatAgent
         </Button>
       </div>
     </div>
@@ -536,7 +536,7 @@ style={{
       )}
       {AboutUs && (
         <div className='text-center px-6 py-2 border rounded-xl border-[#57C0DD] text-[#57C0DD]'>
-          About Chatbot
+          About ChatAgent
         </div>
       )}
     </div>
@@ -608,7 +608,7 @@ style={{
             )}
             {AboutUs && (
               <div className='text-center px-6 py-2 border rounded-xl border-[#57C0DD] text-[#57C0DD]'>
-                About Chatbot
+                About ChatAgent
               </div>
             )}
           </div>

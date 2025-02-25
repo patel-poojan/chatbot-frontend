@@ -91,7 +91,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                 className='bg-[#1B1B20]'
                 sideOffset={14}
               >
-                <p>ChatBots</p>
+                <p>ChatAgents</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

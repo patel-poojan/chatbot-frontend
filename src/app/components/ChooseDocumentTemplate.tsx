@@ -203,7 +203,7 @@ const ChooseDocumentTemplate: React.FC<DocumentTemplateProps> = ({
       const errorMessage =
         error?.response?.data?.errors?.message ||
         error?.response?.data?.message ||
-        'chatbot training failed';
+        'chatAgent training failed';
       toast.error(errorMessage);
     },
   });
@@ -306,7 +306,7 @@ const ChooseDocumentTemplate: React.FC<DocumentTemplateProps> = ({
                 </p>
               </div>
               <p className='font-normal text-black text-sm sm:text-base'>
-                Upload document to start further process of creating chatbot
+                Upload document to start further process of creating chatAgent
               </p>
             </div>
             {optional && (
