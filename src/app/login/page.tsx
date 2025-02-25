@@ -55,7 +55,7 @@ const Page = () => {
       e.preventDefault();
 
       if (!email) {
-        toast.warning('Please fill in your email');
+        toast.warning('Please fill in your email address');
       } else if (!password) {
         toast.warning('Please fill in your password');
       } else {
@@ -87,14 +87,14 @@ const Page = () => {
         </div>
         <div className='w-full'>
           <label htmlFor='email' className='text-black font-normal text-lg'>
-            Email
+            Email Address
           </label>
           <Input
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             id='email'
             className='px-4 py-3 mt-1 rounded  focus-visible:ring-0 placeholder:text-sm placeholder:font-light w-full'
-            placeholder='Enter Your Email'
+            placeholder='Enter Your Email Address'
           />
         </div>
         <div className='w-full'>

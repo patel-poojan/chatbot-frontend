@@ -54,9 +54,9 @@ const SignupForm = () => {
       if (!name) {
         toast.warning('Please fill in your name');
       } else if (!emailId) {
-        toast.warning('Please fill in your email');
+        toast.warning('Please fill in your email address');
       } else if (!isEmailValid(emailId)) {
-        toast.warning('Please enter a valid email');
+        toast.warning('Please enter a valid email address');
       } else if (!password) {
         toast.warning('Please fill in your password');
       } else if (!isPasswordValid(password)) {
@@ -104,14 +104,14 @@ const SignupForm = () => {
         </div>
         <div className='w-full'>
           <label htmlFor='email' className='text-black font-normal text-lg'>
-            Email
+            Email Address
           </label>
           <Input
             id='email'
             value={emailId}
             onChange={(e) => setEmailId(e.target.value)}
             className='px-4 py-3 mt-1 rounded  focus-visible:ring-0 placeholder:text-sm   placeholder:font-light w-full'
-            placeholder='Enter Your Email'
+            placeholder='Enter Your Email Address'
           />
         </div>
         <div className='w-full'>

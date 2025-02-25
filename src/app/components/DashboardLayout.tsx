@@ -58,7 +58,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         <div className='flex flex-col gap-3 items-center'>
           <Link href={'/chatbotlist'}>
             <Image
-              className='bg-white rounded-full cursor-pointer'
+              className='bg-white rounded-full cursor-pointer p-1'
               src='/images/bot-icon.svg'
               alt='chatbot logo'
               width={45}

@@ -90,7 +90,9 @@ const UploadCard: React.FC<{
         height={43}
         quality={100}
       />
-      <div className='text-[#7E7E7E] font-normal text-sm'>upload file</div>
+      <div className='text-[#7E7E7E] font-normal text-sm'>
+        PDF only, max 10MB.
+      </div>
     </div>
     <label className='flex items-center justify-between border border-[#57C0DD] w-full p-2 cursor-pointer'>
       <input type='file' className='hidden' onChange={onFileChange} />
@@ -165,9 +167,9 @@ const ChooseDocumentTemplate: React.FC<DocumentTemplateProps> = ({
         toast.warning(`${file.name} must be a PDF file`);
         return false;
       }
-      const maxSize = 3 * 1024 * 1024;
+      const maxSize = 10 * 1024 * 1024;
       if (file.size > maxSize) {
-        toast.warning(`${file.name} must be less than 3MB`);
+        toast.warning(`${file.name} must be less than 10MB`);
         return false;
       }
     }

@@ -16,7 +16,7 @@ const Page = () => {
       onSuccess(data) {
         if (data.success) {
           router.replace(`/create/${data.data.type}/${data.data._id}`);
-          toast.success(data?.message);
+          // toast.success(data?.message);
         }
       },
       onError(error: axiosError) {
