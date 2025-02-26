@@ -75,13 +75,13 @@ const CreateUserDialog = ({
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       if (!name) {
-        toast.warning('Please fill in your name');
+        toast.warning('Please fill name');
       } else if (!emailId) {
-        toast.warning('Please fill in your email address');
+        toast.warning('Please fill email address');
       } else if (!isEmailValid(emailId)) {
         toast.warning('Please enter a valid email');
       } else if (!password) {
-        toast.warning('Please fill in your password');
+        toast.warning('Please fill password');
       } else if (!isPasswordValid(password)) {
         toast.warning(
           'Password must be at least 8 characters long and include one uppercase letter, one lowercase letter, one number, and one special character',
@@ -159,7 +159,7 @@ const CreateUserDialog = ({
               onChange={(e) => setName(e.target.value)}
               id='fullName'
               className='px-4 py-3 mt-1 rounded  focus-visible:ring-0 placeholder:text-sm   placeholder:font-light w-full'
-              placeholder='Enter Your Name'
+              placeholder='Enter Name'
             />
           </div>
           <div className='w-full'>
@@ -171,7 +171,7 @@ const CreateUserDialog = ({
               value={emailId}
               onChange={(e) => setEmailId(e.target.value)}
               className='px-4 py-3 mt-1 rounded  focus-visible:ring-0 placeholder:text-sm   placeholder:font-light w-full'
-              placeholder='Enter Your Email Address'
+              placeholder='Enter Email Address'
             />
           </div>
           <div className='w-full'>
@@ -185,7 +185,7 @@ const CreateUserDialog = ({
                 onChange={(e) => setPassword(e.target.value)}
                 type={passwordType}
                 className='px-4 py-3 flex-1 !border-none rounded focus-visible:ring-0  placeholder:text-sm   placeholder:font-light w-full'
-                placeholder='Enter Your Password'
+                placeholder='Enter Password'
               />
               <div className='cursor-pointer' onClick={togglePassword}>
                 {passwordType === 'password' ? (

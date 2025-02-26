@@ -215,7 +215,7 @@ const UserInputDialog = ({
                     className='p-2 w-72 text-xs text-gray-700 bg-white rounded shadow-md'
                     style={{ boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}
                   >
-                    Keywords is a matching system in chatAgent. It works great
+                    Keywords is a matching system in ChatAgent. It works great
                     when you want a unique phrase or a word to trigger a bot
                     response.
                   </TooltipContent>

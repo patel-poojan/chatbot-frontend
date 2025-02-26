@@ -453,7 +453,7 @@ const AIKnowledge = ({
                   type='button'
                   className='mt-2 h-fit relative ms-auto w-max bottom-0 right-0 text-white bg-gradient-to-r hover:from-[#53A7DD] hover:to-[#58C8DD]  from-[#58C8DD] to-[#53A7DD] py-3 rounded-xl'
                 >
-                  Train chatAgent
+                  Train ChatAgent
                 </Button>
               </div>
             </div>

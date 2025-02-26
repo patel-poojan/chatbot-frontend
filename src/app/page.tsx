@@ -331,17 +331,17 @@ export default function Home() {
             <MarketingTemplate
               imgSrc='/images/support.svg'
               title='Support'
-              navigationText='Hire chatAgent as support Agent'
+              navigationText='Hire ChatAgent as support Agent'
             />
             <MarketingTemplate
               imgSrc='/images/marketing.svg'
               title='Marketing'
-              navigationText='Hire chatAgent as Marketer'
+              navigationText='Hire ChatAgent as Marketer'
             />
             <MarketingTemplate
               imgSrc='/images/sales.svg'
               title='Sales'
-              navigationText='Hire chatAgent as Sales Rep'
+              navigationText='Hire ChatAgent as Sales Rep'
             />
           </div>
         </div>
@@ -350,11 +350,11 @@ export default function Home() {
 
         <div className=' px-4 max-w-7xl mx-auto'>
           <h2 className='text-center text-2xl md:text-4xl lg:text-5xl font-bold text-primary mb-3 mb:mb-4 lg:mb-6 '>
-            Transform Your Data into a Powerful chatAgent
+            Transform Your Data into a Powerful ChatAgent
           </h2>
           <p className='mb-6 mb:mb-8 lg:mb-12 text-[#1E255EB2] text-center font-normal max-w-6xl text-base sm:text-lg mx-auto'>
             By integrating your resources—internal documents, website content,
-            and expert knowledge—we develop a chatAgent that efficiently
+            and expert knowledge—we develop a ChatAgent that efficiently
             delivers relevant information and enhances user engagement.
           </p>
           <div className='flex flex-col md:flex-row items-center gap-6'>
@@ -407,7 +407,7 @@ export default function Home() {
                 imgName: 'marketing_template_3.png',
                 title: 'Drive Deeper Customer Engagement',
                 message:
-                  'AI-powered chatAgents offer personalized suggestions, keeping customers engaged with relevant options..',
+                  'AI-powered ChatAgents offer personalized suggestions, keeping customers engaged with relevant options..',
               },
               {
                 imgName: 'marketing_template_4.png',
@@ -445,7 +445,7 @@ export default function Home() {
           }}
         >
           <p className='text-white text-lg sm:text-2xl md:text-4xl text-center font-bold'>
-            Watch your business grow with chatAgent
+            Watch your business grow with ChatAgent
           </p>
           <form
             onSubmit={(e) => {

@@ -54,9 +54,9 @@ const PublishDialog = ({
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className='max-w-[87vw] sm:max-w-[600px] w-[95vw]  rounded-lg p-4 sm:p-6 max-h-[90vh] overflow-y-auto'>
         <DialogHeader className='sr-only'>
-          <DialogTitle>Publish chatAgent</DialogTitle>
+          <DialogTitle>Publish ChatAgent</DialogTitle>
           <DialogDescription id='dialog-description'>
-            Publish chatAgent
+            Publish ChatAgent
           </DialogDescription>
         </DialogHeader>
 
@@ -65,7 +65,7 @@ const PublishDialog = ({
           <div className='flex items-center justify-between'>
             <div className='w-8' /> {/* Spacer for balance */}
             <h2 className='text-primary text-lg sm:text-xl font-medium'>
-              Publish chatAgent
+              Publish ChatAgent
             </h2>
             <DialogClose className='p-1 hover:bg-gray-100 rounded-full'>
               <IoCloseOutline className='text-xl sm:text-2xl text-gray-500 hover:text-gray-700' />
@@ -75,7 +75,7 @@ const PublishDialog = ({
           {/* Instructions */}
           <div className='space-y-3 sm:space-y-4'>
             <p className='text-gray-600 text-sm sm:text-base'>
-              Follow these steps to add the chatAgent to your website:
+              Follow these steps to add the ChatAgent to your website:
             </p>
             <ol className='list-decimal pl-4 sm:pl-5 space-y-1.5 sm:space-y-2 text-gray-600 text-sm sm:text-base'>
               <li>Copy the code snippet below</li>
@@ -121,14 +121,14 @@ const PublishDialog = ({
             </h3>
             <ul className='list-disc pl-4 sm:pl-5 space-y-1 text-gray-600 text-xs sm:text-sm'>
               <li>
-                The chatAgent is compatible with all modern browsers and devices
+                The ChatAgent is compatible with all modern browsers and devices
               </li>
               <li>
                 After adding the script tags, please refresh your website (press
                 Ctrl + Shift + R on Windows/Linux or Cmd + Shift + R on Mac)
               </li>
               <li>
-                The chatAgent will appear as a floating button on your website
+                The ChatAgent will appear as a floating button on your website
               </li>
             </ul>
           </div>

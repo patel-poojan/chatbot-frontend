@@ -23,7 +23,7 @@ const Page = () => {
         const errorMessage =
           error?.response?.data?.errors?.message ||
           error?.response?.data?.message ||
-          'Failed to create chatAgent!';
+          'Failed to create ChatAgent!';
         toast.error(errorMessage);
       },
     });
@@ -38,10 +38,10 @@ const Page = () => {
           />
           <div className='max-[768px]:mt-1'>
             <div className='text-xl sm:text-2xl font-semibold  text-black mb-2'>
-              Set up your chatAgent
+              Set up your ChatAgent
             </div>
             <div className='mb-4 sm:mb-6 font-normal text-base sm:text-xl text-black'>
-              Train your chatAgent with data, use our ready-to-use templates or
+              Train your ChatAgent with data, use our ready-to-use templates or
               start from scratch.
             </div>
           </div>

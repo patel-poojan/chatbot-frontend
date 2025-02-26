@@ -69,7 +69,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
       const errorMessage =
         error?.response?.data?.errors?.message ||
         error?.response?.data?.message ||
-        'chatAgent training failed';
+        'ChatAgent training failed';
       toast.error(errorMessage);
     },
   });
@@ -98,7 +98,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
 
   const continueHandler = () => {
     if (!attributes[0].value) {
-      toast.warning('Please enter chatAgent name');
+      toast.warning('Please enter ChatAgent name');
     } else if (!attributes[1].value) {
       toast.warning('Please enter company name');
     } else if (!attributes[2].value) {
@@ -117,7 +117,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
       onUpdateBot({
         chatbotId: botId,
         details: {
-          name: attributes[0].value ?? 'chatAgent',
+          name: attributes[0].value ?? 'ChatAgent',
           aboutAs: attributes[3].value,
           domainName: attributes[4].value,
           welcomeMessage: welcomeMessage,
@@ -208,7 +208,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
         <div className='w-full lg:w-3/5 flex-1 flex flex-col h-full overflow-y-auto overflow-x-hidden'>
           <div className='mb-4 sm:mb-6'>
             <h2 className='text-black font-semibold text-2xl'>
-              Tune your chatAgent
+              Tune your ChatAgent
             </h2>
             <p className='text-[#1E255EB2] font-normal mt-2 text-base'>
               Add final tweaks to achieve better results.

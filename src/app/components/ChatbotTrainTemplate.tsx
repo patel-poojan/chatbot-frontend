@@ -65,8 +65,8 @@ const ChatbotTrainTemplate = ({
           </div>
         </div>
         <div className='flex justify-between mt-2 text-sm sm:text-base'>
-          <div className='text-black font-semibold'>Set up chatAgent</div>
-          <div className='text-black font-semibold'>Train chatAgent</div>
+          <div className='text-black font-semibold'>Set up ChatAgent</div>
+          <div className='text-black font-semibold'>Train ChatAgent</div>
         </div>
       </div>
       {/* Main Content */}

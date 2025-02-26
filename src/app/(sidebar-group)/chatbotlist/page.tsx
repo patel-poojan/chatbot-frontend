@@ -143,7 +143,7 @@ const Page = () => {
             {userName ? ` ${userName}! 👋` : ''}
           </span>
         </h1>
-        <p className='text-gray-500 mt-1'>Here are your chatAgents</p>
+        <p className='text-gray-500 mt-1'>Here are your ChatAgents</p>
       </div>
       <div className='max-[500px]:text-xl text-2xl font-semibold text-black mb-6 max-[500px]:mb-4'>
         ChatAgents
@@ -159,7 +159,7 @@ const Page = () => {
               <MdAdd className='text-xl sm:text-2xl text-[#58C8DD]' />
             </div>
             <div className='text-white mt-1 font-medium text-sm sm:text-base'>
-              Add chatAgent
+              Add ChatAgent
             </div>
           </div>
           {!errorInChatbotList &&
