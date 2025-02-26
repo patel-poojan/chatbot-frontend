@@ -165,7 +165,7 @@ const Details = ({
                     <TableCell className='text-center'>
                       <div className='flex  items-center break-all justify-center '>
                         {'lastTrainBot' in detail
-                          ? DataFormatter(detail.lastTrainBot ?? 0)
+                          ? DataFormatter(detail.lastTrainBot)
                           : ''}
                       </div>
                     </TableCell>

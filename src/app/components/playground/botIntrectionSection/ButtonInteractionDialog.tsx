@@ -104,7 +104,10 @@ const ButtonInteractionDialog = ({
     listOfPlayGroundNode && listOfPlayGroundNode.length > 0
       ? listOfPlayGroundNode
           ?.filter(
-            (node) => node.type == 'botResponseNode' || node.type == 'faqNode'
+            (node) =>
+              node.type == 'botResponseNode' ||
+              node.type == 'faqNode' ||
+              node.type == 'closeChatNode'
           )
           .map((node) => ({
             id: node.id,

@@ -50,7 +50,11 @@ export const StringToDateFormatter = (dateString: string): string => {
  * @param date - timestamp to format
  * @returns formatted date string
  */
-export const DataFormatter = (date: number): string => {
+export const DataFormatter = (date: number | null): string => {
+  if (date === null) {
+    return 'NA';
+  }
+
   const formattedDate = new Date(date).toLocaleDateString('en-GB', {
     day: 'numeric',
     month: 'long',

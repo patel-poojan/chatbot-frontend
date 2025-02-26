@@ -535,20 +535,20 @@ const MainComponent = ({ botId }: { botId: string }) => {
     }
   };
   const actionHandler = () => {
+    setChatBotDialog(false);
+    setAttributesDialog(false);
     if (actionDialog) {
-      setChatBotDialog(false);
-      setAttributesDialog(false);
       setActionDialog(false);
     } else {
       setActionDialog(true);
     }
   };
   const attributesHandler = () => {
+    setChatBotDialog(false);
+    setActionDialog(false);
     if (attributesDialog) {
       setAttributesDialog(false);
     } else {
-      setChatBotDialog(false);
-      setActionDialog(false);
       setAttributesDialog(true);
     }
   };
