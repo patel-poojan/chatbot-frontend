@@ -84,7 +84,7 @@ const ChooseWebsiteTemplate = ({
                     {scanType === 'FULLPAGE' && <IoMdCheckmark />}
                   </div>
                   <div className='text-xs sm:text-sm md:text-base font-light'>
-                    Entire content from the provided page
+                    Scans the page and all linked pages.
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem
@@ -96,7 +96,7 @@ const ChooseWebsiteTemplate = ({
                     {scanType === 'SINGLEPAGE' && <IoMdCheckmark />}
                   </div>
                   <div className='text-xs sm:text-sm md:text-base font-light'>
-                    Only single URL you provided
+                    Scans only the given page.
                   </div>
                 </DropdownMenuItem>
               </DropdownMenuContent>

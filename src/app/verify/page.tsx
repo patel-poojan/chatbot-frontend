@@ -1,7 +1,7 @@
 'use client';
 import { useResendEmail, useVerifyEmail } from '@/utils/auth-api';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { FaRegCircleCheck } from 'react-icons/fa6';
 import { LuBadgeAlert } from 'react-icons/lu';
 import { toast } from 'sonner';
@@ -14,6 +14,12 @@ const Verify = () => {
   const token = searchParams.get('token') || '';
   const emailId = searchParams.get('email') || '';
   const router = useRouter();
+  const [verificationStatus, setVerificationStatus] = useState({
+    isVerified: false,
+    isExpired: false,
+    isVerifying: false,
+  });
+
   const { mutate: verify, isPending: isPendingVerifyEmail } = useVerifyEmail({
     onSuccess(data) {
       const token = data.data.accessToken;
@@ -22,6 +28,11 @@ const Verify = () => {
         localStorage.setItem('email', data.data.user.email);
       }
       if (token) {
+        setVerificationStatus({
+          isVerified: true,
+          isExpired: false,
+          isVerifying: false,
+        });
         Cookies.set('authToken', token, {
           path: '/',
           sameSite: 'Lax',
@@ -34,6 +45,11 @@ const Verify = () => {
       toast.success(data?.message);
     },
     onError(error: axiosError) {
+      setVerificationStatus({
+        isVerified: false,
+        isExpired: true,
+        isVerifying: false,
+      });
       const errorMessage =
         error?.response?.data?.errors?.message ||
         error?.response?.data?.message ||
@@ -41,8 +57,14 @@ const Verify = () => {
       toast.error(errorMessage);
     },
   });
+
   useEffect(() => {
     if (token) {
+      setVerificationStatus({
+        isVerified: false,
+        isExpired: false,
+        isVerifying: true,
+      });
       verify(token);
     }
   }, [token, verify]);
@@ -59,6 +81,7 @@ const Verify = () => {
       toast.error(errorMessage);
     },
   });
+
   const resendEmailHandler = () => {
     if (emailId) {
       resend({ email: emailId });
@@ -66,12 +89,23 @@ const Verify = () => {
       toast.error('something went wrong');
     }
   };
+
   return (
-    <div className='min-h-dvh flex items-center justify-center  p-4'>
-      {isPendingResendEmail || isPendingVerifyEmail ? <Loader /> : <></>}
-      {token && !isPendingVerifyEmail ? (
+    <div className='min-h-dvh flex items-center justify-center p-4'>
+      {isPendingResendEmail ||
+      verificationStatus.isVerifying ||
+      isPendingVerifyEmail ||
+      verificationStatus.isVerified ? (
+        <Loader />
+      ) : null}
+
+      {!verificationStatus.isVerifying &&
+      !isPendingVerifyEmail &&
+      !verificationStatus.isVerified &&
+      token &&
+      verificationStatus.isExpired ? (
         <div
-          className='flex flex-col items-center justify-center gap-4 sm:gap-6 p-6 sm:p-8 max-w-2xl w-full bg-white  rounded-3xl text-center'
+          className='flex flex-col items-center justify-center gap-4 sm:gap-6 p-6 sm:p-8 max-w-2xl w-full bg-white rounded-3xl text-center'
           style={{ boxShadow: '0px 0px 12px 4px #00000014' }}
         >
           <LuBadgeAlert className='text-[#57C0DD] text-6xl md:text-8xl' />
@@ -89,9 +123,9 @@ const Verify = () => {
             Resend link
           </button>
         </div>
-      ) : (
+      ) : !token && !verificationStatus.isVerified ? (
         <div
-          className='flex flex-col items-center justify-center gap-4 sm:gap-6 p-6 sm:p-8 max-w-2xl w-full bg-white  rounded-3xl text-center'
+          className='flex flex-col items-center justify-center gap-4 sm:gap-6 p-6 sm:p-8 max-w-2xl w-full bg-white rounded-3xl text-center'
           style={{ boxShadow: '0px 0px 12px 4px #00000014' }}
         >
           <FaRegCircleCheck className='text-[#57C0DD] text-6xl md:text-8xl' />
@@ -100,17 +134,17 @@ const Verify = () => {
           </div>
           <div className='flex items-center gap-1'>
             <span className='text-lg md:text-xl font-normal text-[#1E255EB2]'>
-              Didn’t received link ?
+              {`Didn't received link ?`}
             </span>
             <button
-              className='text-[#57C0DD] underline underline-offset-2 cursor-pointer text-lg md:text-xl font-semibold  hover:text-[#45A9B8] transition duration-300'
+              className='text-[#57C0DD] underline underline-offset-2 cursor-pointer text-lg md:text-xl font-semibold hover:text-[#45A9B8] transition duration-300'
               onClick={resendEmailHandler}
             >
               Resend link
             </button>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 };
