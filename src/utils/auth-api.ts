@@ -106,11 +106,7 @@ export const useLogin = ({
   );
 
 // Logout Mutation
-export const useLogout = ({
-  onSuccess,
-}: {
-  onSuccess: (data: DefaultResponse) => void;
-}) =>
+export const useLogout = ({ onSuccess }: { onSuccess: (data: DefaultResponse) => void }) =>
   useAuthMutation<DefaultResponse, void>(
     ["auth", "logout"],
     () => axiosInstance.delete("/auth/logout"),
@@ -143,10 +139,9 @@ export const useVerifyEmail = ({
   onSuccess: (data: VerifyResponse) => void;
   onError?: (error: axiosError) => void;
 }) =>
-  useAuthMutation<VerifyResponse, string>(
+  useAuthMutation<VerifyResponse, { token: string; emailId: string }>(
     ["auth", "verify-email"],
-    (token: string) =>
-      axiosInstance.post(`/auth/verify-email?token=${token}`, {}),
+    ({ token, emailId }) => axiosInstance.post(`/auth/verify-email?token=${token}&email=${emailId}`, {}),
     onSuccess,
     onError
   );
@@ -161,8 +156,7 @@ export const useResendEmail = ({
 }) =>
   useAuthMutation<DefaultResponse, ResendEmailRequest>(
     ["auth", "resend-email"],
-    (data: ResendEmailRequest) =>
-      axiosInstance.post(`/auth/resend-verification-email`, data),
+    (data: ResendEmailRequest) => axiosInstance.post(`/auth/resend-verification-email`, data),
     onSuccess,
     onError
   );
@@ -177,8 +171,7 @@ export const useResetPassword = ({
 }) =>
   useAuthMutation<DefaultResponse, ResetPasswordRequest>(
     ["auth", "reset-password"],
-    (data: ResetPasswordRequest) =>
-      axiosInstance.post(`/auth/change-password`, data),
+    (data: ResetPasswordRequest) => axiosInstance.post(`/auth/change-password`, data),
     onSuccess,
     onError
   );
@@ -193,8 +186,7 @@ export const useForgetPassword = ({
 }) =>
   useAuthMutation<DefaultResponse, ForgetPasswordRequest>(
     ["auth", "forget-password"],
-    (data: ForgetPasswordRequest) =>
-      axiosInstance.post(`/auth/forgot-password`, data),
+    (data: ForgetPasswordRequest) => axiosInstance.post(`/auth/forgot-password`, data),
     onSuccess,
     onError
   );
