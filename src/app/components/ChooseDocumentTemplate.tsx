@@ -299,10 +299,10 @@ const ChooseDocumentTemplate: React.FC<DocumentTemplateProps> = ({
               <div className='flex gap-2 md:gap-3 items-center mb-2'>
                 <CgNotes className='text-xl sm:text-2xl font-bold text-[#57C0DD]' />
                 <p className='font-semibold text-black text-lg sm:text-2xl'>
-                  Document{' '}
-                  <span className='text-sm sm:text-2xl'>
+                  Document
+                  {/* <span className='text-sm sm:text-2xl'>
                     {optional ? '(Optional)' : ''}
-                  </span>
+                  </span> */}
                 </p>
               </div>
               <p className='font-normal text-black text-sm sm:text-base'>
