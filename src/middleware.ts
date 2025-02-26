@@ -4,6 +4,7 @@ import { NextResponse, NextRequest } from "next/server";
 export default function middleware(request: NextRequest) {
   const pathName = request.nextUrl.pathname;
 
+  console.log("pathName", pathName);
   // Allow access to specific routes without authentication
   const publicPaths = ["/privacy-policy.pdf", "/terms-of-use.pdf"];
 
