@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { Input } from "@/components/ui/input";
-import { IBDA, ISubcategory } from "@/types/BDA";
+import { IBDA, ISubcategory, IUpdateQuestion } from "@/types/BDA";
 import { RiDeleteBinLine } from "react-icons/ri";
 
 type FetchIndustryListResponse = {
@@ -40,6 +40,7 @@ const ChooseIndustryTemplate = ({
   adminAction?: boolean;
 }) => {
   const router = useRouter();
+  const [loader, setLoader] = useState(false);
   const [openIndustryPopup, setOpenIndustryPopup] = useState(false);
   const [industryValue, setIndustryValue] = useState("");
   const [openSubIndustryPopup, setOpenSubIndustryPopup] = useState(false);
@@ -79,6 +80,7 @@ const ChooseIndustryTemplate = ({
   const {
     data: IndustryList,
     isLoading: loadIndustryList,
+    isFetching: fetchingIndustryList,
     isError: errorInIndustryList,
     refetch: refetchIndustryList,
   } = useQuery({
@@ -103,15 +105,21 @@ const ChooseIndustryTemplate = ({
       toast.warning("Please enter correct data");
       return;
     }
+    setLoader(true);
     axiosInstance
       .post(`/bda/categories`, body)
       .then(() => {
         setOpenAddIndustry(false);
         setindustry("");
         refetchIndustryList();
+        setLoader(false);
       })
       .catch((err) => {
         toast.error(err?.response?.data?.message);
+        setLoader(false);
+      })
+      .finally(() => {
+        setLoader(false);
       });
   };
 
@@ -120,6 +128,7 @@ const ChooseIndustryTemplate = ({
       toast.warning("Please enter correct data");
       return;
     }
+    setLoader(true);
     axiosInstance
       .delete(`/bda/categories/${body.category}`)
       .then(() => {
@@ -131,9 +140,11 @@ const ChooseIndustryTemplate = ({
           setSubIndustryValue("");
           setInputs([]);
         }
+        setLoader(false);
       })
       .catch((err) => {
         toast.error(err?.response?.data?.message);
+        setLoader(false);
       });
   };
 
@@ -142,24 +153,27 @@ const ChooseIndustryTemplate = ({
       toast.warning("Please enter correct data");
       return;
     }
+    setLoader(true);
     axiosInstance
       .post(`/bda/subcategories`, body)
       .then(() => {
         setOpenAddSubIndustry(false);
         setsubIndustry("");
         refetchIndustryList();
+        setLoader(false);
       })
       .catch((err) => {
         toast.error(err?.response?.data?.message);
+        setLoader(false);
       });
   };
 
   const deleteSubIndustry = async (body: ISubcategory) => {
-    console.log(body);
     if (body.category == "" || body.subcategory == "") {
       toast.warning("Please enter correct data");
       return;
     }
+    setLoader(true);
     axiosInstance
       .put(`/bda/subcategories/delete`, body)
       .then(() => {
@@ -168,22 +182,20 @@ const ChooseIndustryTemplate = ({
           setSubIndustryValue("");
           setInputs([]);
         }
+        setLoader(false);
       })
       .catch((err) => {
         toast.error(err?.response?.data?.message);
+        setLoader(false);
       });
   };
 
   const updateQuestion = async () => {
     const questions = inputs.filter((input) => input.value !== "").map((input) => input.value);
-    const body: IBDA = {
+    const body: IUpdateQuestion = {
       category: industryValue,
-      subcategories: [
-        {
-          subcategory: subIndustryValue,
-          questions,
-        },
-      ],
+      subcategory: subIndustryValue,
+      questions,
     };
     const category = IndustryList?.find((industry) => industry.category == body.category);
     if (body.category == "" && !category) {
@@ -194,13 +206,17 @@ const ChooseIndustryTemplate = ({
       toast.warning("Please enter atleast one question");
       return;
     }
+    setLoader(true);
     await axiosInstance
       .put(`/bda/categories/${category?.id}`, body)
       .then(() => {
+        refetchIndustryList();
         toast.success("BDA Updated successfuly");
+        setLoader(false);
       })
       .catch((err) => {
         toast.error(err?.response?.data?.message);
+        setLoader(false);
       });
   };
 
@@ -240,7 +256,7 @@ const ChooseIndustryTemplate = ({
   return (
     <>
       <div className={`w-full ${!adminAction && "max-w-7xl"} flex-1 mx-auto h-auto flex flex-col`}>
-        {loadIndustryList && <Loader />}
+        {(loadIndustryList || fetchingIndustryList || loader) && <Loader />}
         <div className="flex justify-between items-center gap-3 mb-2">
           <div className="flex justify-between flex-col">
             <div className="text-lg md:text-xl font-semibold text-black">Select your industry</div>
