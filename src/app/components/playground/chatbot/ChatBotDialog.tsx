@@ -196,7 +196,7 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
       saveContact({
         chatbotId: chatbotId as string,
         name,
-        email,
+        email: email.toLowerCase(),
         number,
       });
     }
