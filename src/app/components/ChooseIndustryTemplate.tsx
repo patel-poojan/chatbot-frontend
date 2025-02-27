@@ -28,7 +28,17 @@ type FetchIndustryListResponse = {
     subcategories: string[];
   }[];
 };
-const ChooseIndustryTemplate = ({ up, adminAction = false }: { up: () => void; adminAction?: boolean }) => {
+const ChooseIndustryTemplate = ({
+  up,
+  setSubIndustry,
+  setIndustry,
+  adminAction = false,
+}: {
+  up: () => void;
+  setIndustry: React.Dispatch<React.SetStateAction<string>>;
+  setSubIndustry: React.Dispatch<React.SetStateAction<string>>;
+  adminAction?: boolean;
+}) => {
   const router = useRouter();
   const [openIndustryPopup, setOpenIndustryPopup] = useState(false);
   const [industryValue, setIndustryValue] = useState("");
@@ -82,6 +92,8 @@ const ChooseIndustryTemplate = ({ up, adminAction = false }: { up: () => void; a
     } else if (!subIndustryValue) {
       toast.warning("Please select sub industry");
     } else {
+      setIndustry(industryValue);
+      setSubIndustry(subIndustryValue);
       up();
     }
   };

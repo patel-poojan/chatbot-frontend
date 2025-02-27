@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import ChooseIndustryTemplate from "@/app/components/ChooseIndustryTemplate";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,8 @@ import { axiosInstance } from "@/utils/axiosInstance";
 import { toast } from "sonner";
 
 const BDA = () => {
+  const [industry, setIndustry] = useState<string>("");
+  const [subIndustry, setSubIndustry] = useState<string>("");
   const [openBulkUpdate, setOpenBulkUpdate] = useState(false);
   const [csvData, setCsvData] = useState<unknown[]>([]);
 
@@ -108,7 +111,12 @@ const BDA = () => {
         </div>
 
         <div className="flex-1 flex flex-col overflow-auto">
-          <ChooseIndustryTemplate up={() => {}} adminAction={true} />
+          <ChooseIndustryTemplate
+            up={() => {}}
+            setIndustry={setIndustry}
+            setSubIndustry={setSubIndustry}
+            adminAction={true}
+          />
           <div className="flex md:hidden gap-4 items-center ">
             <Button
               type="button"
