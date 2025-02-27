@@ -85,28 +85,6 @@ export default function RootLayout({
         <>
           <ClientProvider>{children}</ClientProvider>
         </>
-        <script defer src="https://cdn.tailwindcss.com"></script>
-        <script defer src="https://c20.live/script/chatbot-embed.js"></script>
-        <script
-          defer
-          dangerouslySetInnerHTML={{
-            __html: `
-        document.addEventListener('DOMContentLoaded', function() {
-          if (window.initializeChatbot) {
-            window.initializeChatbot("67bf061af31f2a6852e74967");
-            return;
-          }
-          const checkInitialize = setInterval(function() {
-            if (window.initializeChatbot) {
-              window.initializeChatbot("67bf061af31f2a6852e74967");
-              clearInterval(checkInitialize);
-            }
-          }, 100);
-          setTimeout(() => clearInterval(checkInitialize), 10000);
-        });
-      `,
-          }}
-        />
       </body>
     </html>
   );
