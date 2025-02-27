@@ -10,8 +10,10 @@ import React, { useState } from "react";
 import Papa from "papaparse";
 import { axiosInstance } from "@/utils/axiosInstance";
 import { toast } from "sonner";
+import { Loader } from "@/app/components/Loader";
 
 const BDA = () => {
+  const [loader, setLoader] = useState(false);
   const [industry, setIndustry] = useState<string>("");
   const [subIndustry, setSubIndustry] = useState<string>("");
   const [openBulkUpdate, setOpenBulkUpdate] = useState(false);
@@ -70,23 +72,29 @@ const BDA = () => {
       return;
     }
 
+    setLoader(true);
     try {
-      const response = await axiosInstance.put("/bda/bulk-update", {
+      const response: { success: boolean; message: string } = await axiosInstance.put("/bda/bulk-update", {
         data: csvData,
       });
-      if (response.data.success) {
+      if (response.success) {
+        setOpenBulkUpdate(false);
         toast.success("Bulk update successful!");
       } else {
         toast.error("Bulk update failed.");
       }
+      setLoader(false);
     } catch (error) {
       console.error("Bulk update error:", error);
       toast.error("An error occurred during bulk update.");
+      setLoader(false);
     }
   };
 
   return (
     <>
+      {loader && <Loader />}
+
       <div className="flex flex-1 overflow-hidden flex-col max-[500px]:p-4 gap-4 sm:gap-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <p className="max-[500px]:text-xl text-2xl font-semibold text-black ">BDA Questions</p>
@@ -142,7 +150,7 @@ const BDA = () => {
       <Dialog open={openBulkUpdate}>
         <DialogContent overlayOnClick={() => setOpenBulkUpdate(false)}>
           <DialogHeader>
-            <DialogTitle>Add Sub Industry</DialogTitle>
+            <DialogTitle>Bulk Update</DialogTitle>
             <DialogClose
               className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
               onClick={() => {
