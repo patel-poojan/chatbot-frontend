@@ -155,6 +155,7 @@ const ChooseIndustryTemplate = ({
   };
 
   const deleteSubIndustry = async (body: ISubcategory) => {
+    console.log(body);
     if (body.category == "" || body.subcategory == "") {
       toast.warning("Please enter correct data");
       return;
@@ -318,7 +319,9 @@ const ChooseIndustryTemplate = ({
                         {adminAction && (
                           <RiDeleteBinLine
                             className="text-red-600 ml-auto cursor-pointer"
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              e.preventDefault();
                               deleteIndustry({ category: Industry.id! });
                             }}
                           />
@@ -389,7 +392,7 @@ const ChooseIndustryTemplate = ({
                             onClick={(e) => {
                               e.stopPropagation();
                               e.preventDefault();
-                              deleteSubIndustry({ category: industryValue, subcategory: subIndustryValue });
+                              deleteSubIndustry({ category: industryValue, subcategory: subIndustry });
                             }}
                           />
                         )}
