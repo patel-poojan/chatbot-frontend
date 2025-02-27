@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { Input } from "@/components/ui/input";
-import { IBDA, ISubcategory, IUpdateQuestion } from "@/types/BDA";
+import { IBDA, IDeletecategory, ISubcategory, IUpdateQuestion } from "@/types/BDA";
 import { RiDeleteBinLine } from "react-icons/ri";
 
 type FetchIndustryListResponse = {
@@ -123,14 +123,14 @@ const ChooseIndustryTemplate = ({
       });
   };
 
-  const deleteIndustry = async (body: IBDA) => {
-    if (body.category == "") {
+  const deleteIndustry = async (body: IDeletecategory) => {
+    if (body.categoryID == "") {
       toast.warning("Please enter correct data");
       return;
     }
     setLoader(true);
     axiosInstance
-      .delete(`/bda/categories/${body.category}`)
+      .delete(`/bda/categories/${body.categoryID}`)
       .then(() => {
         setOpenAddIndustry(false);
         setindustry("");
@@ -338,7 +338,7 @@ const ChooseIndustryTemplate = ({
                             onClick={(e) => {
                               e.stopPropagation();
                               e.preventDefault();
-                              deleteIndustry({ category: Industry.id! });
+                              deleteIndustry({ categoryID: Industry.id!, category: Industry.category });
                             }}
                           />
                         )}

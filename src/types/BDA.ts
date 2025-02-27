@@ -11,6 +11,11 @@ export interface ISubcategory {
   subcategory: string;
 }
 
+export interface IDeletecategory {
+  category: string;
+  categoryID: string;
+}
+
 export interface IUpdateQuestion {
   category: string;
   subcategory: string;
