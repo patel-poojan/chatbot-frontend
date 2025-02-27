@@ -64,7 +64,7 @@ const SignupForm = () => {
       } else if (!conditionChecker) {
         toast.warning("Please accept the terms and conditions");
       } else {
-        onSignup({ username: name, email: emailId, password });
+        onSignup({ username: name, email: emailId.toLowerCase(), password });
       }
     },
     [name, emailId, password, conditionChecker, onSignup]

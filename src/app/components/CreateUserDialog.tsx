@@ -91,7 +91,7 @@ const CreateUserDialog = ({
         if (type === 'user') {
           onAdd({
             username: name,
-            email: emailId,
+            email: emailId.toLowerCase(),
             password: password,
             role: 'user',
             permissionIds: [],
