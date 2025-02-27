@@ -17,6 +17,17 @@ import { Cross2Icon } from "@radix-ui/react-icons";
 import { Input } from "@/components/ui/input";
 import { IBDA, IDeletecategory, ISubcategory, IUpdateQuestion } from "@/types/BDA";
 import { RiDeleteBinLine } from "react-icons/ri";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 type FetchIndustryListResponse = {
   message: string;
@@ -49,6 +60,14 @@ const ChooseIndustryTemplate = ({
   const [openAddSubIndustry, setOpenAddSubIndustry] = useState(false);
   const [industry, setindustry] = useState<string>("");
   const [subIndustry, setsubIndustry] = useState<string>("");
+  const [industryAlert, setIndustryAlert] = useState({
+    open: false,
+    data: { categoryID: "", category: "" },
+  });
+  const [subIndustryAlert, setSubIndustryAlert] = useState({
+    open: false,
+    data: { category: "", subcategory: "" },
+  });
 
   // Initialize state with a single input field
   const [inputs, setInputs] = useState([{ id: 1, value: "" }]);
@@ -132,6 +151,10 @@ const ChooseIndustryTemplate = ({
     axiosInstance
       .delete(`/bda/categories/${body.categoryID}`)
       .then(() => {
+        setIndustryAlert({
+          open: false,
+          data: { categoryID: "", category: "" },
+        });
         setOpenAddIndustry(false);
         setindustry("");
         refetchIndustryList();
@@ -178,6 +201,10 @@ const ChooseIndustryTemplate = ({
       .put(`/bda/subcategories/delete`, body)
       .then(() => {
         refetchIndustryList();
+        setSubIndustryAlert({
+          open: false,
+          data: { category: "", subcategory: "" },
+        });
         if (subIndustryValue == body.subcategory) {
           setSubIndustryValue("");
           setInputs([]);
@@ -323,6 +350,7 @@ const ChooseIndustryTemplate = ({
                           setSubIndustryValue("");
                           setIndustryValue(currentValue === industryValue ? "" : currentValue);
                           setOpenIndustryPopup(false);
+                          setInputs([]);
                         }}
                       >
                         <Check
@@ -338,7 +366,11 @@ const ChooseIndustryTemplate = ({
                             onClick={(e) => {
                               e.stopPropagation();
                               e.preventDefault();
-                              deleteIndustry({ categoryID: Industry.id!, category: Industry.category });
+                              setIndustryAlert({
+                                open: true,
+                                data: { categoryID: Industry.id!, category: Industry.category },
+                              });
+                              // deleteIndustry({ categoryID: Industry.id!, category: Industry.category });
                             }}
                           />
                         )}
@@ -408,7 +440,11 @@ const ChooseIndustryTemplate = ({
                             onClick={(e) => {
                               e.stopPropagation();
                               e.preventDefault();
-                              deleteSubIndustry({ category: industryValue, subcategory: subIndustry });
+                              setSubIndustryAlert({
+                                open: true,
+                                data: { category: industryValue, subcategory: subIndustry },
+                              });
+                              // deleteSubIndustry({ category: industryValue, subcategory: subIndustry });
                             }}
                           />
                         )}
@@ -529,6 +565,66 @@ const ChooseIndustryTemplate = ({
           </Button>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Industry confirm alert */}
+      <AlertDialog open={industryAlert.open}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Industry <b>{industryAlert.data.category}</b> will be deleted. You will lose all the data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() =>
+                setIndustryAlert({
+                  open: false,
+                  data: { categoryID: "", category: "" },
+                })
+              }
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-500 hover:bg-red-700"
+              onClick={() => deleteIndustry(industryAlert.data)}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Sub-Industry confirm alert */}
+      <AlertDialog open={subIndustryAlert.open}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              SubIndustry <b>{subIndustryAlert.data.subcategory}</b> will be deleted. You will lose all the data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() =>
+                setSubIndustryAlert({
+                  open: false,
+                  data: { category: "", subcategory: "" },
+                })
+              }
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-500 hover:bg-red-700"
+              onClick={() => deleteSubIndustry(subIndustryAlert.data)}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

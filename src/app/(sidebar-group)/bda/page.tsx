@@ -18,6 +18,7 @@ const BDA = () => {
   const [subIndustry, setSubIndustry] = useState<string>("");
   const [openBulkUpdate, setOpenBulkUpdate] = useState(false);
   const [csvData, setCsvData] = useState<unknown[]>([]);
+  const [renderTrigger, setRenderTrigger] = useState(0); // State variable to trigger re-render
 
   // Sample data for the CSV file
   const sampleData = [
@@ -80,6 +81,7 @@ const BDA = () => {
       if (response.success) {
         setOpenBulkUpdate(false);
         toast.success("Bulk update successful!");
+        setRenderTrigger((prev) => prev + 1); // Update the render trigger state
       } else {
         toast.error("Bulk update failed.");
       }
@@ -120,6 +122,7 @@ const BDA = () => {
 
         <div className="flex-1 flex flex-col overflow-auto">
           <ChooseIndustryTemplate
+            key={renderTrigger} // Use the render trigger state as the key
             up={() => {}}
             setIndustry={setIndustry}
             setSubIndustry={setSubIndustry}
