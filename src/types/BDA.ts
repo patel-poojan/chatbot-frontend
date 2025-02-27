@@ -5,3 +5,8 @@ export interface IBDA {
     questions: string[];
   }[];
 }
+
+export interface ISubcategory {
+  category: string;
+  subcategory: string;
+}

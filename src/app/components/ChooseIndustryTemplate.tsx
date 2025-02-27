@@ -15,7 +15,8 @@ import { toast } from "sonner";
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { Input } from "@/components/ui/input";
-import { IBDA } from "@/types/BDA";
+import { IBDA, ISubcategory } from "@/types/BDA";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 type FetchIndustryListResponse = {
   message: string;
@@ -27,17 +28,7 @@ type FetchIndustryListResponse = {
     subcategories: string[];
   }[];
 };
-const ChooseIndustryTemplate = ({
-  up,
-  setSubIndustry,
-  setIndustry,
-  adminAction = false,
-}: {
-  up: () => void;
-  setIndustry: React.Dispatch<React.SetStateAction<string>>;
-  setSubIndustry: React.Dispatch<React.SetStateAction<string>>;
-  adminAction?: boolean;
-}) => {
+const ChooseIndustryTemplate = ({ up, adminAction = false }: { up: () => void; adminAction?: boolean }) => {
   const router = useRouter();
   const [openIndustryPopup, setOpenIndustryPopup] = useState(false);
   const [industryValue, setIndustryValue] = useState("");
@@ -69,8 +60,6 @@ const ChooseIndustryTemplate = ({
   const fetchIndustry = async () => {
     const response: FetchIndustryListResponse = await axiosInstance.get(`/bda/get-category`);
     if (response.data.length >= 0) {
-      // setIndustryValue(response.data[0].category);
-      // setSubIndustryValue(response.data[0].subcategories[0]);
       return response.data;
     } else {
       return [];
@@ -81,6 +70,7 @@ const ChooseIndustryTemplate = ({
     data: IndustryList,
     isLoading: loadIndustryList,
     isError: errorInIndustryList,
+    refetch: refetchIndustryList,
   } = useQuery({
     queryKey: ["Industries", "List"],
     queryFn: fetchIndustry,
@@ -92,49 +82,83 @@ const ChooseIndustryTemplate = ({
     } else if (!subIndustryValue) {
       toast.warning("Please select sub industry");
     } else {
-      setIndustry(industryValue);
-      setSubIndustry(subIndustryValue);
       up();
     }
   };
 
   const addIndustry = async (body: IBDA) => {
     if (body.category == "") {
-      toast.warning("PLease enter correct data");
+      toast.warning("Please enter correct data");
       return;
     }
-    axiosInstance.post(`/bda/categories`, body).then(() => {
-      setOpenAddIndustry(false);
-      setindustry("");
-    });
-
-    // if (response.data.length >= 0) {
-    //   setIndustryValue(response.data[0].category);
-    //   setSubIndustryValue(response.data[0].subcategories[0]);
-    //   return response.data;
-    // } else {
-    //   return [];
-    // }
+    axiosInstance
+      .post(`/bda/categories`, body)
+      .then(() => {
+        setOpenAddIndustry(false);
+        setindustry("");
+        refetchIndustryList();
+      })
+      .catch((err) => {
+        toast.error(err?.response?.data?.message);
+      });
   };
 
-  const updateIndustry = async (body: IBDA) => {
-    const category = IndustryList?.find((industry) => industry.category == body.category);
-
-    if (body.category == "" && !category) {
-      toast.warning("PLease enter correct data");
+  const deleteIndustry = async (body: IBDA) => {
+    if (body.category == "") {
+      toast.warning("Please enter correct data");
       return;
     }
-    await axiosInstance.put(`/bda/categories/${category?.id}`, body).then(() => {
-      setOpenAddSubIndustry(false);
-      setsubIndustry("");
-    });
-    // if (response.data.length >= 0) {
-    //   setIndustryValue(response.data[0].category);
-    //   setSubIndustryValue(response.data[0].subcategories[0]);
-    //   return response.data;
-    // } else {
-    //   return [];
-    // }
+    axiosInstance
+      .delete(`/bda/categories/${body.category}`)
+      .then(() => {
+        setOpenAddIndustry(false);
+        setindustry("");
+        refetchIndustryList();
+        if (industryValue == body.category) {
+          setIndustryValue("");
+          setSubIndustryValue("");
+          setInputs([]);
+        }
+      })
+      .catch((err) => {
+        toast.error(err?.response?.data?.message);
+      });
+  };
+
+  const addSubCategory = async (body: ISubcategory) => {
+    if (body.category == "" || body.subcategory == "") {
+      toast.warning("Please enter correct data");
+      return;
+    }
+    axiosInstance
+      .post(`/bda/subcategories`, body)
+      .then(() => {
+        setOpenAddSubIndustry(false);
+        setsubIndustry("");
+        refetchIndustryList();
+      })
+      .catch((err) => {
+        toast.error(err?.response?.data?.message);
+      });
+  };
+
+  const deleteSubIndustry = async (body: ISubcategory) => {
+    if (body.category == "" || body.subcategory == "") {
+      toast.warning("Please enter correct data");
+      return;
+    }
+    axiosInstance
+      .put(`/bda/subcategories/delete`, body)
+      .then(() => {
+        refetchIndustryList();
+        if (subIndustryValue == body.subcategory) {
+          setSubIndustryValue("");
+          setInputs([]);
+        }
+      })
+      .catch((err) => {
+        toast.error(err?.response?.data?.message);
+      });
   };
 
   const updateQuestion = async () => {
@@ -157,9 +181,14 @@ const ChooseIndustryTemplate = ({
       toast.warning("Please enter atleast one question");
       return;
     }
-    await axiosInstance.put(`/bda/categories/${category?.id}`, body).then(() => {
-      toast.success("BDA Updated successfuly");
-    });
+    await axiosInstance
+      .put(`/bda/categories/${category?.id}`, body)
+      .then(() => {
+        toast.success("BDA Updated successfuly");
+      })
+      .catch((err) => {
+        toast.error(err?.response?.data?.message);
+      });
   };
 
   type FetchBDAQuestionListResponse = {
@@ -171,7 +200,6 @@ const ChooseIndustryTemplate = ({
     };
   };
 
-  // const [questionAnswer, setQuestionAnswer] = useState<{ question: string; answer: string }[]>([]);
   const fetchBDAQuestion = async () => {
     const response: FetchBDAQuestionListResponse = await axiosInstance.post(`/bda/questions`, {
       category: industryValue,
@@ -263,7 +291,7 @@ const ChooseIndustryTemplate = ({
                         key={Industry.category}
                         value={Industry.category}
                         onSelect={(currentValue) => {
-                          // setSubIndustryValue(Industry.subcategories[0]);
+                          setSubIndustryValue("");
                           setIndustryValue(currentValue === industryValue ? "" : currentValue);
                           setOpenIndustryPopup(false);
                         }}
@@ -275,6 +303,14 @@ const ChooseIndustryTemplate = ({
                           )}
                         />
                         {Industry.category}
+                        {adminAction && (
+                          <RiDeleteBinLine
+                            className="text-red-600 ml-auto cursor-pointer"
+                            onClick={() => {
+                              deleteIndustry({ category: Industry.id! });
+                            }}
+                          />
+                        )}
                       </CommandItem>
                     ))}
                 </CommandGroup>
@@ -309,7 +345,7 @@ const ChooseIndustryTemplate = ({
               <CommandList className="max-h-[120px] md:max-h-[250px] overflow-scroll">
                 <CommandEmpty>No subindustry found.</CommandEmpty>
                 <CommandGroup>
-                  {adminAction && (
+                  {adminAction && industryValue !== "" && (
                     <Button
                       className="flex gap-4 bg-primary px-2 py-0 w-full hover:bg-primary mb-2 justify-start"
                       onClick={() => {
@@ -335,6 +371,16 @@ const ChooseIndustryTemplate = ({
                           className={cn("mr-2 h-4 w-4", subIndustryValue === subIndustry ? "opacity-100" : "opacity-0")}
                         />
                         {subIndustry}
+                        {adminAction && (
+                          <RiDeleteBinLine
+                            className="text-red-600 ml-auto cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              e.preventDefault();
+                              deleteSubIndustry({ category: industryValue, subcategory: subIndustryValue });
+                            }}
+                          />
+                        )}
                       </CommandItem>
                     ))}
                 </CommandGroup>
@@ -349,10 +395,10 @@ const ChooseIndustryTemplate = ({
           </div>
         )}
         {adminAction && inputs && subIndustryValue && industryValue && (
-          <div className="mt-4 md:mt-6 px-1">
+          <div className="mt-4 md:mt-6 px-1 flex flex-col items-end w-full">
             <div className="text-lg md:text-xl mb-3 font-semibold text-black">Questions</div>
             {inputs.map((input, index) => (
-              <div className="flex gap-3" key={input.id}>
+              <div className="flex gap-3 w-full" key={input.id}>
                 <Input
                   type="text"
                   value={input.value}
@@ -360,24 +406,21 @@ const ChooseIndustryTemplate = ({
                   placeholder={`Question ${index + 1}`}
                   style={{ display: "block", marginBottom: "8px" }}
                 />
-                {index == inputs.length - 1 ? (
-                  <Button onClick={addInput} className="hover:bg-primary">
-                    <FaPlus />
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={() => {
-                      deleteInput(input.id);
-                    }}
-                    className="hover:bg-primary"
-                  >
-                    <FaMinus />
-                  </Button>
-                )}
+                <Button
+                  onClick={() => {
+                    deleteInput(input.id);
+                  }}
+                  className="hover:bg-primary"
+                >
+                  <FaMinus />
+                </Button>
               </div>
             ))}
-            <div className="flex gap-4">
-              <Button onClick={updateQuestion} className="min-w-32 hover:bg-[#53ABDC] bg-[#53ABDC]">
+            <Button onClick={addInput} className="hover:bg-primary mb-2 !w-40 ml-auto">
+              <FaPlus />
+            </Button>
+            <div className="flex gap-4 ml-auto">
+              <Button onClick={updateQuestion} className="min-w-40 hover:bg-[#53ABDC] bg-[#53ABDC]">
                 Submit
               </Button>
             </div>
@@ -444,16 +487,11 @@ const ChooseIndustryTemplate = ({
           <Button
             className="hover:bg-primary"
             onClick={() => {
-              const body: IBDA = {
+              const body: ISubcategory = {
                 category: industryValue,
-                subcategories: [
-                  {
-                    subcategory: subIndustry,
-                    questions: [],
-                  },
-                ],
+                subcategory: subIndustry,
               };
-              updateIndustry(body);
+              addSubCategory(body);
             }}
           >
             Submit
