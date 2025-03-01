@@ -22,7 +22,6 @@ const ChatbotTrainTemplate = ({ type, botId }: { type: string; botId: string }) 
       setWebsiteStep(websiteStep + 1);
     } else {
       if (websiteStep === 0) {
-        router.replace(`/create/${type}/${botId}?step=1`);
       } else {
         setWebsiteStep(websiteStep - 1);
       }

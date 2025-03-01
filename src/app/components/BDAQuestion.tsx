@@ -31,18 +31,12 @@ const BDAQuestion = ({
   industry,
   subIndustry,
   chatBotId,
-  haveData,
-  changed,
-  questionData,
 }: {
   down: () => void;
   type: string;
   industry: string;
   subIndustry: string;
   chatBotId: string;
-  haveData: boolean;
-  changed: boolean;
-  questionData: IQuestionData[];
 }) => {
   const [questionAnswer, setQuestionAnswer] = useState<{ question: string; answer: string }[]>([]);
 
@@ -73,7 +67,7 @@ const BDAQuestion = ({
   } = useQuery({
     queryKey: ["BDAQuestion", "List"],
     queryFn: fetchBDAQuestion,
-    enabled: haveData && !changed ? false : industry && subIndustry ? true : false,
+    enabled: industry && subIndustry ? true : false,
   });
 
   useEffect(() => {
@@ -107,14 +101,6 @@ const BDAQuestion = ({
       router.replace(path);
     }
   };
-
-  useEffect(() => {
-    if (haveData && !changed) {
-      setQuestionAnswer(questionData);
-    } else if (haveData && changed) {
-      setQuestionAnswer([]);
-    }
-  }, [haveData, changed, questionData]);
 
   return (
     <div className="w-full max-w-7xl flex-1 mx-auto h-auto flex flex-col">
