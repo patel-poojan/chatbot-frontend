@@ -40,13 +40,23 @@ type FetchIndustryListResponse = {
 };
 const ChooseIndustryTemplate = ({
   up,
+  defaultSubIndustry,
   setSubIndustry,
+  defaultIndustry,
   setIndustry,
+  haveData,
+  changed,
+  setChanged,
   adminAction = false,
 }: {
   up: () => void;
+  defaultSubIndustry: string;
   setIndustry: React.Dispatch<React.SetStateAction<string>>;
+  defaultIndustry: string;
   setSubIndustry: React.Dispatch<React.SetStateAction<string>>;
+  haveData: boolean;
+  changed: boolean;
+  setChanged: React.Dispatch<React.SetStateAction<boolean>>;
   adminAction?: boolean;
 }) => {
   const router = useRouter();
@@ -274,10 +284,17 @@ const ChooseIndustryTemplate = ({
   };
 
   useEffect(() => {
-    if (industryValue !== "" && subIndustryValue !== "") {
+    if (industryValue !== "" && subIndustryValue !== "" && adminAction) {
       fetchBDAQuestion();
     }
   }, [subIndustryValue]);
+
+  useEffect(() => {
+    if (haveData && !changed) {
+      setIndustryValue(defaultIndustry);
+      setSubIndustryValue(defaultSubIndustry);
+    }
+  }, [haveData, changed, defaultIndustry, defaultSubIndustry]);
 
   return (
     <>
@@ -347,6 +364,7 @@ const ChooseIndustryTemplate = ({
                         value={Industry.category}
                         onSelect={(currentValue) => {
                           setSubIndustryValue("");
+                          changed && setChanged(true);
                           setIndustryValue(currentValue === industryValue ? "" : currentValue);
                           setOpenIndustryPopup(false);
                           setInputs([]);
@@ -425,6 +443,7 @@ const ChooseIndustryTemplate = ({
                         key={subIndustry}
                         value={subIndustry}
                         onSelect={(currentValue) => {
+                          changed && setChanged(true);
                           setSubIndustryValue(currentValue === subIndustryValue ? "" : currentValue);
                           setOpenSubIndustryPopup(false);
                         }}
