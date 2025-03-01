@@ -9,20 +9,17 @@ import { Input } from '@/components/ui/input';
 import React, { useState } from 'react';
 import { IoIosArrowDown, IoIosArrowUp, IoMdCheckmark } from 'react-icons/io';
 import { TfiWorld } from 'react-icons/tfi';
-import AlertDialog from './AlertDialog';
 import { toast } from 'sonner';
 import { isValidUrl } from '@/utils/validator';
 
 const ChooseWebsiteTemplate = ({
   websiteStepHandler,
-  botId,
   scanType,
   websiteUrl,
   setWebsiteUrl,
   setScanType,
 }: {
   websiteStepHandler: (type: 'up' | 'down') => void;
-  botId: string;
   scanType: string;
   websiteUrl: string;
   setWebsiteUrl: React.Dispatch<React.SetStateAction<string>>;
@@ -110,7 +107,7 @@ const ChooseWebsiteTemplate = ({
       </div>
 
       <div className='mt-6 sm:mt-0  sm:ms-auto flex  items-center gap-4'>
-        <AlertDialog
+        {/* <AlertDialog
           botId={botId}
           trigger={
             <Button
@@ -120,8 +117,13 @@ const ChooseWebsiteTemplate = ({
               Go Back
             </Button>
           }
-        />
-
+        /> */}
+        <Button
+          className='w-full sm:w-auto px-8 py-2 sm:px-11 border border-[#57C0DD] bg-transparent text-[#57C0DD] hover:bg-transparent'
+          onClick={() => websiteStepHandler('down')}
+        >
+          Go Back
+        </Button>
         <Button
           className='w-full sm:w-auto px-8 py-2 sm:px-11 border bg-gradient-to-r hover:from-[#53A7DD] hover:to-[#58C8DD]  from-[#58C8DD] to-[#53A7DD] hover:bg-transparent'
           onClick={() => continueHandler()}
