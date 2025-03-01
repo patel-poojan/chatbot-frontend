@@ -1,31 +1,28 @@
-'use client';
-import React, { useState } from 'react';
-import ChooseWebsiteTemplate from './ChooseWebsiteTemplate';
-import ChooseDocumentTemplate from './ChooseDocumentTemplate';
-import TuneChatbot from './TuneChatbot';
+"use client";
+import React, { useState } from "react";
+import ChooseWebsiteTemplate from "./ChooseWebsiteTemplate";
+import ChooseDocumentTemplate from "./ChooseDocumentTemplate";
+import TuneChatbot from "./TuneChatbot";
+import { useRouter } from "next/navigation";
 
 // import { useRouter } from "next/navigation";
 
-const ChatbotTrainTemplate = ({
-  type,
-  botId,
-}: {
-  type: string;
-  botId: string;
-}) => {
+const ChatbotTrainTemplate = ({ type, botId }: { type: string; botId: string }) => {
+  const router = useRouter();
   const [step, setStep] = useState(0);
   const [websiteStep, setWebsiteStep] = useState(0);
-  const [websiteUrl, setWebsiteUrl] = useState<string>('');
-  const [scanType, setScanType] = useState<string>('SINGLEPAGE');
+  const [websiteUrl, setWebsiteUrl] = useState<string>("");
+  const [scanType, setScanType] = useState<string>("SINGLEPAGE");
   const [files, setFiles] = useState<File[]>([]);
   const stepHandler = () => {
     setStep(step + 1);
   };
-  const websiteStepHandler = (type: string) => {
-    if (type === 'up') {
+  const websiteStepHandler = (Type: string) => {
+    if (Type === "up") {
       setWebsiteStep(websiteStep + 1);
     } else {
       if (websiteStep === 0) {
+        router.replace(`/create/${type}/${botId}?step=1`);
       } else {
         setWebsiteStep(websiteStep - 1);
       }
@@ -49,34 +46,32 @@ const ChatbotTrainTemplate = ({
   // }, []);
 
   return (
-    <div className='w-full  max-w-7xl flex-1 mx-auto h-auto flex flex-col gap-4 md:gap-6'>
-      <div className='w-fit md:mx-5 mx-auto'>
-        <div className='flex items-center gap-1 px-9'>
-          <div className='rounded-full p-2 w-8 h-8 flex items-center justify-center blue-gradient text-white'>
-            1
-          </div>
+    <div className="w-full  max-w-7xl flex-1 mx-auto h-auto flex flex-col gap-4 md:gap-6">
+      <div className="w-fit md:mx-5 mx-auto">
+        <div className="flex items-center gap-1 px-9">
+          <div className="rounded-full p-2 w-8 h-8 flex items-center justify-center blue-gradient text-white">1</div>
           <div
             className={`w-24 sm:w-64 h-px border ${
-              step === 1 ? 'border-[#57C0DD]' : 'border-[#CCCCCC]'
+              step === 1 ? "border-[#57C0DD]" : "border-[#CCCCCC]"
             }  border-dashed `}
           ></div>
           <div
             className={`rounded-full p-2 w-8 h-8 flex items-center justify-center ${
-              step === 1 ? 'blue-gradient' : 'bg-[#CCCCCC]'
+              step === 1 ? "blue-gradient" : "bg-[#CCCCCC]"
             } text-white`}
           >
             2
           </div>
         </div>
-        <div className='flex justify-between mt-2 text-sm sm:text-base'>
-          <div className='text-black font-semibold'>Set up ChatAgent</div>
-          <div className='text-black font-semibold'>Train ChatAgent</div>
+        <div className="flex justify-between mt-2 text-sm sm:text-base">
+          <div className="text-black font-semibold">Set up ChatAgent</div>
+          <div className="text-black font-semibold">Train ChatAgent</div>
         </div>
       </div>
       {/* Main Content */}
-      <div className='flex-1 h-full flex flex-col w-full'>
+      <div className="flex-1 h-full flex flex-col w-full">
         {step === 0 ? (
-          type === 'website' ? (
+          type === "website" ? (
             websiteStep === 0 ? (
               <ChooseWebsiteTemplate
                 websiteStepHandler={websiteStepHandler}
@@ -92,7 +87,7 @@ const ChatbotTrainTemplate = ({
                 scanType={scanType}
                 websiteUrl={websiteUrl}
                 botId={botId}
-                type='website'
+                type="website"
                 websiteStepHandler={websiteStepHandler}
                 files={files}
                 setFiles={setFiles}
@@ -103,7 +98,7 @@ const ChatbotTrainTemplate = ({
               optional={false}
               stepHandler={stepHandler}
               botId={botId}
-              type='document'
+              type="document"
               websiteStepHandler={websiteStepHandler}
               files={files}
               setFiles={setFiles}

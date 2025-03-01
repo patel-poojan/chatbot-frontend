@@ -5,6 +5,7 @@ import { Loader } from "@/app/components/Loader";
 import OuterTemplate from "@/app/components/OuterTemplate";
 import { axiosInstance } from "@/utils/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
 
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -26,6 +27,7 @@ type FetchBDAQuestionListResponse = {
 };
 
 const Page = ({ params }: { params: { id: string } }) => {
+  const searchParams = useSearchParams();
   const [step, setStep] = useState(0);
   const [industry, setIndustry] = useState<string>("");
   const [subIndustry, setSubIndustry] = useState<string>("");
@@ -46,7 +48,10 @@ const Page = ({ params }: { params: { id: string } }) => {
       setHaveData(true);
       setIndustry(response.data.category);
       setSubIndustry(response.data.subcategory);
-      setQuesstionData(response.data.data);
+      const modifiedData = response.data.data.map((data) => {
+        return { question: data.question, answer: data.answer };
+      });
+      setQuesstionData(modifiedData);
       return response.data.data;
     } else {
       setHaveData(false);
@@ -59,6 +64,12 @@ const Page = ({ params }: { params: { id: string } }) => {
     queryFn: fetchSubmitedQuestion,
     enabled: true,
   });
+
+  useEffect(() => {
+    if (searchParams.get("step") === "1") {
+      setStep(1);
+    }
+  }, []);
 
   return (
     <OuterTemplate>

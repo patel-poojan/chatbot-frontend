@@ -364,7 +364,7 @@ const ChooseIndustryTemplate = ({
                         value={Industry.category}
                         onSelect={(currentValue) => {
                           setSubIndustryValue("");
-                          changed && setChanged(true);
+                          setChanged(true);
                           setIndustryValue(currentValue === industryValue ? "" : currentValue);
                           setOpenIndustryPopup(false);
                           setInputs([]);
@@ -443,7 +443,7 @@ const ChooseIndustryTemplate = ({
                         key={subIndustry}
                         value={subIndustry}
                         onSelect={(currentValue) => {
-                          changed && setChanged(true);
+                          setChanged(true);
                           setSubIndustryValue(currentValue === subIndustryValue ? "" : currentValue);
                           setOpenSubIndustryPopup(false);
                         }}
