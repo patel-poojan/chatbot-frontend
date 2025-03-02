@@ -27,7 +27,7 @@ interface StepConnectorProps {
 
 const StepConnector: React.FC<StepConnectorProps> = ({ isActive }) => (
   <div
-    className={`w-24 sm:w-64 h-px border ${
+    className={`w-20 sm:w-24 md:w-40 lg:w-64 h-px border ${
       isActive ? 'border-[#57C0DD]' : 'border-[#CCCCCC]'
     } border-dashed`}
   ></div>
