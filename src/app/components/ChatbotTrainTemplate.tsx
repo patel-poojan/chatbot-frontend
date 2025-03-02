@@ -1,83 +1,77 @@
-"use client";
-import React, { useState } from "react";
-import ChooseWebsiteTemplate from "./ChooseWebsiteTemplate";
-import ChooseDocumentTemplate from "./ChooseDocumentTemplate";
-import TuneChatbot from "./TuneChatbot";
-import { useRouter } from "next/navigation";
+'use client';
+import React, { useState } from 'react';
+import ChooseWebsiteTemplate from './ChooseWebsiteTemplate';
+import ChooseDocumentTemplate from './ChooseDocumentTemplate';
+import TuneChatbot from './TuneChatbot';
+import ChooseIndustryTemplate from './ChooseIndustryTemplate';
+import BDAQuestion from './BDAQuestion';
+import ProgressStepper from './ProgressStepper';
 
 // import { useRouter } from "next/navigation";
 
-const ChatbotTrainTemplate = ({ type, botId }: { type: string; botId: string }) => {
-  const router = useRouter();
+const ChatbotTrainTemplate = ({
+  type,
+  botId,
+}: {
+  type: string;
+  botId: string;
+}) => {
   const [step, setStep] = useState(0);
   const [websiteStep, setWebsiteStep] = useState(0);
-  const [websiteUrl, setWebsiteUrl] = useState<string>("");
-  const [scanType, setScanType] = useState<string>("SINGLEPAGE");
+  const [websiteUrl, setWebsiteUrl] = useState<string>('');
+  const [scanType, setScanType] = useState<string>('SINGLEPAGE');
   const [files, setFiles] = useState<File[]>([]);
-  const stepHandler = () => {
-    setStep(step + 1);
-  };
-  const websiteStepHandler = (Type: string) => {
-    if (Type === "up") {
-      setWebsiteStep(websiteStep + 1);
+  const [industry, setIndustry] = useState<string>('');
+  const [subIndustry, setSubIndustry] = useState<string>('');
+  const [questionAnswer, setQuestionAnswer] = useState<
+    { question: string; answer: string }[]
+  >([]);
+  const stepHandler = (Type: string) => {
+    if (Type === 'up') {
+      setStep(step + 1);
     } else {
-      if (websiteStep === 0) {
-      } else {
-        setWebsiteStep(websiteStep - 1);
-      }
+      setStep(step - 1);
     }
   };
-
-  // const router = useRouter();
-
-  // useEffect(() => {
-  //   const handleUnload = (event: BeforeUnloadEvent) => {
-  //     event.preventDefault();
-  //     // Displaying a default message (custom messages are not allowed)
-  //     event.returnValue = "Are you sure you want to leave?";
-  //   };
-
-  //   window.addEventListener("beforeunload", handleUnload);
-
-  //   return () => {
-  //     window.removeEventListener("beforeunload", handleUnload);
-  //   };
-  // }, []);
-
+  const websiteStepHandler = (Type: string) => {
+    if (Type === 'up') {
+      setWebsiteStep(websiteStep + 1);
+    } else {
+      setWebsiteStep(websiteStep - 1);
+    }
+  };
+  console.log('websiteStep', websiteStep);
   return (
-    <div className="w-full  max-w-7xl flex-1 mx-auto h-auto flex flex-col gap-4 md:gap-6">
-      <div className="w-fit md:mx-5 mx-auto">
-        <div className="flex items-center gap-1 px-9">
-          <div className="rounded-full p-2 w-8 h-8 flex items-center justify-center blue-gradient text-white">1</div>
-          <div
-            className={`w-24 sm:w-64 h-px border ${
-              step === 1 ? "border-[#57C0DD]" : "border-[#CCCCCC]"
-            }  border-dashed `}
-          ></div>
-          <div
-            className={`rounded-full p-2 w-8 h-8 flex items-center justify-center ${
-              step === 1 ? "blue-gradient" : "bg-[#CCCCCC]"
-            } text-white`}
-          >
-            2
-          </div>
-        </div>
-        <div className="flex justify-between mt-2 text-sm sm:text-base">
-          <div className="text-black font-semibold">Set up ChatAgent</div>
-          <div className="text-black font-semibold">Train ChatAgent</div>
-        </div>
-      </div>
+    <div className='w-full  max-w-7xl flex-1 mx-auto h-auto flex flex-col gap-4 md:gap-6'>
+      <ProgressStepper currentStep={step} />
       {/* Main Content */}
-      <div className="flex-1 h-full flex flex-col w-full">
+      <div className='flex-1 h-full flex flex-col w-full'>
         {step === 0 ? (
-          type === "website" ? (
+          <ChooseIndustryTemplate
+            stepHandler={stepHandler}
+            setIndustry={setIndustry}
+            setSubIndustry={setSubIndustry}
+            botId={botId}
+          />
+        ) : step === 1 ? (
+          <BDAQuestion
+            stepHandler={stepHandler}
+            industry={industry}
+            subIndustry={subIndustry}
+            chatBotId={botId}
+            questionAnswer={questionAnswer}
+            setQuestionAnswer={setQuestionAnswer}
+          />
+        ) : step === 2 ? (
+          type === 'website' ? (
             websiteStep === 0 ? (
               <ChooseWebsiteTemplate
-                websiteStepHandler={websiteStepHandler}
+                stepHandler={stepHandler}
                 scanType={scanType}
                 websiteUrl={websiteUrl}
                 setWebsiteUrl={setWebsiteUrl}
                 setScanType={setScanType}
+                websiteStepHandler={websiteStepHandler}
               />
             ) : (
               <ChooseDocumentTemplate
@@ -86,7 +80,7 @@ const ChatbotTrainTemplate = ({ type, botId }: { type: string; botId: string }) 
                 scanType={scanType}
                 websiteUrl={websiteUrl}
                 botId={botId}
-                type="website"
+                type='website'
                 websiteStepHandler={websiteStepHandler}
                 files={files}
                 setFiles={setFiles}
@@ -97,7 +91,7 @@ const ChatbotTrainTemplate = ({ type, botId }: { type: string; botId: string }) 
               optional={false}
               stepHandler={stepHandler}
               botId={botId}
-              type="document"
+              type='document'
               websiteStepHandler={websiteStepHandler}
               files={files}
               setFiles={setFiles}

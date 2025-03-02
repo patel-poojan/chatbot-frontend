@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import AlertDialog from './AlertDialog';
+import CustomAlertDialog from './CustomAlertDialog';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import {
@@ -327,7 +327,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
       </div>
 
       <div className='mt-6 flex flex-col sm:flex-row sm:justify-end gap-4'>
-        <AlertDialog
+        <CustomAlertDialog
           botId={botId}
           trigger={
             <Button className='w-full sm:w-auto px-8 py-2 border border-[#57C0DD] bg-transparent text-[#57C0DD] hover:bg-transparent'>

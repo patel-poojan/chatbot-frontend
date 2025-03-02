@@ -13,12 +13,14 @@ import { toast } from 'sonner';
 import { isValidUrl } from '@/utils/validator';
 
 const ChooseWebsiteTemplate = ({
-  websiteStepHandler,
+  stepHandler,
   scanType,
   websiteUrl,
   setWebsiteUrl,
   setScanType,
+  websiteStepHandler,
 }: {
+  stepHandler: (type: 'up' | 'down') => void;
   websiteStepHandler: (type: 'up' | 'down') => void;
   scanType: string;
   websiteUrl: string;
@@ -120,7 +122,7 @@ const ChooseWebsiteTemplate = ({
         /> */}
         <Button
           className='w-full sm:w-auto px-8 py-2 sm:px-11 border border-[#57C0DD] bg-transparent text-[#57C0DD] hover:bg-transparent'
-          onClick={() => websiteStepHandler('down')}
+          onClick={() => stepHandler('down')}
         >
           Go Back
         </Button>

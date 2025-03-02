@@ -8,7 +8,6 @@ import { FaArrowRightLong } from 'react-icons/fa6';
 import { IoCloseOutline } from 'react-icons/io5';
 import { BiGlobe } from 'react-icons/bi';
 import { toast } from 'sonner';
-// import AlertDialog from './AlertDialog';
 import { Loader } from './Loader';
 import useWindowDimensions from '@/utils/windowSize';
 import { useFetchURLForTraining, useTrainBot } from '@/utils/botCreation-api';
@@ -23,7 +22,7 @@ import {
 // Types
 interface DocumentTemplateProps {
   optional: boolean;
-  stepHandler: () => void;
+  stepHandler: (type: 'up' | 'down') => void;
   botId: string;
   type: string;
   scanType?: string;
@@ -202,7 +201,7 @@ const ChooseDocumentTemplate: React.FC<DocumentTemplateProps> = ({
   const { mutate: onTrainBot, isPending } = useTrainBot({
     onSuccess(data) {
       toast.success(data?.message);
-      stepHandler();
+      stepHandler('up');
     },
     onError(error: axiosError) {
       const errorMessage =
@@ -376,21 +375,17 @@ const ChooseDocumentTemplate: React.FC<DocumentTemplateProps> = ({
       ) : null}
 
       <div className='pt-6 sm:ms-auto flex items-center gap-4'>
-        {/* <AlertDialog
-          botId={botId}
-          trigger={
-            <Button className='w-full sm:w-auto px-8 py-2 sm:px-11 border border-[#57C0DD] bg-transparent text-[#57C0DD] hover:bg-transparent'>
-              Go Back
-            </Button>
-          }
-        /> */}
         <Button
           className='w-full sm:w-auto px-8 py-2 sm:px-11 border border-[#57C0DD] bg-transparent text-[#57C0DD] hover:bg-transparent'
           onClick={() => {
             if (step === 1) {
               setStep(0);
             } else {
-              websiteStepHandler('down');
+              if (type === 'website') {
+                websiteStepHandler('down');
+              } else {
+                stepHandler('down');
+              }
             }
           }}
         >
