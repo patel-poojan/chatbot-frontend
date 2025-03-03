@@ -27,8 +27,6 @@ const ChatbotTrainTemplate = ({ type, botId }: { type: string; botId: string }) 
   const [websiteUrl, setWebsiteUrl] = useState<string>("");
   const [scanType, setScanType] = useState<string>("SINGLEPAGE");
   const [files, setFiles] = useState<File[]>([]);
-  const [industry, setIndustry] = useState<string>("");
-  const [subIndustry, setSubIndustry] = useState<string>("");
   const [questionAnswer, setQuestionAnswer] = useState<{ question: string; answer: string }[]>([]);
   const [industryValue, setIndustryValue] = useState("");
   const [subIndustryValue, setSubIndustryValue] = useState("");
@@ -48,10 +46,10 @@ const ChatbotTrainTemplate = ({ type, botId }: { type: string; botId: string }) 
     }
   };
 
-  const fetchBDAQuestion = async (industry: string, subIndustry: string) => {
+  const fetchBDAQuestion = async () => {
     const response: FetchBDAQuestionListResponse = await axiosInstance.post(`/bda/questions`, {
-      category: industry,
-      subcategory: subIndustry,
+      category: industryValue,
+      subcategory: subIndustryValue,
     });
     if (response.data.questions.length >= 0) {
       setQuestionAnswer(
@@ -69,15 +67,15 @@ const ChatbotTrainTemplate = ({ type, botId }: { type: string; botId: string }) 
   const {
     isLoading: loadBDAQuestionList,
     isError: errorInBDAQuestionList,
-    isFetching: fetchingBDAQuestion,
-    refetch: refetchBDAQuestion,
+    isRefetching: fetchingBDAQuestion,
   } = useQuery({
-    queryKey: ["BDAQuestion", "List", industry, subIndustry],
-    queryFn: () => fetchBDAQuestion(industry, subIndustry),
-    enabled: industry && subIndustry ? true : false,
+    queryKey: ["BDAQuestion", "List", industryValue, subIndustryValue],
+    queryFn: () => fetchBDAQuestion(),
+    enabled: industryValue && subIndustryValue ? true : false,
   });
 
   useEffect(() => {
+    console.log("errorInBDAQuestionList", errorInBDAQuestionList);
     if (errorInBDAQuestionList) {
       toast.error("Something went wrong");
     }
@@ -127,21 +125,18 @@ const ChatbotTrainTemplate = ({ type, botId }: { type: string; botId: string }) 
           <TrainWrapper>
             <ChooseIndustryTemplate
               stepHandler={stepHandler}
-              setIndustry={setIndustry}
-              setSubIndustry={setSubIndustry}
               botId={botId}
               industryValue={industryValue}
               setIndustryValue={setIndustryValue}
               subIndustryValue={subIndustryValue}
               setSubIndustryValue={setSubIndustryValue}
-              refetchBDAQuestion={refetchBDAQuestion}
             />
           </TrainWrapper>
         ) : step === 1 ? (
           <BDAQuestion
             stepHandler={stepHandler}
-            industry={industry}
-            subIndustry={subIndustry}
+            industry={industryValue}
+            subIndustry={subIndustryValue}
             chatBotId={botId}
             questionAnswer={questionAnswer}
             setQuestionAnswer={setQuestionAnswer}

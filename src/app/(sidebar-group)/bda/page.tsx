@@ -6,12 +6,10 @@ import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from "@
 import { Input } from "@/components/ui/input";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import React, { useState } from "react";
-// import { IoSearchSharp } from 'react-icons/io5';
 import Papa from "papaparse";
 import { axiosInstance } from "@/utils/axiosInstance";
 import { toast } from "sonner";
 import { Loader } from "@/app/components/Loader";
-import { useQuery } from "@tanstack/react-query";
 
 type FetchBDAQuestionListResponse = {
   message: string;
@@ -24,12 +22,9 @@ type FetchBDAQuestionListResponse = {
 
 const BDA = () => {
   const [loader, setLoader] = useState(false);
-  const [industry, setIndustry] = useState<string>("");
-  const [subIndustry, setSubIndustry] = useState<string>("");
   const [openBulkUpdate, setOpenBulkUpdate] = useState(false);
   const [csvData, setCsvData] = useState<unknown[]>([]);
   const [renderTrigger, setRenderTrigger] = useState(0); // State variable to trigger re-render
-  const [questionAnswer, setQuestionAnswer] = useState<{ question: string; answer: string }[]>([]);
   const [industryValue, setIndustryValue] = useState("");
   const [subIndustryValue, setSubIndustryValue] = useState("");
 
@@ -106,35 +101,6 @@ const BDA = () => {
     }
   };
 
-  const fetchBDAQuestion = async () => {
-    const response: FetchBDAQuestionListResponse = await axiosInstance.post(`/bda/questions`, {
-      category: industry,
-      subcategory: subIndustry,
-    });
-    if (response.data.questions.length >= 0) {
-      setQuestionAnswer(
-        response.data.questions.map((question: string) => {
-          return { question: question, answer: "" };
-        })
-      );
-      return response.data.questions;
-    } else {
-      setQuestionAnswer([]);
-      return [];
-    }
-  };
-
-  const {
-    isLoading: loadBDAQuestionList,
-    isError: errorInBDAQuestionList,
-    isFetching: fetchingBDAQuestion,
-    refetch: refetchBDAQuestion,
-  } = useQuery({
-    queryKey: ["BDAQuestion", "List"],
-    queryFn: fetchBDAQuestion,
-    enabled: industry && subIndustry ? true : false,
-  });
-
   return (
     <>
       {loader && <Loader />}
@@ -165,14 +131,11 @@ const BDA = () => {
         <div className="flex-1 flex flex-col overflow-auto">
           <ChooseIndustryTemplate
             key={renderTrigger} // Use the render trigger state as the key
-            setIndustry={setIndustry}
-            setSubIndustry={setSubIndustry}
             adminAction={true}
             industryValue={industryValue}
             setIndustryValue={setIndustryValue}
             subIndustryValue={subIndustryValue}
             setSubIndustryValue={setSubIndustryValue}
-            refetchBDAQuestion={refetchBDAQuestion}
             stepHandler={() => {}}
           />
           <div className="flex md:hidden gap-4 items-center ">
