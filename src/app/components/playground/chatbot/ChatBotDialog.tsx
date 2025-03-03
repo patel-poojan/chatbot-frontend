@@ -209,7 +209,6 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
       setShowCloseDialog(true);
     }
   }, [visibleMessages]);
-  console.log('visibleMessages', visibleMessages);
   return (
     <div
       className=' min-[425px]:right-6 top-32 min-[699px]:top-20 flex flex-col min-[425px]:w-[375px] h-[65vh] max-[425px]:mx-6 min-[500px]:h-[60vh] rounded-lg overflow-hidden absolute '

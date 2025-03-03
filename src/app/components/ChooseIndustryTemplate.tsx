@@ -17,12 +17,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
-import {
-  FaArrowLeftLong,
-  FaArrowRightLong,
-  FaMinus,
-  FaPlus,
-} from 'react-icons/fa6';
+import { FaMinus, FaPlus } from 'react-icons/fa6';
 import { useQuery } from '@tanstack/react-query';
 import { Loader } from './Loader';
 import { axiosInstance } from '@/utils/axiosInstance';
@@ -69,20 +64,28 @@ const ChooseIndustryTemplate = ({
   stepHandler,
   setSubIndustry,
   setIndustry,
+  industryValue,
+  subIndustryValue,
+  setIndustryValue,
+  setSubIndustryValue,
+  refetchBDAQuestion,
   adminAction = false,
   botId,
 }: {
   stepHandler: (type: 'up' | 'down') => void;
   setIndustry: React.Dispatch<React.SetStateAction<string>>;
   setSubIndustry: React.Dispatch<React.SetStateAction<string>>;
+  industryValue: string;
+  subIndustryValue: string;
+  setIndustryValue: React.Dispatch<React.SetStateAction<string>>;
+  setSubIndustryValue: React.Dispatch<React.SetStateAction<string>>;
+  refetchBDAQuestion: () => void;
   adminAction?: boolean;
   botId?: string;
 }) => {
   const [loader, setLoader] = useState(false);
   const [openIndustryPopup, setOpenIndustryPopup] = useState(false);
-  const [industryValue, setIndustryValue] = useState('');
   const [openSubIndustryPopup, setOpenSubIndustryPopup] = useState(false);
-  const [subIndustryValue, setSubIndustryValue] = useState('');
   const [openAddIndustry, setOpenAddIndustry] = useState(false);
   const [openAddSubIndustry, setOpenAddSubIndustry] = useState(false);
   const [industry, setindustry] = useState<string>('');
@@ -148,6 +151,7 @@ const ChooseIndustryTemplate = ({
     } else {
       setIndustry(industryValue);
       setSubIndustry(subIndustryValue);
+      refetchBDAQuestion();
       stepHandler('up');
     }
   };
@@ -322,11 +326,7 @@ const ChooseIndustryTemplate = ({
 
   return (
     <>
-      <div
-        className={`w-full ${
-          !adminAction && 'max-w-7xl'
-        } flex-1 mx-auto h-auto flex flex-col`}
-      >
+      <div className={`w-full  flex-1 mx-auto h-auto flex flex-col`}>
         {(loadIndustryList || fetchingIndustryList || loader) && <Loader />}
         <div className='flex justify-between items-center gap-3 mb-2'>
           <div className='flex justify-between flex-col'>
@@ -339,15 +339,6 @@ const ChooseIndustryTemplate = ({
               </div>
             )}
           </div>
-          {!adminAction && (
-            <Button
-              onClick={continueHandler}
-              className='bg-gradient-to-r hover:from-[#53A7DD] hover:to-[#58C8DD]  from-[#58C8DD] to-[#53A7DD] text-white flex gap-2 items-center py-0 md:py-4 px-2 md:px-9 text-xs max-[500px]:h-7 md:text-lg rounded md:my-3'
-            >
-              Continue
-              <FaArrowRightLong className='text-base md:text-lg text-white' />
-            </Button>
-          )}
         </div>
         <Popover open={openIndustryPopup} onOpenChange={setOpenIndustryPopup}>
           <PopoverTrigger asChild className='mt-3 md:mt-2'>
@@ -537,19 +528,27 @@ const ChooseIndustryTemplate = ({
             </Command>
           </PopoverContent>
         </Popover>
-        {!adminAction && botId && (
-          <CustomAlertDialog
-            botId={botId as string}
-            trigger={
-              <div className='flex items-center gap-2 cursor-pointer mt-4 md:mt-6'>
-                <FaArrowLeftLong className='text-[#57C0DD] text-lg' />
-                <span className='text-[#57C0DD] text-base md:text-lg'>
-                  Back
-                </span>
-              </div>
-            }
-          />
-        )}
+        <div className='pt-6 sm:ms-auto flex items-center gap-4 mt-auto'>
+          {!adminAction && botId && (
+            <CustomAlertDialog
+              botId={botId as string}
+              trigger={
+                <Button className='w-full sm:w-auto px-8 py-2 sm:px-11 border border-[#57C0DD] bg-transparent text-[#57C0DD] hover:bg-transparent'>
+                  Go Back
+                </Button>
+              }
+            />
+          )}
+          {!adminAction && (
+            <Button
+              className='w-full sm:w-auto px-8 py-2 sm:px-11 border bg-gradient-to-r hover:from-[#53A7DD] hover:to-[#58C8DD] from-[#58C8DD] to-[#53A7DD] hover:bg-transparent'
+              onClick={continueHandler}
+            >
+              Continue
+            </Button>
+          )}
+        </div>
+
         {adminAction && inputs && subIndustryValue && industryValue && (
           <div className='mt-4 md:mt-6 px-1 flex flex-col items-end w-full'>
             <div className='text-lg md:text-xl mb-3 font-semibold text-black'>
