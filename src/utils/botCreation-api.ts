@@ -1,6 +1,6 @@
-import { axiosError } from "@/types/axiosTypes";
-import { useMutation } from "@tanstack/react-query";
-import { axiosInstance } from "./axiosInstance";
+import { axiosError } from '@/types/axiosTypes';
+import { useMutation } from '@tanstack/react-query';
+import { axiosInstance } from './axiosInstance';
 
 type DefaultResponse = {
   statusCode: number;
@@ -51,8 +51,10 @@ export const useCreateChatbot = ({
   onError: (error: axiosError) => void;
 }) =>
   useMutation({
-    mutationKey: ["create", "chatbot"],
-    mutationFn: (data: CreateChatbotRequest): Promise<CreateChatbotResponse> => {
+    mutationKey: ['create', 'chatbot'],
+    mutationFn: (
+      data: CreateChatbotRequest
+    ): Promise<CreateChatbotResponse> => {
       return axiosInstance.post(`/chatbot`, data);
     },
     onError,
@@ -87,8 +89,10 @@ export const useSaveBDAQuestion = ({
   onError: (error: axiosError) => void;
 }) =>
   useMutation({
-    mutationKey: ["save", "BDA"],
-    mutationFn: (data: SaveBDAQuestionRequest): Promise<SaveBDAQuestionResponse> => {
+    mutationKey: ['save', 'BDA'],
+    mutationFn: (
+      data: SaveBDAQuestionRequest
+    ): Promise<SaveBDAQuestionResponse> => {
       return axiosInstance.post(
         `/bda/submit-question-data
 `,
@@ -134,7 +138,7 @@ type trainBotResponse = {
   message: string;
   success: boolean;
 };
-const createFormData = (details: TrainBotRequest["details"]) => {
+const createFormData = (details: TrainBotRequest['details']) => {
   const formData = new FormData();
 
   if (details.document) {
@@ -143,10 +147,11 @@ const createFormData = (details: TrainBotRequest["details"]) => {
     });
   }
 
-  formData.append("type", details.type);
-  if (details.websiteUrl) formData.append("websiteUrl", details.websiteUrl);
-  if (details.scanType) formData.append("scanType", details.scanType);
-  if (details.urls_to_scrape) formData.append("urls_to_scrape", JSON.stringify(details.urls_to_scrape));
+  formData.append('type', details.type);
+  if (details.websiteUrl) formData.append('websiteUrl', details.websiteUrl);
+  if (details.scanType) formData.append('scanType', details.scanType);
+  if (details.urls_to_scrape)
+    formData.append('urls_to_scrape', JSON.stringify(details.urls_to_scrape));
 
   return formData;
 };
@@ -158,14 +163,18 @@ export const useTrainBot = ({
   onError: (error: axiosError) => void;
 }) =>
   useMutation({
-    mutationKey: ["train", "Bot"],
+    mutationKey: ['train', 'Bot'],
     mutationFn: (data: TrainBotRequest): Promise<trainBotResponse> => {
       const formData = createFormData(data.details);
-      return axiosInstance.post(`/chatbot/${data.chatbotId}/chatbotDoc`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      return axiosInstance.post(
+        `/chatbot/${data.chatbotId}/chatbotDoc`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
     },
     onError,
     onSuccess,
@@ -182,7 +191,7 @@ export const useDeleteBot = ({
   onError: (error: axiosError) => void;
 }) =>
   useMutation({
-    mutationKey: ["delete", "bot"],
+    mutationKey: ['delete', 'bot'],
     mutationFn: (data: DeleteBotRequest): Promise<CreateChatbotResponse> =>
       axiosInstance.delete(`/chatbot/${data.chatbotId}`),
     onSuccess,
@@ -200,6 +209,7 @@ type UpdateChatbotRequest = {
     version?: number;
     language?: string;
     analyticsEnabled?: boolean;
+    state: 'active' | 'draft';
     configuredButtons?: {
       type: string;
       isEnabled: boolean;
@@ -221,7 +231,7 @@ export const useUpdateChatbot = ({
   onError: (error: axiosError) => void;
 }) =>
   useMutation({
-    mutationKey: ["update", "bot"],
+    mutationKey: ['update', 'bot'],
     mutationFn: (data: UpdateChatbotRequest): Promise<DefaultResponse> =>
       axiosInstance.put(`/chatbot/${data.chatbotId}`, data.details),
     onSuccess,
@@ -247,9 +257,12 @@ export const useSetupPlayground = ({
   onError: (error: axiosError) => void;
 }) =>
   useMutation({
-    mutationKey: ["setup", "playground"],
+    mutationKey: ['setup', 'playground'],
     mutationFn: (data: SetupPlaygroundRequest): Promise<DefaultResponse> => {
-      return axiosInstance.post(`/playground/setup/${data.chatbotId}`, data.details);
+      return axiosInstance.post(
+        `/playground/setup/${data.chatbotId}`,
+        data.details
+      );
     },
     onError,
     onSuccess,
@@ -272,7 +285,7 @@ type fetchURLResponse = {
   success: boolean;
 };
 
-function sortByUrlLevels(jsonArray: fetchURLResponse["data"]["urls"]) {
+function sortByUrlLevels(jsonArray: fetchURLResponse['data']['urls']) {
   return jsonArray.sort((a, b) => {
     const levelA = (a.url.match(/\//g) || []).length;
     const levelB = (b.url.match(/\//g) || []).length;
@@ -295,9 +308,12 @@ export const useFetchURLForTraining = ({
   onError: (error: axiosError) => void;
 }) =>
   useMutation({
-    mutationKey: ["fetch", "urls", "training"],
+    mutationKey: ['fetch', 'urls', 'training'],
     mutationFn: async (data: fetchURLRequest): Promise<fetchURLResponse> => {
-      const response: fetchURLResponse = await axiosInstance.post(`/chatbot/getURLs`, data);
+      const response: fetchURLResponse = await axiosInstance.post(
+        `/chatbot/getURLs`,
+        data
+      );
       const sortedURLs = sortByUrlLevels(response?.data?.urls);
       response.data.urls = sortedURLs;
       return response;

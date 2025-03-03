@@ -28,10 +28,11 @@ const ChooseWebsiteTemplate = ({
   setScanType: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const [dropDown, setDropDown] = useState(false);
-  const continueHandler = () => {
+  const continueHandler = async () => {
+    const isValidUrlData = await isValidUrl(websiteUrl);
     if (websiteUrl.length === 0) {
       toast.warning('Please enter website url');
-    } else if (!isValidUrl(websiteUrl)) {
+    } else if (!isValidUrlData) {
       toast.warning('Please enter a valid website url');
     } else if (scanType.length === 0) {
       toast.warning('Please select scan type');

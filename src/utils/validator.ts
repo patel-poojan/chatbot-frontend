@@ -23,11 +23,32 @@ export const isPasswordValid = (password: string) => {
   return passwordRegex.test(password);
 };
 
-export const isValidUrl = (url: string) => {
+const urlRegex =
+  /^(((http|https):\/\/|)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,6}(:[0-9]{1,5})?(\/.*)?)$/;
+
+// Combined function that returns true only when URL is both valid and active
+export const isValidUrl = async (url: string): Promise<boolean> => {
+  // Check if format is valid
+  const isValid = urlRegex.test(url);
+
+  // If not valid, return false immediately
+  if (!isValid) {
+    return false;
+  }
+
+  // Add protocol if missing
+  const urlToCheck = url.startsWith('http') ? url : `https://${url}`;
+
   try {
-    new URL(url);
+    // Attempt to fetch the URL
+    await fetch(urlToCheck, {
+      method: 'HEAD', // Use HEAD to avoid downloading full content
+      mode: 'no-cors', // For client-side browser environment
+    });
+    // Return true only if URL is both valid and active
     return true;
   } catch (error) {
+    // Any error means URL is not active
     return false;
   }
 };
