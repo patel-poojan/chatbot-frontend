@@ -209,7 +209,7 @@ type UpdateChatbotRequest = {
     version?: number;
     language?: string;
     analyticsEnabled?: boolean;
-    state: 'active' | 'draft';
+    state?: 'active' | 'draft';
     configuredButtons?: {
       type: string;
       isEnabled: boolean;
