@@ -1,9 +1,7 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { axiosInstance } from "@/utils/axiosInstance";
-import { useQuery } from "@tanstack/react-query";
-import React, { useEffect } from "react";
+import React from "react";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { Loader } from "./Loader";
 import { toast } from "sonner";
