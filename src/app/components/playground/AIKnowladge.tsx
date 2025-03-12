@@ -1,17 +1,4 @@
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
 import {
   Table,
@@ -27,42 +14,65 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { axiosInstance } from '@/utils/axiosInstance';
 import useWindowDimensions from '@/utils/windowSize';
+import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
 import React, { useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
-import { IoIosArrowDown, IoIosArrowUp, IoMdCheckmark } from 'react-icons/io';
-import {
-  IoChevronBackOutline,
-  IoCloseOutline,
-  IoSearchSharp,
-} from 'react-icons/io5';
-import { MdPublic } from 'react-icons/md';
+import { IoChevronBackOutline, IoCloseOutline } from 'react-icons/io5';
 import { RiDeleteBin6Line } from 'react-icons/ri';
+import { Loader } from '../Loader';
+import { toast } from 'sonner';
+import { useUpdateTrainData } from '@/utils/botCreation-api';
+import { axiosError } from '@/types/axiosTypes';
 
+interface TrainDataType {
+  statusCode: number;
+  data: {
+    chatbotId: string;
+    documentContent: {
+      active: boolean;
+      url: string;
+      localPath: string;
+    }[];
+    websiteContent: {
+      active: boolean;
+      url: string;
+      localPath: string;
+    }[];
+    pdfName: string;
+    websiteUrl: string;
+    type: string;
+  };
+  message: string;
+  success: boolean;
+}
 const AIKnowledge = ({
   setAiSection,
+  chatbotId,
 }: {
   setAiSection: React.Dispatch<React.SetStateAction<boolean>>;
+  chatbotId: string;
 }) => {
   const { width: screenWidth } = useWindowDimensions();
   const [tab, setTab] = useState('websites');
-  const [dropDown, setDropDown] = useState(false);
-  const [websiteUrl, setWebsiteUrl] = useState<string>('');
-  const [scanType, setScanType] = useState<string>('SINGLEPAGE');
   const [initialIndex, setInitialIndex] = useState(0);
-  const dummy = [
+  const [listOfDocument, setListOfDocument] = useState<
     {
-      url: 'https://www.chatbot.com',
-      lastEdited: 'Today 12:00 pm',
-      state: 'Used by AI',
-    },
+      active: boolean;
+      url: string;
+      localPath: string;
+    }[]
+  >([]);
+  const [listOfWebsites, setListOfWebsites] = useState<
     {
-      url: 'https://www.chatbot.com',
-      lastEdited: 'Today 12:00 pm',
-      state: 'Not Used by AI',
-    },
-  ];
+      active: boolean;
+      url: string;
+      localPath: string;
+    }[]
+  >([]);
+
   const [files, setFiles] = useState<File[]>([]);
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(event.target.files!);
@@ -70,6 +80,138 @@ const AIKnowledge = ({
   };
   const handleRemoveFile = (index: number) => {
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+  };
+  const fetchTrainData = async () => {
+    const response: TrainDataType = await axiosInstance.get(
+      `/chatbot/${chatbotId}/chatbotDoc`
+    );
+    if (response.success) {
+      if (response?.data?.documentContent) {
+        setListOfDocument(response?.data?.documentContent);
+      }
+      if (response?.data?.websiteContent) {
+        setListOfWebsites(response?.data?.websiteContent);
+      }
+    } else {
+      toast.error('failed to fetch data');
+    }
+  };
+  const { isLoading: loadTrainData, refetch: refetchTrainData } = useQuery({
+    queryKey: ['train', 'data'],
+    queryFn: fetchTrainData,
+  });
+  const { mutate: onUpdate, isPending: isPendingToUpdate } = useUpdateTrainData(
+    {
+      onSuccess(data) {
+        refetchTrainData();
+        toast.success(data?.message);
+      },
+      onError(error: axiosError) {
+        const errorMessage =
+          error?.response?.data?.errors?.message ||
+          error?.response?.data?.message ||
+          'Failed to update';
+        toast.error(errorMessage);
+      },
+    }
+  );
+
+  const updateHandler = async () => {
+    if (tab === 'documents' && listOfDocument.length === 0) {
+      toast.warning('You cannot update with empty data');
+      return;
+    } else if (tab === 'websites' && listOfWebsites.length === 0) {
+      toast.warning('You cannot update with empty data');
+      return;
+    } else {
+      const data = {
+        chatbotId: chatbotId,
+        details:
+          tab === 'documents'
+            ? { documentContent: listOfDocument }
+            : { websiteContent: listOfWebsites },
+      };
+      onUpdate(data);
+    }
+  };
+
+  // Handle delete functionality
+  const handleDelete = (index: number) => {
+    if (tab === 'documents') {
+      setListOfDocument((prev) => prev.filter((_, i) => i !== index));
+    } else {
+      setListOfWebsites((prev) => prev.filter((_, i) => i !== index));
+    }
+  };
+
+  // Handle toggle functionality
+  const handleToggle = (index: number) => {
+    if (tab === 'documents') {
+      setListOfDocument((prev) =>
+        prev.map((item, i) => {
+          if (i === index) {
+            return {
+              ...item,
+              active: !item.active,
+            };
+          }
+          return item;
+        })
+      );
+    } else {
+      setListOfWebsites((prev) =>
+        prev.map((item, i) => {
+          if (i === index) {
+            return {
+              ...item,
+              active: !item.active,
+            };
+          }
+          return item;
+        })
+      );
+    }
+  };
+
+  // Get current list based on selected tab
+  const getCurrentList = () => {
+    return tab === 'documents' ? listOfDocument : listOfWebsites;
+  };
+  const validateFiles = (files: File[]) => {
+    if (files.length > 4) {
+      toast.warning('Please upload no more than 4 files');
+      return false;
+    }
+    for (const file of files) {
+      if (!file.type.includes('pdf')) {
+        toast.warning(`${file.name} must be a PDF file`);
+        return false;
+      }
+      const maxSize = 10 * 1024 * 1024;
+      if (file.size > maxSize) {
+        toast.warning(`${file.name} must be less than 10MB`);
+        return false;
+      }
+    }
+
+    return true;
+  };
+  const handleTrainAgent = () => {
+    if (files.length === 0) {
+      toast.warning('Please select document');
+    } else if (!validateFiles(files)) {
+      return;
+    } else {
+      onUpdate({
+        chatbotId: chatbotId,
+        details: {
+          document: files,
+          type: 'document',
+          documentContent: listOfDocument,
+          websiteContent: listOfWebsites,
+        },
+      });
+    }
   };
   return (
     <div
@@ -79,21 +221,12 @@ const AIKnowledge = ({
           screenWidth > 500 ? 'calc(100dvh - 72px)' : 'calc(100dvh - 96px)',
       }}
     >
+      {(loadTrainData || isPendingToUpdate) && <Loader />}
       <div className='flex mx-2 justify-between items-center'>
         <div className='text-xs text-black hidden sm:block'>
           www.chatbot.com
         </div>
-        <div
-          className='flex items-center py-0 px-3 rounded-xl bg-white '
-          style={{ boxShadow: '0px 0px 4px 0px #0000001F' }}
-        >
-          <IoSearchSharp className='text-lg text-[#1E255E]' />
-          <Input
-            className='md:w-96 w-40 sm:w-60  border-none shadow-none text-[#1E255E] placeholder:text-[#1E255E] bg-transparent focus-visible:ring-0 placeholder:font-light text-base'
-            type='text'
-            placeholder='Search'
-          />
-        </div>
+
         <div
           className='p-2 bg-white rounded-xl cursor-pointer mt-2 sm:mt-0'
           onClick={() => setAiSection(false)}
@@ -126,7 +259,9 @@ const AIKnowledge = ({
                   {item.charAt(0).toUpperCase() + item.slice(1)}
                 </div>
                 <div className='text-[#7A7A7A] text-base font-medium hidden md:block'>
-                  0
+                  {item === 'websites'
+                    ? listOfWebsites.length
+                    : listOfDocument.length}
                 </div>
               </div>
             ))}
@@ -140,90 +275,52 @@ const AIKnowledge = ({
                   {tab}
                 </div>
                 <div className='flex items-center gap-3'>
-                  <Popover>
-                    <PopoverTrigger>
-                      <div className='bg-white border rounded-lg border-[#EFEFEF] py-1 sm:py-2 px-2 sm:px-3 flex items-center gap-1'>
-                        <MdPublic className='text-[#7A7A7A] text-sm' />
-                        <div className='text-xs text-[#7A7A7A]'>Status</div>
-                      </div>
-                    </PopoverTrigger>
-                    <PopoverContent className='w-[200px]'>
-                      <div className='flex items-center justify-between'>
-                        <div className='flex items-center gap-2'>
-                          <MdPublic className='text-[#57C0DD]  text-base' />
-                          <div className='text-lg text-[#1E255E]'>Status</div>
-                        </div>
-                        {/* <IoCloseOutline className="text-lg" /> */}
-                      </div>
-                      <RadioGroup className='gap-1 mt-2'>
-                        <div className='flex items-center space-x-2'>
-                          <RadioGroupItem
-                            value='Used by AI'
-                            id='r1'
-                            // className="focus:text-[#57C0DD] flex items-center gap-2  focus:border focus:border-[#57C0DD] "
-                          />
-                          <label
-                            htmlFor='r1'
-                            className='text-[#1E255E] text-sm'
-                          >
-                            Used by AI
-                          </label>
-                        </div>
-                        <div className='flex items-center space-x-2'>
-                          <RadioGroupItem
-                            value='Not used by AI'
-                            id='r2'
-                            itemType='radio'
-                            // className="focus:text-[#57C0DD] flex items-center gap-2  focus:border focus:border-[#57C0DD] "
-                          />
-                          <label
-                            htmlFor='r2'
-                            className='text-[#1E255E] text-sm'
-                          >
-                            Not used by AI
-                          </label>
-                        </div>
-                      </RadioGroup>
-                    </PopoverContent>
-                  </Popover>
                   <div
-                    className='bg-[#232323] rounded-lg flex items-center cursor-pointer gap-1 px-2 py-1 sm:py-2'
+                    className='bg-[#232323] w-fit rounded-lg flex items-center cursor-pointer gap-1 px-2 py-1 sm:py-2'
                     style={{ boxShadow: '0px 0px 4px 0px #0000001F' }}
                     onClick={() => setInitialIndex(1)}
                   >
                     <FaPlus className='text-[#EFEFEF] text-base' />
-                    <div className='text-xs text-[#EFEFEF]'>Add Content</div>
+                    <div className='text-xs text-[#EFEFEF]'>Add Document</div>
                   </div>
+                  <Button
+                    className='w-fit text-white bg-gradient-to-r hover:from-[#53A7DD] hover:to-[#58C8DD]  from-[#58C8DD] to-[#53A7DD] px-2 py-1 sm:py-2 rounded-lg'
+                    onClick={updateHandler}
+                  >
+                    Update
+                  </Button>
                 </div>
               </div>
               <div className='flex flex-col flex-1 h-full'>
-                <Table className='min-w-full md:table-fixed '>
+                <Table className='min-w-full md:table-fixed'>
                   <TableHeader className='bg-[#57C0DD1A] backdrop-blur-3xl sticky top-0 z-10'>
                     <TableRow>
-                      <TableHead className='py-2 text-start'>
+                      <TableHead className='py-2 text-start w-[40%] md:w-[45%]'>
                         <div className='flex items-center flex-wrap justify-start gap-1'>
-                          <span className='break-all text-[#1E255E] font-medium '>
-                            Website URL
+                          <span className='text-[#1E255E] font-medium'>
+                            {tab === 'websites'
+                              ? 'Website URL'
+                              : 'Document URL'}
                           </span>
                         </div>
                       </TableHead>
-                      <TableHead className='py-2 text-center'>
+                      <TableHead className='py-2 text-center w-[20%] md:w-[20%]'>
                         <div className='flex items-center flex-wrap justify-center gap-1'>
-                          <span className='break-all text-[#1E255E] font-medium '>
+                          <span className='text-[#1E255E] font-medium'>
                             Last Edited
                           </span>
                         </div>
                       </TableHead>
-                      <TableHead className='py-2 text-center'>
+                      <TableHead className='py-2 text-center w-[20%] md:w-[20%]'>
                         <div className='flex items-center flex-wrap justify-center'>
-                          <span className='break-all text-[#1E255E] font-medium '>
+                          <span className='text-[#1E255E] font-medium'>
                             State
                           </span>
                         </div>
                       </TableHead>
-                      <TableHead className='py-2 text-center'>
+                      <TableHead className='py-2 text-center w-[20%] md:w-[15%]'>
                         <div className='flex items-center flex-wrap justify-center'>
-                          <span className='break-all text-[#1E255E] font-medium '>
+                          <span className='text-[#1E255E] font-medium'>
                             Action
                           </span>
                         </div>
@@ -231,28 +328,49 @@ const AIKnowledge = ({
                     </TableRow>
                   </TableHeader>
                   <TableBody className='overflow-y-auto '>
-                    {Array.isArray(dummy) && dummy.length > 0 ? (
-                      dummy.map((detail, index) => (
+                    {Array.isArray(getCurrentList()) &&
+                    getCurrentList().length > 0 ? (
+                      getCurrentList().map((detail, index) => (
                         <TableRow key={index}>
                           <TableCell className='text-left'>
-                            <div className='flex break-all text-[#1E255E] font-normal  items-center justify-start'>
-                              {detail.url ?? ''}
-                            </div>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <div className='flex text-[#1E255E] font-normal items-center justify-start'>
+                                    {detail?.url
+                                      ? detail.url.length > 30
+                                        ? detail.url.substring(0, 30) + '...'
+                                        : detail.url
+                                      : ''}
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent
+                                  side='bottom'
+                                  align='center'
+                                  style={{
+                                    boxShadow: '0px 0px 4px 0px #0000001F',
+                                  }}
+                                  className='p-1 bg-[#57C0DD] text-white !z-50 max-w-[300px]'
+                                >
+                                  {detail?.url ?? ''}
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
                           </TableCell>
                           <TableCell className='text-center'>
                             <div className='flex break-all text-[#1E255E] font-normal  items-center justify-center'>
-                              {detail.lastEdited ?? ''}
+                              {'Today 12:00 pm'}
                             </div>
                           </TableCell>
                           <TableCell className='text-center'>
                             <div
                               className={`flex font-normal  ${
-                                detail.state === 'Used by AI'
+                                detail.active
                                   ? 'text-[#008000]'
                                   : 'text-[#FF0000]'
                               } break-all items-center justify-center`}
                             >
-                              {detail.state ?? ''}
+                              {detail.active ? '' : 'Not '}Used by AI
                             </div>
                           </TableCell>
 
@@ -263,17 +381,10 @@ const AIKnowledge = ({
                                   <TooltipTrigger asChild>
                                     <div>
                                       <Switch
-                                        checked={true}
-                                        // checked={
-                                        //   selectedPermission.find(
-                                        //     (p) => p._id === permission._id
-                                        //   )
-                                        //     ? true
-                                        //     : false
-                                        // }
-                                        // onCheckedChange={() =>
-                                        //   OnChangePermission(permission._id)
-                                        // }
+                                        checked={detail.active}
+                                        onCheckedChange={() =>
+                                          handleToggle(index)
+                                        }
                                       />
                                     </div>
                                   </TooltipTrigger>
@@ -283,14 +394,14 @@ const AIKnowledge = ({
                                     style={{
                                       boxShadow: '0px 0px 4px 0px #0000001F',
                                     }}
-                                    className='  p-1 bg-[#57C0DD] text-white !z-50'
+                                    className=' p-1 bg-[#57C0DD] text-white !z-50'
                                   >
-                                    AI Disable
+                                    {detail.active ? 'AI Enable' : 'AI Disable'}
                                   </TooltipContent>
                                 </Tooltip>
                                 <Tooltip>
                                   <TooltipTrigger asChild>
-                                    <button>
+                                    <button onClick={() => handleDelete(index)}>
                                       <RiDeleteBin6Line className='text-lg cursor-pointer' />
                                     </button>
                                   </TooltipTrigger>
@@ -300,7 +411,7 @@ const AIKnowledge = ({
                                     style={{
                                       boxShadow: '0px 0px 4px 0px #0000001F',
                                     }}
-                                    className=' mt-1 p-1 bg-[#57C0DD] text-white !z-50'
+                                    className='mt-1 p-1 bg-[#57C0DD] text-white !z-50'
                                   >
                                     Delete
                                   </TooltipContent>
@@ -312,8 +423,10 @@ const AIKnowledge = ({
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell className='text-center' colSpan={3}>
-                          No data
+                        <TableCell className='text-center py-4' colSpan={4}>
+                          <div className='text-[#1E255E] font-normal'>
+                            No data
+                          </div>
                         </TableCell>
                       </TableRow>
                     )}
@@ -329,128 +442,70 @@ const AIKnowledge = ({
                   onClick={() => setInitialIndex(0)}
                 />
                 <span className='text-[#1E255E] capitalize text-lg sm:text-xl font-medium text-center '>
-                  {tab}
+                  Documents
                 </span>
               </div>
               <div className='my-1 sm:my-2 ms-2 text-black font-normal '>
-                {`  Crawl your ${
-                  tab === 'websites' ? 'website’s' : 'document’s'
-                } content to get answers to popular user
+                {`Crawl your document's content to get answers to popular user
                 questions.`}
               </div>
               <div className='flex-1 flex flex-col mx-2 relative overflow-hidden'>
-                {tab === 'websites' ? (
-                  <div className='flex-1'>
-                    <div
-                      className='h-12 w-full  border rounded-xl
-         mt-4 mb-3 flex items-center bg-[#F2F2F2]'
-                    >
-                      <Input
-                        value={websiteUrl}
-                        onChange={(e) => setWebsiteUrl(e.target.value)}
-                        className='flex-1 border-none shadow-none pe-[2px] sm:pe-1 bg-transparent focus-visible:ring-0 text-sm sm:text-base placeholder:text-sm sm:placeholder:text-base placeholder:font-light '
-                        placeholder='Enter a URL address'
-                      ></Input>
-                      <div className='mx-2 sm:mx-3 md:mx-5'>
-                        <DropdownMenu
-                          onOpenChange={() => setDropDown(!dropDown)}
-                        >
-                          <DropdownMenuTrigger className='focus-visible:!outline-none w-full md:w-auto text-sm sm:text-base md:text-lg font-normal text-black flex items-center justify-between gap-1 sm:gap-2'>
-                            {scanType === 'FULLPAGE'
-                              ? 'Scan a full page'
-                              : 'Scan a single page'}
-                            {dropDown ? <IoIosArrowUp /> : <IoIosArrowDown />}
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent className='p-2 md:p-3 rounded-xl mt-3  me-12 sm:me-20 md:me-28 w-auto'>
-                            <DropdownMenuItem
-                              className='p-2  hover:bg-[#EEEEEE] flex flex-col justify-start items-start cursor-pointer'
-                              onClick={() => setScanType('FULLPAGE')}
-                            >
-                              <div className='text-sm sm:text-base md:text-lg font-medium flex items-center justify-between w-full'>
-                                Scan a full page
-                                {scanType === 'FULLPAGE' && <IoMdCheckmark />}
-                              </div>
-                              <div className='text-xs sm:text-sm md:text-base font-light'>
-                                Entire content from the provided page
-                              </div>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className='p-2  hover:bg-[#EEEEEE] flex flex-col justify-start items-start cursor-pointer'
-                              onClick={() => setScanType('SINGLEPAGE')}
-                            >
-                              <div className='text-sm sm:text-base md:text-lg font-medium flex items-center justify-between w-full'>
-                                Scan a single page
-                                {scanType === 'SINGLEPAGE' && <IoMdCheckmark />}
-                              </div>
-                              <div className='text-xs sm:text-sm md:text-base font-light'>
-                                Only single URL you provided
-                              </div>
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </div>
-                    <p className='font-light text-[#999999] text-xs'>
-                      By sharing your URL, you confirm you have the necessary
-                      rights to share its content.
-                    </p>
-                  </div>
-                ) : (
-                  <div className='flex-1 overflow-y-auto '>
-                    <div className='grid overflow-y-auto gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 '>
-                      {files.map((file, index) => (
-                        <div key={index}>
-                          <div className='border-[#CCCCCC] border border-dashed  flex flex-col items-center justify-center gap-2 w-full h-36'>
-                            <Image
-                              src='/images/file_pic.svg'
-                              alt='upload'
-                              width={84}
-                              height={84}
-                              quality={100}
-                            />
-                          </div>
-                          <label className='flex items-center justify-between border border-[#57C0DD]  w-full  p-2'>
-                            <div className='flex justify-between items-center w-full gap-2'>
-                              <span className='text-sm truncate sm:text-base w-full text-center text-[#57C0DD]'>
-                                {file.name}
-                              </span>
-                              <IoCloseOutline
-                                className='text-lg text-[#57C0DD] cursor-pointer'
-                                onClick={() => handleRemoveFile(index)}
-                              />
-                            </div>
-                          </label>
-                        </div>
-                      ))}
-                      <div>
+                <div className='flex-1 overflow-y-auto '>
+                  <div className='grid overflow-y-auto gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 '>
+                    {files.map((file, index) => (
+                      <div key={index}>
                         <div className='border-[#CCCCCC] border border-dashed  flex flex-col items-center justify-center gap-2 w-full h-36'>
                           <Image
-                            src='/images/arrow_upload.svg'
+                            src='/images/file_pic.svg'
                             alt='upload'
-                            width={43}
-                            height={43}
+                            width={84}
+                            height={84}
                             quality={100}
                           />
-                          <div className='text-[#7E7E7E] font-normal text-sm'>
-                            upload file
-                          </div>
                         </div>
-                        <label className='flex items-center justify-between border border-[#57C0DD]  w-full  p-2 cursor-pointer'>
-                          <input
-                            type='file'
-                            className='hidden'
-                            onChange={handleFileChange}
-                          />
-                          <span className='text-sm sm:text-base w-full text-center text-[#57C0DD]'>
-                            Choose file
-                          </span>
+                        <label className='flex items-center justify-between border border-[#57C0DD]  w-full  p-2'>
+                          <div className='flex justify-between items-center w-full gap-2'>
+                            <span className='text-sm truncate sm:text-base w-full text-center text-[#57C0DD]'>
+                              {file.name}
+                            </span>
+                            <IoCloseOutline
+                              className='text-lg text-[#57C0DD] cursor-pointer'
+                              onClick={() => handleRemoveFile(index)}
+                            />
+                          </div>
                         </label>
                       </div>
+                    ))}
+                    <div>
+                      <div className='border-[#CCCCCC] border border-dashed flex flex-col items-center justify-center gap-2 w-full h-36'>
+                        <Image
+                          src='/images/arrow_upload.svg'
+                          alt='upload'
+                          width={43}
+                          height={43}
+                          quality={100}
+                        />
+                        <div className='text-[#7E7E7E] font-normal text-sm'>
+                          PDF only, max 10MB.
+                        </div>
+                      </div>
+                      <label className='flex items-center justify-between border border-[#57C0DD]  w-full  p-2 cursor-pointer'>
+                        <input
+                          type='file'
+                          className='hidden'
+                          onChange={handleFileChange}
+                        />
+                        <span className='text-sm sm:text-base w-full text-center text-[#57C0DD]'>
+                          Choose file
+                        </span>
+                      </label>
                     </div>
                   </div>
-                )}
+                </div>
+
                 <Button
                   type='button'
+                  onClick={handleTrainAgent}
                   className='mt-2 h-fit relative ms-auto w-max bottom-0 right-0 text-white bg-gradient-to-r hover:from-[#53A7DD] hover:to-[#58C8DD]  from-[#58C8DD] to-[#53A7DD] py-3 rounded-xl'
                 >
                   Train ChatAgent
@@ -465,50 +520,3 @@ const AIKnowledge = ({
 };
 
 export default AIKnowledge;
-
-{
-  /* <Popover>
-                                <PopoverTrigger>
-                                  <VscSettings className="text-lg rotate-90 cursor-pointer" />
-                                </PopoverTrigger>
-                                <PopoverContent
-                                  className="w-[200px] flex flex-col gap-2"
-                                  onInteractOutside={(e) => {
-                                    e.preventDefault();
-                                  }}
-                                >
-                                  <RadioGroup className="gap-1">
-                                    <div className="flex items-center space-x-2">
-                                      <RadioGroupItem
-                                        value="Used by AI"
-                                        id="r1"
-                                        // className="focus:text-[#57C0DD] flex items-center gap-2  focus:border focus:border-[#57C0DD] "
-                                      />
-                                      <label
-                                        htmlFor="r1"
-                                        className="text-[#1E255E] text-sm"
-                                      >
-                                        Used by AI
-                                      </label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                      <RadioGroupItem
-                                        value="Not used by AI"
-                                        id="r2"
-                                        itemType="radio"
-                                        // className="focus:text-[#57C0DD] flex items-center gap-2  focus:border focus:border-[#57C0DD] "
-                                      />
-                                      <label
-                                        htmlFor="r2"
-                                        className="text-[#1E255E] text-sm"
-                                      >
-                                        Not used by AI
-                                      </label>
-                                    </div>
-                                  </RadioGroup>
-                                  <Button className="bg-gradient-to-r p-1 mt-1 h-auto hover:from-[#53A7DD] hover:to-[#58C8DD]  from-[#58C8DD] to-[#53A7DD]">
-                                    Save
-                                  </Button>
-                                </PopoverContent>
-                              </Popover> */
-}

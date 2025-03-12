@@ -1,21 +1,43 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import React, { useEffect, useState } from "react";
-import { Check } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import { FaMinus, FaPlus } from "react-icons/fa6";
-import { useQuery } from "@tanstack/react-query";
-import { Loader } from "./Loader";
-import { axiosInstance } from "@/utils/axiosInstance";
-import { toast } from "sonner";
-import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Cross2Icon } from "@radix-ui/react-icons";
-import { Input } from "@/components/ui/input";
-import { IBDA, IDeletecategory, ISubcategory, IUpdateQuestion } from "@/types/BDA";
-import { RiDeleteBinLine } from "react-icons/ri";
+'use client';
+import { Button } from '@/components/ui/button';
+import React, { useEffect, useState } from 'react';
+import { Check } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
+import { FaMinus, FaPlus } from 'react-icons/fa6';
+import { useQuery } from '@tanstack/react-query';
+import { Loader } from './Loader';
+import { axiosInstance } from '@/utils/axiosInstance';
+import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Cross2Icon } from '@radix-ui/react-icons';
+import { Input } from '@/components/ui/input';
+import {
+  IBDA,
+  IDeletecategory,
+  ISubcategory,
+  IUpdateQuestion,
+} from '@/types/BDA';
+import { RiDeleteBinLine } from 'react-icons/ri';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,8 +47,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import CustomAlertDialog from "./CustomAlertDialog";
+} from '@/components/ui/alert-dialog';
+import CustomAlertDialog from './CustomAlertDialog';
 
 type FetchIndustryListResponse = {
   message: string;
@@ -47,7 +69,7 @@ const ChooseIndustryTemplate = ({
   adminAction = false,
   botId,
 }: {
-  stepHandler: (type: "up" | "down") => void;
+  stepHandler: (type: 'up' | 'down') => void;
   industryValue: string;
   subIndustryValue: string;
   setIndustryValue: React.Dispatch<React.SetStateAction<string>>;
@@ -60,23 +82,23 @@ const ChooseIndustryTemplate = ({
   const [openSubIndustryPopup, setOpenSubIndustryPopup] = useState(false);
   const [openAddIndustry, setOpenAddIndustry] = useState(false);
   const [openAddSubIndustry, setOpenAddSubIndustry] = useState(false);
-  const [industry, setindustry] = useState<string>("");
-  const [subIndustry, setsubIndustry] = useState<string>("");
+  const [industry, setindustry] = useState<string>('');
+  const [subIndustry, setsubIndustry] = useState<string>('');
   const [industryAlert, setIndustryAlert] = useState({
     open: false,
-    data: { categoryID: "", category: "" },
+    data: { categoryID: '', category: '' },
   });
   const [subIndustryAlert, setSubIndustryAlert] = useState({
     open: false,
-    data: { category: "", subcategory: "" },
+    data: { category: '', subcategory: '' },
   });
 
   // Initialize state with a single input field
-  const [inputs, setInputs] = useState([{ id: 1, value: "" }]);
+  const [inputs, setInputs] = useState([{ id: 1, value: '' }]);
 
   // Function to handle adding new input
   const addInput = () => {
-    setInputs([...inputs, { id: inputs.length + 1, value: "" }]);
+    setInputs([...inputs, { id: inputs.length + 1, value: '' }]);
   };
 
   // Function to delete an input field
@@ -86,11 +108,17 @@ const ChooseIndustryTemplate = ({
 
   // Function to handle changes in input values
   const handleInputChange = (id: number, newValue: string) => {
-    setInputs(inputs.map((input) => (input.id === id ? { ...input, value: newValue } : input)));
+    setInputs(
+      inputs.map((input) =>
+        input.id === id ? { ...input, value: newValue } : input
+      )
+    );
   };
 
   const fetchIndustry = async () => {
-    const response: FetchIndustryListResponse = await axiosInstance.get(`/bda/get-category`);
+    const response: FetchIndustryListResponse = await axiosInstance.get(
+      `/bda/get-category`
+    );
     if (response.data.length >= 0) {
       return response.data;
     } else {
@@ -105,23 +133,23 @@ const ChooseIndustryTemplate = ({
     isError: errorInIndustryList,
     refetch: refetchIndustryList,
   } = useQuery({
-    queryKey: ["Industries", "List"],
+    queryKey: ['Industries', 'List'],
     queryFn: fetchIndustry,
   });
 
   const continueHandler = () => {
     if (!industryValue) {
-      toast.warning("Please select industry");
+      toast.warning('Please select industry');
     } else if (!subIndustryValue) {
-      toast.warning("Please select sub industry");
+      toast.warning('Please select sub industry');
     } else {
-      stepHandler("up");
+      stepHandler('up');
     }
   };
 
   const addIndustry = async (body: IBDA) => {
-    if (body.category == "") {
-      toast.warning("Please enter correct data");
+    if (body.category == '') {
+      toast.warning('Please enter correct data');
       return;
     }
     setLoader(true);
@@ -129,7 +157,7 @@ const ChooseIndustryTemplate = ({
       .post(`/bda/categories`, body)
       .then(() => {
         setOpenAddIndustry(false);
-        setindustry("");
+        setindustry('');
         refetchIndustryList();
         setLoader(false);
       })
@@ -143,8 +171,8 @@ const ChooseIndustryTemplate = ({
   };
 
   const deleteIndustry = async (body: IDeletecategory) => {
-    if (body.categoryID == "") {
-      toast.warning("Please enter correct data");
+    if (body.categoryID == '') {
+      toast.warning('Please enter correct data');
       return;
     }
     setLoader(true);
@@ -153,14 +181,14 @@ const ChooseIndustryTemplate = ({
       .then(() => {
         setIndustryAlert({
           open: false,
-          data: { categoryID: "", category: "" },
+          data: { categoryID: '', category: '' },
         });
         setOpenAddIndustry(false);
-        setindustry("");
+        setindustry('');
         refetchIndustryList();
         if (industryValue == body.category) {
-          setIndustryValue("");
-          setSubIndustryValue("");
+          setIndustryValue('');
+          setSubIndustryValue('');
           setInputs([]);
         }
         setLoader(false);
@@ -172,8 +200,8 @@ const ChooseIndustryTemplate = ({
   };
 
   const addSubCategory = async (body: ISubcategory) => {
-    if (body.category == "" || body.subcategory == "") {
-      toast.warning("Please enter correct data");
+    if (body.category == '' || body.subcategory == '') {
+      toast.warning('Please enter correct data');
       return;
     }
     setLoader(true);
@@ -181,7 +209,7 @@ const ChooseIndustryTemplate = ({
       .post(`/bda/subcategories`, body)
       .then(() => {
         setOpenAddSubIndustry(false);
-        setsubIndustry("");
+        setsubIndustry('');
         refetchIndustryList();
         setLoader(false);
       })
@@ -192,8 +220,8 @@ const ChooseIndustryTemplate = ({
   };
 
   const deleteSubIndustry = async (body: ISubcategory) => {
-    if (body.category == "" || body.subcategory == "") {
-      toast.warning("Please enter correct data");
+    if (body.category == '' || body.subcategory == '') {
+      toast.warning('Please enter correct data');
       return;
     }
     setLoader(true);
@@ -203,10 +231,10 @@ const ChooseIndustryTemplate = ({
         refetchIndustryList();
         setSubIndustryAlert({
           open: false,
-          data: { category: "", subcategory: "" },
+          data: { category: '', subcategory: '' },
         });
         if (subIndustryValue == body.subcategory) {
-          setSubIndustryValue("");
+          setSubIndustryValue('');
           setInputs([]);
         }
         setLoader(false);
@@ -218,19 +246,23 @@ const ChooseIndustryTemplate = ({
   };
 
   const updateQuestion = async () => {
-    const questions = inputs.filter((input) => input.value !== "").map((input) => input.value);
+    const questions = inputs
+      .filter((input) => input.value !== '')
+      .map((input) => input.value);
     const body: IUpdateQuestion = {
       category: industryValue,
       subcategory: subIndustryValue,
       questions,
     };
-    const category = IndustryList?.find((industry) => industry.category == body.category);
-    if (body.category == "" && !category) {
-      toast.warning("Please enter correct data");
+    const category = IndustryList?.find(
+      (industry) => industry.category == body.category
+    );
+    if (body.category == '' && !category) {
+      toast.warning('Please enter correct data');
       return;
     }
     if (questions.length == 0) {
-      toast.warning("Please enter atleast one question");
+      toast.warning('Please enter atleast one question');
       return;
     }
     setLoader(true);
@@ -238,7 +270,7 @@ const ChooseIndustryTemplate = ({
       .put(`/bda/categories/${category?.id}`, body)
       .then(() => {
         refetchIndustryList();
-        toast.success("BDA Updated successfuly");
+        toast.success('BDA Updated successfuly');
         setLoader(false);
       })
       .catch((err) => {
@@ -259,10 +291,13 @@ const ChooseIndustryTemplate = ({
   const fetchBDAQuestion = async () => {
     setLoader(true);
     try {
-      const response: FetchBDAQuestionListResponse = await axiosInstance.post(`/bda/questions`, {
-        category: industryValue,
-        subcategory: subIndustryValue,
-      });
+      const response: FetchBDAQuestionListResponse = await axiosInstance.post(
+        `/bda/questions`,
+        {
+          category: industryValue,
+          subcategory: subIndustryValue,
+        }
+      );
       if (response.data.questions.length >= 0) {
         setInputs(
           response.data.questions.map((question: string, index: number) => {
@@ -283,7 +318,7 @@ const ChooseIndustryTemplate = ({
   };
 
   useEffect(() => {
-    if (industryValue !== "" && subIndustryValue !== "") {
+    if (industryValue !== '' && subIndustryValue !== '') {
       adminAction && fetchBDAQuestion();
     }
   }, [subIndustryValue]);
@@ -292,45 +327,52 @@ const ChooseIndustryTemplate = ({
     <>
       <div className={`w-full  flex-1 mx-auto h-auto flex flex-col`}>
         {(loadIndustryList || fetchingIndustryList || loader) && <Loader />}
-        <div className="flex justify-between items-center gap-3 mb-2">
-          <div className="flex justify-between flex-col">
-            <div className="text-lg md:text-xl font-semibold text-black">Select your industry</div>
+        <div className='flex justify-between items-center gap-3 mb-2'>
+          <div className='flex justify-between flex-col'>
+            <div className='text-lg md:text-xl font-semibold text-black'>
+              Select your industry
+            </div>
             {!adminAction && (
-              <div className="text-base hidden sm:block md:text-xl mt-1 font-normal text-black">
+              <div className='text-base hidden sm:block md:text-xl mt-1 font-normal text-black'>
                 Knowing your industry will help us
               </div>
             )}
           </div>
         </div>
         <Popover open={openIndustryPopup} onOpenChange={setOpenIndustryPopup}>
-          <PopoverTrigger asChild className="mt-3 md:mt-2">
+          <PopoverTrigger asChild className='mt-3 md:mt-2'>
             <Button
-              variant="outline"
-              role="combobox"
+              variant='outline'
+              role='combobox'
               aria-expanded={openIndustryPopup}
-              className="w-full justify-between !bg-transparent"
+              className='w-full justify-between !bg-transparent'
             >
               {industryValue ? (
                 industryValue
               ) : (
-                <span className="text-[#6F7288B2] text-sm opacity-90">Select your industry</span>
+                <span className='text-[#6F7288B2] text-sm opacity-90'>
+                  Select your industry
+                </span>
               )}
               {openIndustryPopup ? (
-                <IoIosArrowUp className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                <IoIosArrowUp className='ml-2 h-4 w-4 shrink-0 opacity-50' />
               ) : (
-                <IoIosArrowDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                <IoIosArrowDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent align="end" className=" me-7 w-[180px] md:w-[250px] p-0 ">
+          <PopoverContent
+            align='end'
+            className=' me-7 w-[180px] md:w-[250px] p-0 '
+          >
             <Command>
-              <CommandInput placeholder="Search framework..." />
-              <CommandList className="max-h-[120px] md:max-h-[250px] overflow-scroll">
+              <CommandInput placeholder='Search framework...' />
+              <CommandList className='max-h-[120px] md:max-h-[250px] overflow-scroll'>
                 <CommandEmpty>No industry found.</CommandEmpty>
                 <CommandGroup>
                   {adminAction && (
                     <Button
-                      className="flex gap-4 bg-primary px-2 py-0 w-full hover:bg-primary mb-2 justify-start"
+                      className='flex gap-4 bg-primary px-2 py-0 w-full hover:bg-primary mb-2 justify-start'
                       onClick={() => {
                         setOpenAddIndustry((pre) => !pre);
                       }}
@@ -346,22 +388,26 @@ const ChooseIndustryTemplate = ({
                         key={Industry.category}
                         value={Industry.category}
                         onSelect={(currentValue) => {
-                          setSubIndustryValue("");
-                          setIndustryValue(currentValue === industryValue ? "" : currentValue);
+                          setSubIndustryValue('');
+                          setIndustryValue(
+                            currentValue === industryValue ? '' : currentValue
+                          );
                           setOpenIndustryPopup(false);
                           setInputs([]);
                         }}
                       >
                         <Check
                           className={cn(
-                            "mr-2 h-4 w-4",
-                            industryValue === Industry.category ? "opacity-100" : "opacity-0"
+                            'mr-2 h-4 w-4',
+                            industryValue === Industry.category
+                              ? 'opacity-100'
+                              : 'opacity-0'
                           )}
                         />
                         {Industry.category}
                         {adminAction && (
                           <RiDeleteBinLine
-                            className="text-red-600 ml-auto cursor-pointer"
+                            className='text-red-600 ml-auto cursor-pointer'
                             onClick={(e) => {
                               e.stopPropagation();
                               e.preventDefault();
@@ -383,36 +429,46 @@ const ChooseIndustryTemplate = ({
             </Command>
           </PopoverContent>
         </Popover>
-        <div className="text-lg md:text-xl font-semibold text-black mt-4 md:mt-6 ">Select sub industry</div>
-        <Popover open={openSubIndustryPopup} onOpenChange={setOpenSubIndustryPopup}>
-          <PopoverTrigger asChild className=" mt-3 md:mt-2">
+        <div className='text-lg md:text-xl font-semibold text-black mt-4 md:mt-6 '>
+          Select sub industry
+        </div>
+        <Popover
+          open={openSubIndustryPopup}
+          onOpenChange={setOpenSubIndustryPopup}
+        >
+          <PopoverTrigger asChild className=' mt-3 md:mt-2'>
             <Button
-              variant="outline"
-              role="combobox"
+              variant='outline'
+              role='combobox'
               aria-expanded={openSubIndustryPopup}
-              className="w-full justify-between !bg-transparent"
+              className='w-full justify-between !bg-transparent'
             >
               {subIndustryValue ? (
                 subIndustryValue
               ) : (
-                <span className="text-[#6F7288B2] text-sm opacity-90">Select your sub industry</span>
+                <span className='text-[#6F7288B2] text-sm opacity-90'>
+                  Select your sub industry
+                </span>
               )}
               {openSubIndustryPopup ? (
-                <IoIosArrowUp className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                <IoIosArrowUp className='ml-2 h-4 w-4 shrink-0 opacity-50' />
               ) : (
-                <IoIosArrowDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                <IoIosArrowDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent align="end" className=" me-7 w-[180px] md:w-[250px] p-0 ">
+          <PopoverContent
+            align='end'
+            className=' me-7 w-[180px] md:w-[250px] p-0 '
+          >
             <Command>
-              <CommandInput placeholder="Search framework..." />
-              <CommandList className="max-h-[120px] md:max-h-[250px] overflow-scroll">
+              <CommandInput placeholder='Search framework...' />
+              <CommandList className='max-h-[120px] md:max-h-[250px] overflow-scroll'>
                 <CommandEmpty>No subindustry found.</CommandEmpty>
                 <CommandGroup>
-                  {adminAction && industryValue !== "" && (
+                  {adminAction && industryValue !== '' && (
                     <Button
-                      className="flex gap-4 bg-primary px-2 py-0 w-full hover:bg-primary mb-2 justify-start"
+                      className='flex gap-4 bg-primary px-2 py-0 w-full hover:bg-primary mb-2 justify-start'
                       onClick={() => {
                         setOpenAddSubIndustry((pre) => !pre);
                       }}
@@ -423,22 +479,33 @@ const ChooseIndustryTemplate = ({
                   )}
                   {!errorInIndustryList &&
                     IndustryList &&
-                    IndustryList.find((data) => data.category === industryValue)?.subcategories.map((subIndustry) => (
+                    IndustryList.find(
+                      (data) => data.category === industryValue
+                    )?.subcategories.map((subIndustry) => (
                       <CommandItem
                         key={subIndustry}
                         value={subIndustry}
                         onSelect={(currentValue) => {
-                          setSubIndustryValue(currentValue === subIndustryValue ? "" : currentValue);
+                          setSubIndustryValue(
+                            currentValue === subIndustryValue
+                              ? ''
+                              : currentValue
+                          );
                           setOpenSubIndustryPopup(false);
                         }}
                       >
                         <Check
-                          className={cn("mr-2 h-4 w-4", subIndustryValue === subIndustry ? "opacity-100" : "opacity-0")}
+                          className={cn(
+                            'mr-2 h-4 w-4',
+                            subIndustryValue === subIndustry
+                              ? 'opacity-100'
+                              : 'opacity-0'
+                          )}
                         />
                         {subIndustry}
                         {adminAction && (
                           <RiDeleteBinLine
-                            className="text-red-600 ml-auto cursor-pointer"
+                            className='text-red-600 ml-auto cursor-pointer'
                             onClick={(e) => {
                               e.stopPropagation();
                               e.preventDefault();
@@ -460,12 +527,12 @@ const ChooseIndustryTemplate = ({
             </Command>
           </PopoverContent>
         </Popover>
-        <div className="pt-6 sm:ms-auto flex items-center gap-4 mt-auto">
+        <div className='pt-6 sm:ms-auto flex items-center gap-4 mt-auto'>
           {!adminAction && botId && (
             <CustomAlertDialog
               botId={botId as string}
               trigger={
-                <Button className="w-full sm:w-auto px-8 py-2 sm:px-11 border border-[#57C0DD] bg-transparent text-[#57C0DD] hover:bg-transparent">
+                <Button className='w-full sm:w-auto px-8 py-2 sm:px-11 border border-[#57C0DD] bg-transparent text-[#57C0DD] hover:bg-transparent'>
                   Go Back
                 </Button>
               }
@@ -473,7 +540,7 @@ const ChooseIndustryTemplate = ({
           )}
           {!adminAction && (
             <Button
-              className="w-full sm:w-auto px-8 py-2 sm:px-11 border bg-gradient-to-r hover:from-[#53A7DD] hover:to-[#58C8DD] from-[#58C8DD] to-[#53A7DD] hover:bg-transparent"
+              className='w-full sm:w-auto px-8 py-2 sm:px-11 border bg-gradient-to-r hover:from-[#53A7DD] hover:to-[#58C8DD] from-[#58C8DD] to-[#53A7DD] hover:bg-transparent'
               onClick={() => continueHandler()}
             >
               Continue
@@ -482,32 +549,40 @@ const ChooseIndustryTemplate = ({
         </div>
 
         {adminAction && inputs && subIndustryValue && industryValue && (
-          <div className="mt-4 md:mt-6 px-1 flex flex-col items-end w-full">
-            <div className="text-lg md:text-xl mb-3 font-semibold text-black">Questions</div>
+          <div className='mt-4 md:mt-6 px-1 flex flex-col items-end w-full'>
+            <div className='text-lg md:text-xl mb-3 font-semibold text-black'>
+              Questions
+            </div>
             {inputs.map((input, index) => (
-              <div className="flex gap-3 w-full" key={input.id}>
+              <div className='flex gap-3 w-full' key={input.id}>
                 <Input
-                  type="text"
+                  type='text'
                   value={input.value}
                   onChange={(e) => handleInputChange(input.id, e.target.value)}
                   placeholder={`Question ${index + 1}`}
-                  style={{ display: "block", marginBottom: "8px" }}
+                  style={{ display: 'block', marginBottom: '8px' }}
                 />
                 <Button
                   onClick={() => {
                     deleteInput(input.id);
                   }}
-                  className="hover:bg-primary"
+                  className='hover:bg-primary'
                 >
                   <FaMinus />
                 </Button>
               </div>
             ))}
-            <Button onClick={addInput} className="hover:bg-primary mb-2 !w-40 ml-auto">
+            <Button
+              onClick={addInput}
+              className='hover:bg-primary mb-2 !w-40 ml-auto'
+            >
               <FaPlus />
             </Button>
-            <div className="flex gap-4 ml-auto">
-              <Button onClick={updateQuestion} className="min-w-40 hover:bg-[#53ABDC] bg-[#53ABDC]">
+            <div className='flex gap-4 ml-auto'>
+              <Button
+                onClick={updateQuestion}
+                className='min-w-40 hover:bg-[#53ABDC] bg-[#53ABDC]'
+              >
                 Submit
               </Button>
             </div>
@@ -521,23 +596,23 @@ const ChooseIndustryTemplate = ({
           <DialogHeader>
             <DialogTitle>Add Industry</DialogTitle>
             <DialogClose
-              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+              className='absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground'
               onClick={() => {
                 setOpenAddIndustry(false);
               }}
             >
-              <Cross2Icon className="h-4 w-4" />
-              <span className="sr-only">Close</span>
+              <Cross2Icon className='h-4 w-4' />
+              <span className='sr-only'>Close</span>
             </DialogClose>
           </DialogHeader>
           <Input
-            placeholder="Industry name"
+            placeholder='Industry name'
             onChange={(e) => {
               setindustry(e.target.value);
             }}
           />
           <Button
-            className="hover:bg-primary"
+            className='hover:bg-primary'
             onClick={() => {
               const body = {
                 category: industry,
@@ -556,23 +631,23 @@ const ChooseIndustryTemplate = ({
           <DialogHeader>
             <DialogTitle>Add Sub Industry</DialogTitle>
             <DialogClose
-              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+              className='absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground'
               onClick={() => {
                 setOpenAddSubIndustry(false);
               }}
             >
-              <Cross2Icon className="h-4 w-4" />
-              <span className="sr-only">Close</span>
+              <Cross2Icon className='h-4 w-4' />
+              <span className='sr-only'>Close</span>
             </DialogClose>
           </DialogHeader>
           <Input
-            placeholder="Sub Industry name"
+            placeholder='Sub Industry name'
             onChange={(e) => {
               setsubIndustry(e.target.value);
             }}
           />
           <Button
-            className="hover:bg-primary"
+            className='hover:bg-primary'
             onClick={() => {
               const body: ISubcategory = {
                 category: industryValue,
@@ -592,7 +667,8 @@ const ChooseIndustryTemplate = ({
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              Industry <b>{industryAlert.data.category}</b> will be deleted. You will lose all the data.
+              Industry <b>{industryAlert.data.category}</b> will be deleted. You
+              will lose all the data.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -600,14 +676,14 @@ const ChooseIndustryTemplate = ({
               onClick={() =>
                 setIndustryAlert({
                   open: false,
-                  data: { categoryID: "", category: "" },
+                  data: { categoryID: '', category: '' },
                 })
               }
             >
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-500 hover:bg-red-700"
+              className='bg-red-500 hover:bg-red-700'
               onClick={() => deleteIndustry(industryAlert.data)}
             >
               Delete
@@ -622,7 +698,8 @@ const ChooseIndustryTemplate = ({
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              SubIndustry <b>{subIndustryAlert.data.subcategory}</b> will be deleted. You will lose all the data.
+              SubIndustry <b>{subIndustryAlert.data.subcategory}</b> will be
+              deleted. You will lose all the data.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -630,14 +707,14 @@ const ChooseIndustryTemplate = ({
               onClick={() =>
                 setSubIndustryAlert({
                   open: false,
-                  data: { category: "", subcategory: "" },
+                  data: { category: '', subcategory: '' },
                 })
               }
             >
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-500 hover:bg-red-700"
+              className='bg-red-500 hover:bg-red-700'
               onClick={() => deleteSubIndustry(subIndustryAlert.data)}
             >
               Delete

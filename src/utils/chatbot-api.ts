@@ -1,7 +1,7 @@
-import { axiosError } from "@/types/axiosTypes";
-import { useMutation } from "@tanstack/react-query";
-import { axiosInstance } from "./axiosInstance";
-import { TypeBotResponse } from "@/types/node";
+import { axiosError } from '@/types/axiosTypes';
+import { useMutation } from '@tanstack/react-query';
+import { axiosInstance } from './axiosInstance';
+import { TypeBotResponse } from '@/types/node';
 type DefaultResponse = {
   statusCode: number;
   data: null;
@@ -17,8 +17,9 @@ type GetBotResponseRequest = {
   model: string;
 };
 type GetBotResponse = {
+  closeChat?: 'END' | 'START' | 'END';
   response: TypeBotResponse[];
-  message: "Fallback response";
+  message: 'Fallback response';
 };
 export const useGetChatbotResponse = ({
   onSuccess,
@@ -28,11 +29,11 @@ export const useGetChatbotResponse = ({
   onError: (error: axiosError) => void;
 }) =>
   useMutation({
-    mutationKey: ["get", "bot", "response"],
+    mutationKey: ['get', 'bot', 'response'],
     mutationFn: (data: GetBotResponseRequest): Promise<GetBotResponse> => {
       return axiosInstance.post(`/chatbot-interact`, data, {
         headers: {
-          "x-playground": "true",
+          'x-playground': 'true',
         },
       });
     },
@@ -54,11 +55,11 @@ export const useSaveContact = ({
   onError: (error: axiosError) => void;
 }) =>
   useMutation({
-    mutationKey: ["save", "contact"],
+    mutationKey: ['save', 'contact'],
     mutationFn: (data: saveContactRequest): Promise<DefaultResponse> => {
       return axiosInstance.post(`chatbot-interact/contact`, data, {
         headers: {
-          "x-playground": "true",
+          'x-playground': 'true',
         },
       });
     },

@@ -50,13 +50,13 @@ const CustomAlertDialog = ({
         <div className='gap-4 flex flex-col'>
           <div className='flex items-center justify-between'>
             <div className='text-primary  text-base'>
-              Training {`is't`} finished yet
+              The ChatAgent creation process is incomplete
             </div>
             <DialogClose>
               <IoCloseOutline className='text-lg' />
             </DialogClose>
           </div>
-          <div className='text-primary text-sm text-black'>{`Are you sure you want to finish go back?you'll lose the genrate content`}</div>
+          <div className='text-primary text-sm text-black'>{`Are you sure you want to exit? Any generated content will be lost.`}</div>
           <div className='flex gap-2 sm:gap-3 items-center justify-end'>
             <Button
               className='border border-[#57C0DD] text-xs text-[#57C0DD] py-2 w-[105px] sm:w-[116px] bg-transparent rounded-full hover:bg-[#f0faff]'

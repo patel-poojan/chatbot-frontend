@@ -29,8 +29,7 @@ import {
   DefaultBotResponseNode,
 } from '@/app/components/playground/playgroundArea/CustomNode';
 import { Button } from '@/components/ui/button';
-import { IoCode, IoFlashOutline } from 'react-icons/io5';
-import { MdUpdate } from 'react-icons/md';
+import { IoCode, IoFlashOutline, IoPersonCircleOutline } from 'react-icons/io5';
 import {
   Tooltip,
   TooltipContent,
@@ -56,6 +55,8 @@ import AttributesDialog from '@/app/components/playground/AttributesDialog';
 import ChatBotDialog from '@/app/components/playground/chatbot/ChatBotDialog';
 import { TypePlaygroundNode } from '@/types/node';
 import PublishDialog from '@/app/components/playground/PublishDialog';
+import ContactGatheringDialog from '@/app/components/playground/ContactGatheringDialog';
+import Image from 'next/image';
 
 const ReactFlow = dynamic(
   () => import('@xyflow/react').then((mod) => mod.ReactFlow),
@@ -155,6 +156,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
   const [aiSection, setAiSection] = useState(false);
   const [chatBotDialog, setChatBotDialog] = useState(false);
   const [attributesDialog, setAttributesDialog] = useState(false);
+  const [contactGatheringEnabled, setContactGatheringEnabled] = useState(false);
   const { screenToFlowPosition } = useReactFlow();
   // const { type, label } = usePlayground();
   const {
@@ -532,11 +534,13 @@ const MainComponent = ({ botId }: { botId: string }) => {
       setChatBotDialog(true);
       setActionDialog(false);
       setAttributesDialog(false);
+      setContactGatheringEnabled(false);
     }
   };
   const actionHandler = () => {
     setChatBotDialog(false);
     setAttributesDialog(false);
+    setContactGatheringEnabled(false);
     if (actionDialog) {
       setActionDialog(false);
     } else {
@@ -546,10 +550,21 @@ const MainComponent = ({ botId }: { botId: string }) => {
   const attributesHandler = () => {
     setChatBotDialog(false);
     setActionDialog(false);
+    setContactGatheringEnabled(false);
     if (attributesDialog) {
       setAttributesDialog(false);
     } else {
       setAttributesDialog(true);
+    }
+  };
+  const contactGatheringHandler = () => {
+    setChatBotDialog(false);
+    setActionDialog(false);
+    setAttributesDialog(false);
+    if (contactGatheringEnabled) {
+      setContactGatheringEnabled(false);
+    } else {
+      setContactGatheringEnabled(true);
     }
   };
   return (
@@ -557,7 +572,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
       {(loadPlayground || pendingAddNode || isPageLoader) && <Loader />}
       {aiSection ? (
         <div className='p-4 sm:p-6 flex flex-1 flex-col relative '>
-          <AIKnowledge setAiSection={setAiSection} />
+          <AIKnowledge setAiSection={setAiSection} chatbotId={botId} />
         </div>
       ) : (
         <div className=' sm:p-6 flex flex-1 flex-col relative bg-[#F6F6F6]'>
@@ -572,7 +587,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
                 </div>
               ) : null}
 
-              {/* <TooltipProvider>
+              <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div
@@ -596,10 +611,10 @@ const MainComponent = ({ botId }: { botId: string }) => {
                     style={{ boxShadow: '0px 0px 4px 0px #0000001F' }}
                     className=' mt-1  p-1 bg-[#57C0DD] text-white !z-50'
                   >
-                    Action
+                    AI knowledge
                   </TooltipContent>
                 </Tooltip>
-              </TooltipProvider> */}
+              </TooltipProvider>
             </div>
             <div className=' flex items-center gap-3'>
               <div
@@ -628,7 +643,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
                     </TooltipContent>
                   </Tooltip>
 
-                  <Tooltip>
+                  {/* <Tooltip>
                     <TooltipTrigger asChild>
                       <button>
                         <MdUpdate className='text-xl cursor-pointer' />
@@ -641,6 +656,26 @@ const MainComponent = ({ botId }: { botId: string }) => {
                       className=' mt-3 p-1 bg-[#57C0DD] text-white !z-50'
                     >
                       Version History
+                    </TooltipContent>
+                  </Tooltip> */}
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button onClick={() => contactGatheringHandler()}>
+                        <IoPersonCircleOutline
+                          className={`text-xl cursor-pointer ${
+                            contactGatheringEnabled ? 'text-[#57C0DD]' : ''
+                          } `}
+                        />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      side='bottom'
+                      align='center'
+                      style={{ boxShadow: '0px 0px 4px 0px #0000001F' }}
+                      className=' mt-3 p-1 bg-[#57C0DD] text-white !z-50'
+                    >
+                      Contact Gathering
                     </TooltipContent>
                   </Tooltip>
                   <Tooltip>
@@ -716,6 +751,13 @@ const MainComponent = ({ botId }: { botId: string }) => {
               attributesHandler={attributesHandler}
               chatbotId={botId}
               attributeDialog={attributesDialog}
+            />
+          )}
+          {contactGatheringEnabled && (
+            <ContactGatheringDialog
+              contactGatheringHandler={contactGatheringHandler}
+              isOpen={contactGatheringEnabled}
+              chatbotId={botId}
             />
           )}
         </div>

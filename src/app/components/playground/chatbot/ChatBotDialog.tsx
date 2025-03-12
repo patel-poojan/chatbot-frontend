@@ -2,7 +2,7 @@ import { Input } from '@/components/ui/input';
 import { Cross2Icon } from '@radix-ui/react-icons';
 // import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
-import { IoSend } from 'react-icons/io5';
+import { IoClose, IoSend } from 'react-icons/io5';
 import ChatLoader from './ChatLoader';
 import { useGetChatbotResponse, useSaveContact } from '@/utils/chatbot-api';
 import { toast } from 'sonner';
@@ -44,6 +44,9 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
   const [pendingMessages, setPendingMessages] = useState<TypeBotResponse[]>([]);
   const [visibleMessages, setVisibleMessages] = useState<TypeBotResponse[]>([]);
   const [showCloseDialog, setShowCloseDialog] = useState(false);
+  const [closeChatPosition, setCloseChatPosition] = useState<
+    'OFF' | 'START' | 'END'
+  >('OFF');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [number, setNumber] = useState('');
@@ -91,9 +94,9 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
 
   const { mutate: fetchBotResponse } = useGetChatbotResponse({
     onSuccess(data) {
-      // if (data?.message) {
-      //   toast.success(data.message);
-      // }
+      if (data?.closeChat) {
+        setCloseChatPosition(data.closeChat);
+      }
       setApiLoading(false);
       if (data?.response) {
         setPendingMessages((prev) => [...prev, ...data.response]);
@@ -172,7 +175,7 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
       if (data?.message) {
         toast.success(data.message);
         setShowCloseDialog(false);
-        chatBotHandler();
+        closeChatPosition === 'END' && chatBotHandler();
       }
     },
     onError(error: axiosError) {
@@ -209,9 +212,20 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
       setShowCloseDialog(true);
     }
   }, [visibleMessages]);
+  const closeChatBotHandler = () => {
+    if (closeChatPosition === 'END') {
+      setShowCloseDialog(true);
+    } else {
+      chatBotHandler();
+    }
+  };
+  const closeChatHandler = () => {
+    setShowCloseDialog(false);
+    closeChatPosition === 'END' && chatBotHandler();
+  };
   return (
     <div
-      className=' min-[425px]:right-6 top-32 min-[699px]:top-20 flex flex-col min-[425px]:w-[375px] h-[65vh] max-[425px]:mx-6 min-[500px]:h-[60vh] rounded-lg overflow-hidden absolute '
+      className=' min-[425px]:right-6 max-[425px]:w-[calc(100vw-48px)] top-32 min-[699px]:top-20 flex flex-col min-[425px]:w-[375px] h-[65vh] max-[425px]:mx-6 min-[500px]:h-[60vh] rounded-lg overflow-hidden absolute '
       style={{ boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)' }}
     >
       {isPendingToSave && <Loader />}
@@ -246,7 +260,7 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
           </div>
           <Cross2Icon
             className='h-4 w-4 cursor-pointer'
-            onClick={chatBotHandler}
+            onClick={closeChatBotHandler}
           />
         </div>
         <div
@@ -312,6 +326,10 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
                 <h3 className='text-lg font-semibold text-[#1E255E]'>
                   Before you go
                 </h3>
+                <IoClose
+                  className='text-[#1E255E] text-xl cursor-pointer'
+                  onClick={closeChatHandler}
+                />
               </div>
               <div className='space-y-4'>
                 <Input
