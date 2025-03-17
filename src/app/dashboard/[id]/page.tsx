@@ -572,7 +572,11 @@ const MainComponent = ({ botId }: { botId: string }) => {
       {(loadPlayground || pendingAddNode || isPageLoader) && <Loader />}
       {aiSection ? (
         <div className='p-4 sm:p-6 flex flex-1 flex-col relative '>
-          <AIKnowledge setAiSection={setAiSection} chatbotId={botId} />
+          <AIKnowledge
+            setAiSection={setAiSection}
+            chatbotId={botId}
+            chatbotName={playgroundData?.chatbotName ?? ''}
+          />
         </div>
       ) : (
         <div className=' sm:p-6 flex flex-1 flex-col relative bg-[#F6F6F6]'>

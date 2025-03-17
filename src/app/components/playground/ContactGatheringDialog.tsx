@@ -117,7 +117,7 @@ const ContactGatheringDialog = ({
         if (!open) contactGatheringHandler();
       }}
     >
-      <DialogContent className='sm:max-w-md w-full max-w-[95vw] mx-auto'>
+      <DialogContent className='sm:max-w-md w-full max-w-[90vw] mx-auto rounded-lg'>
         {(isPending || isUpdatePending) && <Loader />}
         <DialogHeader>
           <DialogTitle className='text-xl font-medium'>
