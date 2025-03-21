@@ -151,6 +151,15 @@ const AIKnowledge = ({
   // Handle toggle functionality
   const handleToggle = (index: number) => {
     if (tab === 'documents') {
+      // Check if trying to disable the last active document
+      if (
+        listOfDocument[index].active && // If currently active
+        listOfDocument.filter((item) => item.active).length === 1 // And it's the only active one
+      ) {
+        toast.warning('At least one document must remain active');
+        return;
+      }
+
       setListOfDocument((prev) =>
         prev.map((item, i) => {
           if (i === index) {
@@ -163,6 +172,15 @@ const AIKnowledge = ({
         })
       );
     } else {
+      // Check if trying to disable the last active website
+      if (
+        listOfWebsites[index].active && // If currently active
+        listOfWebsites.filter((item) => item.active).length === 1 // And it's the only active one
+      ) {
+        toast.warning('At least one website must remain active');
+        return;
+      }
+
       setListOfWebsites((prev) =>
         prev.map((item, i) => {
           if (i === index) {
