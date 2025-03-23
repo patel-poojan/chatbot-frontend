@@ -329,13 +329,7 @@ const AIKnowledge = ({
                           </span>
                         </div>
                       </TableHead>
-                      <TableHead className='py-2 text-center w-[20%] md:w-[20%]'>
-                        <div className='flex items-center flex-wrap justify-center gap-1'>
-                          <span className='text-[#1E255E] font-medium'>
-                            Last Edited
-                          </span>
-                        </div>
-                      </TableHead>
+                     
                       <TableHead className='py-2 text-center w-[20%] md:w-[20%]'>
                         <div className='flex items-center flex-wrap justify-center'>
                           <span className='text-[#1E255E] font-medium'>
@@ -382,11 +376,7 @@ const AIKnowledge = ({
                               </Tooltip>
                             </TooltipProvider>
                           </TableCell>
-                          <TableCell className='text-center'>
-                            <div className='flex break-all text-[#1E255E] font-normal  items-center justify-center'>
-                              {'Today 12:00 pm'}
-                            </div>
-                          </TableCell>
+                      
                           <TableCell className='text-center'>
                             <div
                               className={`flex font-normal  ${
