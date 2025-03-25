@@ -17,6 +17,8 @@ import { axiosError } from '@/types/axiosTypes';
 import { PopoverClose } from '@radix-ui/react-popover';
 import { Input } from '@/components/ui/input';
 import { Loader } from '@/app/components/Loader';
+import Cookies from 'js-cookie';
+import { useUserRole } from '@/app/components/UserRoleProvider';
 
 type FetchChatbotListResponse = {
   statusCode: number;
@@ -40,11 +42,6 @@ const Page = () => {
   const titleInputRef = useRef<HTMLInputElement>(null);
   const [userName, setUserName] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setUserName(localStorage.getItem('username'));
-    }
-  }, []);
   const [greeting] = useState(() => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Good morning';
@@ -53,8 +50,10 @@ const Page = () => {
   });
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const storedUsername = localStorage.getItem('username');
-      setUserName(storedUsername);
+      const storedUsername = Cookies.get('username');
+      if (storedUsername) {
+        setUserName(storedUsername);
+      }
     }
   }, []);
   const handleEditClick = (chatbotId: string, name: string) => {
@@ -132,7 +131,13 @@ const Page = () => {
       toast.error(errorMessage);
     },
   });
+  const { userRole, permissions, isLoading } = useUserRole();
 
+  // Logging for debugging purposes
+  useEffect(() => {
+    console.log('userRole in Page component dash:', userRole);
+    console.log('permissions in Page component:', permissions, isLoading);
+  }, [userRole, permissions, isLoading]);
   return (
     <div className='flex-1 flex flex-col max-[500px]:p-4 overflow-auto'>
       {loadChatbotList || updatePending || deletePending ? <Loader /> : <></>}

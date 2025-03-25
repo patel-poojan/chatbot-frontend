@@ -26,14 +26,41 @@ const Page = () => {
       const token = data.data.accessToken;
       if (token) {
         if (data.data.user.username) {
-          localStorage.setItem('username', data.data.user.username);
-          localStorage.setItem('email', data.data.user.email);
+          Cookies.set('username', data.data.user.username, {
+            path: '/',
+            sameSite: 'Lax',
+            secure: true,
+          });
+          Cookies.set('email', data.data.user.email, {
+            path: '/',
+            sameSite: 'Lax',
+            secure: true,
+          });
+        }
+        if (data.data.user.userRole) {
+          Cookies.set('userRole', data.data.user.userRole, {
+            path: '/',
+            sameSite: 'Lax',
+            secure: true,
+          });
+        }
+        if (data.data.user.permissions) {
+          Cookies.set(
+            'permissions',
+            JSON.stringify(data.data.user.permissions),
+            {
+              path: '/',
+              sameSite: 'Lax',
+              secure: true,
+            }
+          );
         }
         Cookies.set('authToken', token, {
           path: '/',
           sameSite: 'Lax',
           secure: true,
         });
+
         router.push('/chatbotlist');
       }
       toast.success(data?.message);

@@ -14,7 +14,15 @@ export default function middleware(request: NextRequest) {
   try {
     // Retrieve the token from cookies
     const token = request.cookies.get('authToken')?.value || '';
-
+    const role = request.cookies.get('userRole')?.value || '';
+    const permissions = request.cookies.get('permissions')?.value || '[]';
+    const parsedPermissions = JSON.parse(permissions);
+    console.log(
+      'parsedPermissions',
+      parsedPermissions,
+      parsedPermissions.includes('ACCESS_TO_USER_DATA'),
+      role === 'subadmin' && !parsedPermissions.includes('ACCESS_TO_USER_DATA')
+    );
     // If no token is found, redirect to the home page
     if (pathName === '/login' && !token) {
       return NextResponse.next();
@@ -26,6 +34,16 @@ export default function middleware(request: NextRequest) {
 
     // Decode the token and check its expiration
     const decoded = jwtDecode<{ exp: number }>(token);
+
+    // Check role-based access control
+    if (
+      pathName === '/users' &&
+      (role === 'user' ||
+        (role === 'subadmin' &&
+          !parsedPermissions.includes('ACCESS_TO_USER_DATA')))
+    ) {
+      return NextResponse.redirect(new URL('/chatbotlist', request.url));
+    }
 
     if (pathName === '/login' && token) {
       if (decoded.exp * 1000 > new Date().getTime()) {
@@ -59,7 +77,7 @@ export const config = {
     '/create/document/train',
     '/create/website',
     '/create/website/train',
-    '/user',
+    '/users',
     '/training',
     '/login',
     '/create/website/:path*',

@@ -1,8 +1,8 @@
-import { useMutation } from "@tanstack/react-query";
-import { axiosInstance } from "./axiosInstance";
-import { axiosError } from "@/types/axiosTypes";
-import Cookies from "js-cookie";
-import { toast } from "sonner";
+import { useMutation } from '@tanstack/react-query';
+import { axiosInstance } from './axiosInstance';
+import { axiosError } from '@/types/axiosTypes';
+import Cookies from 'js-cookie';
+import { toast } from 'sonner';
 
 // Common types
 type DefaultResponse = {
@@ -22,6 +22,8 @@ type LoginResponse = {
       id: string;
       username: string;
       email: string;
+      permissions: string[];
+      userRole: string;
     };
   };
 };
@@ -46,6 +48,8 @@ type VerifyResponse = {
       id: string;
       username: string;
       email: string;
+      permissions: string[];
+      userRole: string;
     };
   };
   success: boolean;
@@ -72,7 +76,7 @@ type ForgetPasswordResetRequest = {
 
 // Helper for centralized error handling
 const handleError = (error: axiosError) => {
-  toast.error(error.response?.data?.message || "An error occurred");
+  toast.error(error.response?.data?.message || 'An error occurred');
 };
 
 // Generic hook factory for auth mutations
@@ -99,19 +103,25 @@ export const useLogin = ({
   onError?: (error: axiosError) => void;
 }) =>
   useAuthMutation<LoginResponse, LoginRequest>(
-    ["auth", "login"],
-    (data: LoginRequest) => axiosInstance.post("/auth/login", data),
+    ['auth', 'login'],
+    (data: LoginRequest) => axiosInstance.post('/auth/login', data),
     onSuccess,
     onError
   );
 
 // Logout Mutation
-export const useLogout = ({ onSuccess }: { onSuccess: (data: DefaultResponse) => void }) =>
+export const useLogout = ({
+  onSuccess,
+}: {
+  onSuccess: (data: DefaultResponse) => void;
+}) =>
   useAuthMutation<DefaultResponse, void>(
-    ["auth", "logout"],
-    () => axiosInstance.delete("/auth/logout"),
+    ['auth', 'logout'],
+    () => axiosInstance.delete('/auth/logout'),
     (data) => {
-      Cookies.remove("authToken");
+      Object.keys(Cookies.get()).forEach((cookieName) => {
+        Cookies.remove(cookieName);
+      });
       onSuccess(data);
     }
   );
@@ -125,8 +135,8 @@ export const useSignup = ({
   onError?: (error: axiosError) => void;
 }) =>
   useAuthMutation<DefaultResponse, SignupRequest>(
-    ["auth", "signup"],
-    (data: SignupRequest) => axiosInstance.post("/auth/register", data),
+    ['auth', 'signup'],
+    (data: SignupRequest) => axiosInstance.post('/auth/register', data),
     onSuccess,
     onError
   );
@@ -140,8 +150,12 @@ export const useVerifyEmail = ({
   onError?: (error: axiosError) => void;
 }) =>
   useAuthMutation<VerifyResponse, { token: string; emailId: string }>(
-    ["auth", "verify-email"],
-    ({ token, emailId }) => axiosInstance.post(`/auth/verify-email?token=${token}&email=${emailId}`, {}),
+    ['auth', 'verify-email'],
+    ({ token, emailId }) =>
+      axiosInstance.post(
+        `/auth/verify-email?token=${token}&email=${emailId}`,
+        {}
+      ),
     onSuccess,
     onError
   );
@@ -155,8 +169,9 @@ export const useResendEmail = ({
   onError?: (error: axiosError) => void;
 }) =>
   useAuthMutation<DefaultResponse, ResendEmailRequest>(
-    ["auth", "resend-email"],
-    (data: ResendEmailRequest) => axiosInstance.post(`/auth/resend-verification-email`, data),
+    ['auth', 'resend-email'],
+    (data: ResendEmailRequest) =>
+      axiosInstance.post(`/auth/resend-verification-email`, data),
     onSuccess,
     onError
   );
@@ -170,8 +185,9 @@ export const useResetPassword = ({
   onError?: (error: axiosError) => void;
 }) =>
   useAuthMutation<DefaultResponse, ResetPasswordRequest>(
-    ["auth", "reset-password"],
-    (data: ResetPasswordRequest) => axiosInstance.post(`/auth/change-password`, data),
+    ['auth', 'reset-password'],
+    (data: ResetPasswordRequest) =>
+      axiosInstance.post(`/auth/change-password`, data),
     onSuccess,
     onError
   );
@@ -185,8 +201,9 @@ export const useForgetPassword = ({
   onError?: (error: axiosError) => void;
 }) =>
   useAuthMutation<DefaultResponse, ForgetPasswordRequest>(
-    ["auth", "forget-password"],
-    (data: ForgetPasswordRequest) => axiosInstance.post(`/auth/forgot-password`, data),
+    ['auth', 'forget-password'],
+    (data: ForgetPasswordRequest) =>
+      axiosInstance.post(`/auth/forgot-password`, data),
     onSuccess,
     onError
   );
@@ -200,10 +217,10 @@ export const useForgetPasswordReset = ({
   onError?: (error: axiosError) => void;
 }) =>
   useAuthMutation<DefaultResponse, ForgetPasswordResetRequest>(
-    ["auth", "forget-password-reset"],
+    ['auth', 'forget-password-reset'],
     (data: ForgetPasswordResetRequest) =>
       axiosInstance.post(`auth/reset-password?token=${data.token}`, {
-        newPassword: data?.newPassword || "",
+        newPassword: data?.newPassword || '',
       }),
     onSuccess,
     onError

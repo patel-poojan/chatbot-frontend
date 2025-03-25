@@ -3,6 +3,7 @@
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/utils/react-query';
 import { Toaster } from 'sonner';
+import UserRoleProvider from './UserRoleProvider';
 
 export default function ClientProvider({
   children,
@@ -10,9 +11,11 @@ export default function ClientProvider({
   children: React.ReactNode;
 }) {
   return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-      <Toaster richColors position='top-right' duration={2000} />
-    </QueryClientProvider>
+    <UserRoleProvider>
+      <QueryClientProvider client={queryClient}>
+        {children}
+        <Toaster richColors position='top-right' duration={2000} />
+      </QueryClientProvider>
+    </UserRoleProvider>
   );
 }

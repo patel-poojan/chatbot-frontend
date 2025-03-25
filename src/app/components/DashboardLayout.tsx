@@ -29,10 +29,15 @@ import { useLogout } from '@/utils/auth-api';
 import ResetPasswordDialog from './ResetPasswordDialog';
 import { toast } from 'sonner';
 import { Loader } from './Loader';
+import Cookies from 'js-cookie';
+import { UserRoleProvider } from './UserRoleProvider';
+
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const pathName = usePathname();
   const [userName, setUserName] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
+  const [role, setRole] = useState('');
+  const [permissions, setPermissions] = useState<string[]>([]);
   // const [isOpenPopup, setIsOpenPopup] = useState<boolean>(false);
   const router = useRouter();
   const params = useParams();
@@ -45,92 +50,138 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   });
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const storedUsername = localStorage.getItem('username');
-      setUserName(storedUsername);
-      const storedEmail = localStorage.getItem('email');
-      setEmail(storedEmail);
+      const storedUsername = Cookies.get('username');
+      if (storedUsername) {
+        setUserName(storedUsername);
+      }
+
+      const storedEmail = Cookies.get('email');
+      if (storedEmail) {
+        setEmail(storedEmail);
+      }
+      const role = Cookies.get('userRole');
+      if (role) {
+        setRole(role);
+      }
+      const permissions = Cookies.get('permissions');
+      if (permissions) {
+        setPermissions(JSON.parse(permissions));
+      }
     }
   }, []);
+  const showUser =
+    role === 'admin' ||
+    (role !== 'user' &&
+      !(role === 'subadmin' && !permissions.includes('ACCESS_TO_USER_DATA')));
   return (
-    <div className='min-[500px]:bg-[#1B1B20] h-dvh  flex  p-0 min-[500px]:p-3'>
-      {isPending ? <Loader /> : <></>}
-      <div className='pr-3 hidden min-[500px]:flex flex-col justify-between py-3  lg:items-center'>
-        <div className='flex flex-col gap-3 items-center'>
-          <Link href={'/chatbotlist'}>
-            <Image
-              className='bg-white rounded-full cursor-pointer p-1'
-              src='/images/bot-icon.svg'
-              alt='chatbot logo'
-              width={45}
-              height={45}
-              priority
-              quality={100}
-            />
-          </Link>
+    <UserRoleProvider>
+      <div className='min-[500px]:bg-[#1B1B20] h-dvh  flex  p-0 min-[500px]:p-3'>
+        {isPending ? <Loader /> : <></>}
+        <div className='pr-3 hidden min-[500px]:flex flex-col justify-between py-3  lg:items-center'>
+          <div className='flex flex-col gap-3 items-center'>
+            <Link href={'/chatbotlist'}>
+              <Image
+                className='bg-white rounded-full cursor-pointer p-1'
+                src='/images/bot-icon.svg'
+                alt='chatbot logo'
+                width={45}
+                height={45}
+                priority
+                quality={100}
+              />
+            </Link>
 
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link href={'/chatbotlist'}>
-                  <div
-                    className={`${
-                      pathName === '/chatbotlist' ||
-                      pathName === '/create' ||
-                      pathName.includes('/dashboard')
-                        ? 'bg-[#3D3D4A]'
-                        : 'bg-transparent'
-                    } hover:bg-[#3D3D4A] h-11 w-11 flex items-center justify-center rounded-md cursor-pointer`}
-                  >
-                    <IoGrid className='text-white text-2xl' />
-                  </div>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent
-                side='right'
-                align='center'
-                className='bg-[#1B1B20]'
-                sideOffset={14}
-              >
-                <p>ChatAgents</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link href={'/users'}>
-                  <div
-                    className={`${
-                      pathName === '/users' ? 'bg-[#3D3D4A]' : 'bg-transparent'
-                    } hover:bg-[#3D3D4A] h-11 w-11 flex items-center justify-center rounded-md cursor-pointer`}
-                  >
-                    <MdOutlinePeopleAlt className='text-2xl text-white cursor-pointer' />
-                  </div>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent
-                side='right'
-                align='center'
-                className='bg-[#1B1B20]'
-                sideOffset={14}
-              >
-                <p>users</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          {chatbotId && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Link href={`/training/${chatbotId}`}>
+                  <Link href={'/chatbotlist'}>
                     <div
                       className={`${
-                        pathName.includes('/training')
+                        pathName === '/chatbotlist' ||
+                        pathName === '/create' ||
+                        pathName.includes('/dashboard')
                           ? 'bg-[#3D3D4A]'
                           : 'bg-transparent'
                       } hover:bg-[#3D3D4A] h-11 w-11 flex items-center justify-center rounded-md cursor-pointer`}
                     >
-                      <MdOutlineQuickreply className='text-2xl text-white cursor-pointer' />
+                      <IoGrid className='text-white text-2xl' />
+                    </div>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent
+                  side='right'
+                  align='center'
+                  className='bg-[#1B1B20]'
+                  sideOffset={14}
+                >
+                  <p>ChatAgents</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            {showUser && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link href={'/users'}>
+                      <div
+                        className={`${
+                          pathName === '/users'
+                            ? 'bg-[#3D3D4A]'
+                            : 'bg-transparent'
+                        } hover:bg-[#3D3D4A] h-11 w-11 flex items-center justify-center rounded-md cursor-pointer`}
+                      >
+                        <MdOutlinePeopleAlt className='text-2xl text-white cursor-pointer' />
+                      </div>
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    side='right'
+                    align='center'
+                    className='bg-[#1B1B20]'
+                    sideOffset={14}
+                  >
+                    <p>users</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+            {chatbotId && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link href={`/training/${chatbotId}`}>
+                      <div
+                        className={`${
+                          pathName.includes('/training')
+                            ? 'bg-[#3D3D4A]'
+                            : 'bg-transparent'
+                        } hover:bg-[#3D3D4A] h-11 w-11 flex items-center justify-center rounded-md cursor-pointer`}
+                      >
+                        <MdOutlineQuickreply className='text-2xl text-white cursor-pointer' />
+                      </div>
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    className='bg-[#1B1B20]'
+                    side='right'
+                    align='center'
+                    sideOffset={14}
+                  >
+                    <p>training</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link href={'/bda'}>
+                    <div
+                      className={`${
+                        pathName === '/bda' ? 'bg-[#3D3D4A]' : 'bg-transparent'
+                      } hover:bg-[#3D3D4A] h-11 w-11 flex items-center justify-center rounded-md cursor-pointer`}
+                    >
+                      <PiNotepadBold className='text-2xl text-white cursor-pointer' />
                     </div>
                   </Link>
                 </TooltipTrigger>
@@ -140,166 +191,176 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                   align='center'
                   sideOffset={14}
                 >
-                  <p>training</p>
+                  <p>BDA</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-          )}
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link href={'/bda'}>
-                  <div
-                    className={`${
-                      pathName === '/bda' ? 'bg-[#3D3D4A]' : 'bg-transparent'
-                    } hover:bg-[#3D3D4A] h-11 w-11 flex items-center justify-center rounded-md cursor-pointer`}
-                  >
-                    <PiNotepadBold className='text-2xl text-white cursor-pointer' />
-                  </div>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent
-                className='bg-[#1B1B20]'
-                side='right'
-                align='center'
-                sideOffset={14}
-              >
-                <p>BDA</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-        <Popover>
-          <PopoverTrigger>
-            <BsPersonFill className='text-black text-4xl cursor-pointer p-1 rounded-full bg-white ms-auto' />
-          </PopoverTrigger>
-          <PopoverContent
-            className='mb-1 ms-3 border border-[#EFEFEF] rounded-xl w-fit p-1'
-            style={{ boxShadow: '0px 0px 12px 4px #00000014' }}
-          >
-            <ResetPasswordDialog
-              trigger={
-                <div className='text-black font-medium text-base flex gap-1 pt-2 px-4 pb-1 hover:bg-[#58C8DD4a] items-center cursor-pointer'>
-                  <MdLockReset className='text-xl' /> Reset Password
-                </div>
-              }
-            />
-
-            <div
-              className='text-black font-medium text-base gap-1 hover:bg-[#58C8DD4a] pb-2 px-4 pt-1 flex items-center cursor-pointer'
-              onClick={() => mutate()}
+          </div>
+          <Popover>
+            <PopoverTrigger>
+              <BsPersonFill className='text-black text-4xl cursor-pointer p-1 rounded-full bg-white ms-auto' />
+            </PopoverTrigger>
+            <PopoverContent
+              className='mb-1 ms-3 border border-[#EFEFEF] rounded-xl w-fit p-1'
+              style={{ boxShadow: '0px 0px 12px 4px #00000014' }}
             >
-              <MdOutlineLogout className='text-xl' /> Log Out
-            </div>
-          </PopoverContent>
-        </Popover>
-      </div>
-      <div
-        className={`flex-1 w-full flex flex-col bg-white ${
-          pathName.startsWith('/dashboard')
-            ? 'p-0'
-            : 'max-[500px]:p-0 p-6 lg:p-8 xl:px-16 xl:py-12'
-        }   min-[500px]:rounded-3xl overflow-hidden h-full`}
-      >
-        <div className='block min-[500px]:hidden'>
-          <TopBar
-            content={
-              <div className='h-full flex flex-col w-full bg-white pt-3'>
-                <div className='w-full  flex-1'>
-                  <Link href={'/chatbotlist'}>
-                    <div
-                      className={`flex gap-3 items-center  rounded-lg py-3 ${
-                        pathName === '/chatbotlist' ||
-                        pathName === '/create' ||
-                        pathName.includes('/dashboard')
-                          ? 'px-3 blue-gradient'
-                          : ''
-                      }`}
-                    >
-                      <div
-                        className={
-                          pathName === '/chatbotlist' ||
-                          pathName === '/create' ||
-                          pathName.includes('/dashboard')
-                            ? 'p-2 rounded-md bg-[#3D3D4A33]'
-                            : ''
-                        }
-                      >
-                        <IoGrid
-                          className={
-                            pathName === '/chatbotlist' ||
-                            pathName === '/create' ||
-                            pathName.includes('/dashboard')
-                              ? 'text-white text-xl'
-                              : 'text-lg text-[#1e255eb2]'
-                          }
-                        />
-                      </div>
-                      <p
-                        className={`text-base  ${
-                          pathName === '/chatbotlist' ||
-                          pathName === '/create' ||
-                          pathName.includes('/dashboard')
-                            ? 'text-white'
-                            : 'text-[#1e255eb2]'
-                        }  font-medium`}
-                      >
-                        Dashboard
-                      </p>
-                    </div>
-                  </Link>
-                  <Link href={'/users'}>
-                    <div
-                      className={`flex gap-3 items-center   rounded-lg py-3 ${
-                        pathName === '/users' ? 'px-3 blue-gradient' : ''
-                      }`}
-                    >
-                      <div
-                        className={
-                          pathName === '/users'
-                            ? 'p-2 rounded-md bg-[#3D3D4A33] '
-                            : ''
-                        }
-                      >
-                        <MdOutlinePeopleAlt
-                          className={
-                            pathName === '/users'
-                              ? 'text-white text-xl'
-                              : 'text-2xl text-[#1e255eb2]'
-                          }
-                        />
-                      </div>
-                      <p
-                        className={`text-base  ${
-                          pathName === '/users'
-                            ? 'text-white'
-                            : 'text-[#1e255eb2]'
-                        }  font-medium`}
-                      >
-                        User
-                      </p>
-                    </div>
-                  </Link>
+              <ResetPasswordDialog
+                trigger={
+                  <div className='text-black font-medium text-base flex gap-1 pt-2 px-4 pb-1 hover:bg-[#58C8DD4a] items-center cursor-pointer'>
+                    <MdLockReset className='text-xl' /> Reset Password
+                  </div>
+                }
+              />
 
-                  {chatbotId && (
-                    <Link href={`/training/${chatbotId}`}>
+              <div
+                className='text-black font-medium text-base gap-1 hover:bg-[#58C8DD4a] pb-2 px-4 pt-1 flex items-center cursor-pointer'
+                onClick={() => mutate()}
+              >
+                <MdOutlineLogout className='text-xl' /> Log Out
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
+        <div
+          className={`flex-1 w-full flex flex-col bg-white ${
+            pathName.startsWith('/dashboard')
+              ? 'p-0'
+              : 'max-[500px]:p-0 p-6 lg:p-8 xl:px-16 xl:py-12'
+          }   min-[500px]:rounded-3xl overflow-hidden h-full`}
+        >
+          <div className='block min-[500px]:hidden'>
+            <TopBar
+              content={
+                <div className='h-full flex flex-col w-full bg-white pt-3'>
+                  <div className='w-full  flex-1'>
+                    <Link href={'/chatbotlist'}>
                       <div
                         className={`flex gap-3 items-center  rounded-lg py-3 ${
-                          pathName.includes('/training')
+                          pathName === '/chatbotlist' ||
+                          pathName === '/create' ||
+                          pathName.includes('/dashboard')
                             ? 'px-3 blue-gradient'
                             : ''
                         }`}
                       >
                         <div
                           className={
-                            pathName.includes('/training')
+                            pathName === '/chatbotlist' ||
+                            pathName === '/create' ||
+                            pathName.includes('/dashboard')
                               ? 'p-2 rounded-md bg-[#3D3D4A33]'
                               : ''
                           }
                         >
-                          <MdOutlineQuickreply
+                          <IoGrid
+                            className={
+                              pathName === '/chatbotlist' ||
+                              pathName === '/create' ||
+                              pathName.includes('/dashboard')
+                                ? 'text-white text-xl'
+                                : 'text-lg text-[#1e255eb2]'
+                            }
+                          />
+                        </div>
+                        <p
+                          className={`text-base  ${
+                            pathName === '/chatbotlist' ||
+                            pathName === '/create' ||
+                            pathName.includes('/dashboard')
+                              ? 'text-white'
+                              : 'text-[#1e255eb2]'
+                          }  font-medium`}
+                        >
+                          Dashboard
+                        </p>
+                      </div>
+                    </Link>
+                    {showUser && (
+                      <Link href={'/users'}>
+                        <div
+                          className={`flex gap-3 items-center   rounded-lg py-3 ${
+                            pathName === '/users' ? 'px-3 blue-gradient' : ''
+                          }`}
+                        >
+                          <div
+                            className={
+                              pathName === '/users'
+                                ? 'p-2 rounded-md bg-[#3D3D4A33] '
+                                : ''
+                            }
+                          >
+                            <MdOutlinePeopleAlt
+                              className={
+                                pathName === '/users'
+                                  ? 'text-white text-xl'
+                                  : 'text-2xl text-[#1e255eb2]'
+                              }
+                            />
+                          </div>
+                          <p
+                            className={`text-base  ${
+                              pathName === '/users'
+                                ? 'text-white'
+                                : 'text-[#1e255eb2]'
+                            }  font-medium`}
+                          >
+                            User
+                          </p>
+                        </div>
+                      </Link>
+                    )}
+                    {chatbotId && (
+                      <Link href={`/training/${chatbotId}`}>
+                        <div
+                          className={`flex gap-3 items-center  rounded-lg py-3 ${
+                            pathName.includes('/training')
+                              ? 'px-3 blue-gradient'
+                              : ''
+                          }`}
+                        >
+                          <div
                             className={
                               pathName.includes('/training')
+                                ? 'p-2 rounded-md bg-[#3D3D4A33]'
+                                : ''
+                            }
+                          >
+                            <MdOutlineQuickreply
+                              className={
+                                pathName.includes('/training')
+                                  ? 'text-white text-xl'
+                                  : 'text-2xl text-[#1e255eb2]'
+                              }
+                            />
+                          </div>
+                          <p
+                            className={`text-base  ${
+                              pathName.includes('/training')
+                                ? 'text-white'
+                                : 'text-[#1e255eb2]'
+                            }  font-medium`}
+                          >
+                            Training
+                          </p>
+                        </div>
+                      </Link>
+                    )}
+                    <Link href={'/bda'}>
+                      <div
+                        className={`flex gap-3 items-center   rounded-lg py-3 ${
+                          pathName === '/bda' ? 'px-3 blue-gradient' : ''
+                        }`}
+                      >
+                        <div
+                          className={
+                            pathName === '/bda'
+                              ? 'p-2 rounded-md bg-[#3D3D4A33] '
+                              : ''
+                          }
+                        >
+                          <PiNotepadBold
+                            className={
+                              pathName === '/bda'
                                 ? 'text-white text-xl'
                                 : 'text-2xl text-[#1e255eb2]'
                             }
@@ -307,93 +368,61 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                         </div>
                         <p
                           className={`text-base  ${
-                            pathName.includes('/training')
+                            pathName === '/bda'
                               ? 'text-white'
                               : 'text-[#1e255eb2]'
                           }  font-medium`}
                         >
-                          Training
+                          BDA
                         </p>
                       </div>
                     </Link>
-                  )}
-                  <Link href={'/bda'}>
-                    <div
-                      className={`flex gap-3 items-center   rounded-lg py-3 ${
-                        pathName === '/bda' ? 'px-3 blue-gradient' : ''
-                      }`}
+                  </div>
+                  <Popover>
+                    <PopoverTrigger>
+                      <div className='flex justify-between items-center border-2 bg-[#e9e9e933] rounded-xl border-[#F3F3F3] p-2'>
+                        <div className='flex items-center gap-3'>
+                          <BsPersonFill className='text-white text-4xl cursor-pointer p-2 rounded-full bg-black' />
+                          <div className='text-start'>
+                            <p className='text-[#1e255eb2] font-medium text-base capitalize'>
+                              {userName ?? 'User'}
+                            </p>
+                            <p className='text-[#1e255eb2] font-light text-base'>
+                              {email ?? 'Email'}
+                            </p>
+                          </div>
+                        </div>
+                        <MdKeyboardArrowRight className='text-xl text-[#1E255E]' />
+                      </div>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className='mb-1 border  border-[#EFEFEF] rounded-xl w-[95vw]  p-1'
+                      style={{ boxShadow: '0px 0px 12px 4px #00000014' }}
                     >
-                      <div
-                        className={
-                          pathName === '/bda'
-                            ? 'p-2 rounded-md bg-[#3D3D4A33] '
-                            : ''
+                      <ResetPasswordDialog
+                        trigger={
+                          <div className='text-black font-medium text-base  flex gap-1 pt-2 px-6  items-center cursor-pointer'>
+                            <MdLockReset className='text-xl' /> Reset Password
+                          </div>
                         }
+                      />
+                      <div className='border-b-2 border-[#EFEFEF] my-2 mx-3 '></div>
+                      <div
+                        className='text-[red] font-medium text-base gap-1  pb-2 px-6  flex items-center cursor-pointer'
+                        onClick={() => mutate()}
                       >
-                        <PiNotepadBold
-                          className={
-                            pathName === '/bda'
-                              ? 'text-white text-xl'
-                              : 'text-2xl text-[#1e255eb2]'
-                          }
-                        />
+                        <MdOutlineLogout className='text-xl' /> Log Out
                       </div>
-                      <p
-                        className={`text-base  ${
-                          pathName === '/bda'
-                            ? 'text-white'
-                            : 'text-[#1e255eb2]'
-                        }  font-medium`}
-                      >
-                        BDA
-                      </p>
-                    </div>
-                  </Link>
+                    </PopoverContent>
+                  </Popover>
                 </div>
-                <Popover>
-                  <PopoverTrigger>
-                    <div className='flex justify-between items-center border-2 bg-[#e9e9e933] rounded-xl border-[#F3F3F3] p-2'>
-                      <div className='flex items-center gap-3'>
-                        <BsPersonFill className='text-white text-4xl cursor-pointer p-2 rounded-full bg-black' />
-                        <div className='text-start'>
-                          <p className='text-[#1e255eb2] font-medium text-base capitalize'>
-                            {userName ?? 'User'}
-                          </p>
-                          <p className='text-[#1e255eb2] font-light text-base'>
-                            {email ?? 'Email'}
-                          </p>
-                        </div>
-                      </div>
-                      <MdKeyboardArrowRight className='text-xl text-[#1E255E]' />
-                    </div>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className='mb-1 border  border-[#EFEFEF] rounded-xl w-[95vw]  p-1'
-                    style={{ boxShadow: '0px 0px 12px 4px #00000014' }}
-                  >
-                    <ResetPasswordDialog
-                      trigger={
-                        <div className='text-black font-medium text-base  flex gap-1 pt-2 px-6  items-center cursor-pointer'>
-                          <MdLockReset className='text-xl' /> Reset Password
-                        </div>
-                      }
-                    />
-                    <div className='border-b-2 border-[#EFEFEF] my-2 mx-3 '></div>
-                    <div
-                      className='text-[red] font-medium text-base gap-1  pb-2 px-6  flex items-center cursor-pointer'
-                      onClick={() => mutate()}
-                    >
-                      <MdOutlineLogout className='text-xl' /> Log Out
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
-            }
-          />
+              }
+            />
+          </div>
+          {children}
         </div>
-        {children}
       </div>
-    </div>
+    </UserRoleProvider>
   );
 };
 

@@ -1,6 +1,5 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import DashboardLayout from '../components/DashboardLayout';
 import {
   Table,
   TableBody,
@@ -20,10 +19,10 @@ import { Input } from '@/components/ui/input';
 import { IoSearchSharp } from 'react-icons/io5';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { VscSettings } from 'react-icons/vsc';
-import PermissionDialog from '../components/PermissionDialog';
+import PermissionDialog from '../../components/PermissionDialog';
 import { axiosInstance } from '@/utils/axiosInstance';
 import { useQuery } from '@tanstack/react-query';
-import { Loader } from '../components/Loader';
+import { Loader } from '../../components/Loader';
 import { DataFormatter } from '@/utils/formatter';
 import { toast } from 'sonner';
 import { useDeleteUser } from '@/utils/user-api';
@@ -34,7 +33,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import CreateUserDialog from '../components/CreateUserDialog';
+import CreateUserDialog from '../../components/CreateUserDialog';
+import { useUserRole } from '../../components/UserRoleProvider';
+
 // Define types for API responses
 interface User {
   _id: string | null;
@@ -185,7 +186,9 @@ const Details = ({
                         permissions={detail.permissions ?? []}
                         name={detail.username ?? ''}
                         trigger={
-                          <VscSettings className='text-lg rotate-90 cursor-pointer' />
+                          <div className='cursor-pointer'>
+                            <VscSettings className='text-lg rotate-90 cursor-pointer' />
+                          </div>
                         }
                       />
                     )}
@@ -214,17 +217,23 @@ const Details = ({
 };
 
 const Page = () => {
-  const [tab, setTab] = useState(0);
-  const [searchTerms, setSearchTerms] = useState<string>('');
+  const { userRole, permissions, isLoading: isUserRoleLoading } = useUserRole();
+
+  const isAdmin = userRole === 'admin';
+
+  // Set default tab based on user role
+  const [tab, setTab] = useState(isAdmin ? 0 : 1);
+  const [searchTerms, setSearchTerms] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState(searchTerms);
-  const fetchUsers = async (): Promise<User[]> => {
+
+  const fetchUsers = async () => {
     const response: FetchUserResponse = await axiosInstance.get(
       `/admin/users?search=${debouncedSearch}`
     );
     return response.data;
   };
 
-  const fetchSubAdmins = async (): Promise<SubAdmin[]> => {
+  const fetchSubAdmins = async () => {
     const response: FetchSubAdminResponse = await axiosInstance.get(
       `/admin/subadmin?search=${debouncedSearch}`
     );
@@ -242,6 +251,7 @@ const Page = () => {
     // staleTime: 5 * 60 * 1000,
     enabled: tab === 1,
   });
+
   const {
     data: subAdminDetails,
     isLoading: loadSubAdminDetails,
@@ -250,8 +260,9 @@ const Page = () => {
   } = useQuery({
     queryKey: ['subAdmins'],
     queryFn: fetchSubAdmins,
-    enabled: tab === 0,
+    enabled: tab === 0 && isAdmin,
   });
+
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchTerms);
@@ -260,6 +271,7 @@ const Page = () => {
       clearTimeout(handler);
     };
   }, [searchTerms]);
+
   useEffect(() => {
     if (debouncedSearch.length > 2) {
       if (tab === 0) {
@@ -276,10 +288,18 @@ const Page = () => {
       }
     }
   }, [debouncedSearch, refetchSubAdmins, refetchUsers, searchTerms, tab]);
+
   useEffect(() => {
     setSearchTerms('');
     setDebouncedSearch('');
   }, [tab]);
+
+  // Set default tab when user role changes
+  useEffect(() => {
+    if (!isUserRoleLoading) {
+      setTab(isAdmin ? 0 : 1);
+    }
+  }, [isAdmin, isUserRoleLoading]);
 
   useEffect(() => {
     if (errorInSubAdminDetails) {
@@ -291,24 +311,31 @@ const Page = () => {
       toast.error(errorMessage);
     }
   }, [errorInSubAdminDetails, errorInUsersDetails]);
-
+  console.log(
+    'permission',
+    userRole === 'admin' || permissions?.includes('CREATE_USER')
+  );
   return (
-    <DashboardLayout>
-      {(loadUsersDetails || loadSubAdminDetails) && <Loader />}
-      <div className='flex flex-1 flex-col  overflow-hidden max-[500px]:p-4 gap-4 sm:gap-6 max-w-full'>
+    <>
+      {(loadUsersDetails || loadSubAdminDetails || isUserRoleLoading) && (
+        <Loader />
+      )}
+      <div className='flex flex-1 flex-col overflow-hidden max-[500px]:p-4 gap-4 sm:gap-6 max-w-full'>
         <div className='flex flex-col sm:flex-row sm:items-center gap-3'>
           <div className='flex-1 flex items-center justify-between'>
             <div className='flex items-center gap-4'>
-              <div
-                onClick={() => setTab(0)}
-                className={`cursor-pointer ${
-                  tab === 0
-                    ? 'text-base sm:text-lg text-[#1E255E] font-medium underline underline-offset-8 decoration-2 decoration-[#57C0DD]'
-                    : 'text-sm sm:text-base text-black font-light'
-                }`}
-              >
-                Admin
-              </div>
+              {isAdmin && (
+                <div
+                  onClick={() => setTab(0)}
+                  className={`cursor-pointer ${
+                    tab === 0
+                      ? 'text-base sm:text-lg text-[#1E255E] font-medium underline underline-offset-8 decoration-2 decoration-[#57C0DD]'
+                      : 'text-sm sm:text-base text-black font-light'
+                  }`}
+                >
+                  Admin
+                </div>
+              )}
               <div
                 onClick={() => setTab(1)}
                 className={`cursor-pointer ${
@@ -320,34 +347,36 @@ const Page = () => {
                 User
               </div>
             </div>
-            <CreateUserDialog
-              type={tab === 1 ? 'user' : 'subAdmin'}
-              refetch={tab === 1 ? refetchUsers : refetchSubAdmins}
-              trigger={
-                <div>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className='bg-[#F8F8F8] flex items-center cursor-pointer justify-center rounded-xl px-3 h-10 md:h-11'>
-                          <MdOutlinePersonAddAlt className='text-lg text-[#1E255E]' />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent
-                        side='bottom'
-                        align='center'
-                        className='bg-[#1B1B20]'
-                      >
-                        <p className=' !text-[10px]'>
-                          {tab === 1 ? 'Add User' : 'Add sub Admin'}
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>{' '}
-                  </TooltipProvider>
-                </div>
-              }
-            />
+            {(userRole === 'admin' || permissions?.includes('CREATE_USER')) && (
+              <CreateUserDialog
+                type={tab === 1 ? 'user' : 'subAdmin'}
+                refetch={tab === 1 ? refetchUsers : refetchSubAdmins}
+                trigger={
+                  <div>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className='bg-[#F8F8F8] flex items-center cursor-pointer justify-center rounded-xl px-3 h-10 md:h-11'>
+                            <MdOutlinePersonAddAlt className='text-lg text-[#1E255E]' />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent
+                          side='bottom'
+                          align='center'
+                          className='bg-[#1B1B20]'
+                        >
+                          <p className=' !text-[10px]'>
+                            {tab === 1 ? 'Add User' : 'Add sub Admin'}
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>{' '}
+                    </TooltipProvider>
+                  </div>
+                }
+              />
+            )}
           </div>
-          <div className='flex items-center py-0 md:py-1 px-3  rounded-xl bg-[#F8F8F8] w-full sm:w-auto'>
+          <div className='flex items-center py-0 md:py-1 px-3 rounded-xl bg-[#F8F8F8] w-full sm:w-auto'>
             <IoSearchSharp className='text-lg text-[#1E255E]' />
             <Input
               onChange={(e) => setSearchTerms(e.target.value)}
@@ -358,7 +387,7 @@ const Page = () => {
           </div>
         </div>
 
-        {tab === 0 && (
+        {tab === 0 && isAdmin && (
           <Details
             type='admin'
             refetch={refetchSubAdmins}
@@ -373,7 +402,7 @@ const Page = () => {
           />
         )}
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 export default Page;
