@@ -141,6 +141,14 @@ const AIKnowledge = ({
 
   // Handle delete functionality
   const handleDelete = (index: number) => {
+    if (tab === 'documents' && listOfDocument.length <= 1) {
+      toast.warning('At least one document must remain');
+      return;
+    } else if (tab === 'websites' && listOfWebsites.length <= 1) {
+      toast.warning('At least one website must remain');
+      return;
+    }
+
     if (tab === 'documents') {
       setListOfDocument((prev) => prev.filter((_, i) => i !== index));
     } else {
@@ -329,7 +337,7 @@ const AIKnowledge = ({
                           </span>
                         </div>
                       </TableHead>
-                     
+
                       <TableHead className='py-2 text-center w-[20%] md:w-[20%]'>
                         <div className='flex items-center flex-wrap justify-center'>
                           <span className='text-[#1E255E] font-medium'>
@@ -376,7 +384,7 @@ const AIKnowledge = ({
                               </Tooltip>
                             </TooltipProvider>
                           </TableCell>
-                      
+
                           <TableCell className='text-center'>
                             <div
                               className={`flex font-normal  ${
