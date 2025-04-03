@@ -311,10 +311,7 @@ const Page = () => {
       toast.error(errorMessage);
     }
   }, [errorInSubAdminDetails, errorInUsersDetails]);
-  console.log(
-    'permission',
-    userRole === 'admin' || permissions?.includes('CREATE_USER')
-  );
+
   return (
     <>
       {(loadUsersDetails || loadSubAdminDetails || isUserRoleLoading) && (
