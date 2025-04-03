@@ -312,7 +312,6 @@ const ChooseIndustryTemplate = ({
         return [];
       }
     } catch (error) {
-      console.log(error);
       setLoader(false);
     }
   };
