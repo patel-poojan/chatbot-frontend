@@ -1,23 +1,13 @@
-import Axios, {
-  AxiosError,
-  AxiosHeaders,
-  AxiosResponse,
-  InternalAxiosRequestConfig,
-} from 'axios';
-import { toast } from 'sonner';
-import Cookies from 'js-cookie';
+import Axios, { AxiosError, AxiosHeaders, AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import { toast } from "sonner";
+import Cookies from "js-cookie";
 
 const authRequestInterceptor = (config: InternalAxiosRequestConfig) => {
   // Get the current URL or path
-  const requestUrl = config.url || '';
+  const requestUrl = config.url || "";
 
   // Define the api routes where the token should NOT be passed
-  const noAuthPages = [
-    '/register',
-    '/verify-email',
-    '/resend-verification-email',
-    '/login',
-  ];
+  const noAuthPages = ["/register", "/verify-email", "/resend-verification-email", "/login"];
 
   // Check if the request URL matches any of the noAuthPages
   const shouldSkipAuth = noAuthPages.some((page) => requestUrl.includes(page));
@@ -27,13 +17,13 @@ const authRequestInterceptor = (config: InternalAxiosRequestConfig) => {
   }
 
   if (!shouldSkipAuth) {
-    const authToken = Cookies.get('authToken');
+    const authToken = Cookies.get("authToken");
     if (authToken) {
       config.headers.Authorization = `Bearer ${authToken}`;
     }
   }
 
-  config.headers.Accept = 'application/json';
+  config.headers.Accept = "application/json";
   return config;
 };
 
@@ -53,62 +43,60 @@ const responseInterceptor = (response: AxiosResponse) => response.data;
 const errorInterceptor = (error: AxiosError) => {
   if (!error.response) {
     // Handle network/server issues
-    if (error.code !== 'ERR_CANCELED') {
-      toast.error('Server or network error occurred');
+    if (error.code !== "ERR_CANCELED") {
+      toast.error("Server or network error occurred");
     }
     return Promise.reject(error);
   }
 
-  if (error.response.status === 401) {
-    window.location.replace('/login');
-    toast.error('Authentication required, please log in');
-  } else if (error.response.status === 403) {
-    // Define a more accurate type for the response data
-    interface ErrorResponseData {
-      data?: {
-        user?: {
-          permissions?: string[];
-        };
-      };
-    }
+  // if (error.response.status === 401) {
+  //   window.location.replace('/login');
+  //   toast.error('Authentication required, please log in');
+  // } else if (error.response.status === 403) {
+  //   // Define a more accurate type for the response data
+  //   interface ErrorResponseData {
+  //     data?: {
+  //       user?: {
+  //         permissions?: string[];
+  //       };
+  //     };
+  //   }
 
-    try {
-      const responseData = error.response.data as ErrorResponseData;
-      const permissionList = responseData?.data?.user?.permissions;
+  //   try {
+  //     const responseData = error.response.data as ErrorResponseData;
+  //     const permissionList = responseData?.data?.user?.permissions;
 
-      if (permissionList && Array.isArray(permissionList)) {
-        console.log('Updating permissions:', permissionList);
-        Cookies.set('permissions', JSON.stringify(permissionList), {
-          path: '/',
-          sameSite: 'Lax',
-          secure: true,
-        });
-      }
+  //     if (permissionList && Array.isArray(permissionList)) {
+  //       console.log('Updating permissions:', permissionList);
+  //       Cookies.set('permissions', JSON.stringify(permissionList), {
+  //         path: '/',
+  //         sameSite: 'Lax',
+  //         secure: true,
+  //       });
+  //     }
 
-      // Optionally redirect after permission update
-      setTimeout(() => {
-        window.location.replace('/chatbotlist');
-      }, 200);
-    } catch (err) {
-      console.error('Error updating permissions:', err);
-    }
-  }
+  //     // Optionally redirect after permission update
+  //     setTimeout(() => {
+  //       window.location.replace('/chatbotlist');
+  //     }, 200);
+  //   } catch (err) {
+  //     console.error('Error updating permissions:', err);
+  //   }
+  // }
 
   return Promise.reject(error);
 };
 
 const paramsSerializer = (params: { [key: string]: string }) => {
   return Object.keys(params)
-    .map(
-      (key) => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`
-    )
-    .join('&');
+    .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+    .join("&");
 };
 
 export const axiosInstance = Axios.create({
   baseURL: process.env.NEXT_PUBLIC_LOCAL_SERVER_URL,
   timeout: 300000, // Set timeout to 5 minutes (300,000 milliseconds)
-  timeoutErrorMessage: 'timeoutErrorMessage: Request took too long to complete',
+  timeoutErrorMessage: "timeoutErrorMessage: Request took too long to complete",
 });
 
 axiosInstance.defaults.paramsSerializer = paramsSerializer;
