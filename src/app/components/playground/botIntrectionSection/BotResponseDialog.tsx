@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogClose,
@@ -7,46 +7,46 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { MdAutorenew, MdOutlineFormatSize } from 'react-icons/md';
-import { IoIosSend, IoMdCheckmark, IoMdClose } from 'react-icons/io';
-import { Input } from '@/components/ui/input';
-import { PiClockCounterClockwise } from 'react-icons/pi';
-import { RiDeleteBinLine } from 'react-icons/ri';
+} from "@/components/ui/dialog";
+import { MdAutorenew, MdOutlineFormatSize } from "react-icons/md";
+import { IoIosSend, IoMdCheckmark, IoMdClose } from "react-icons/io";
+import { Input } from "@/components/ui/input";
+import { PiClockCounterClockwise } from "react-icons/pi";
+import { RiDeleteBinLine } from "react-icons/ri";
 import {
   ButtonNodeResponse,
   GalleryNodeResponse,
   ImageNodeResponse,
   QuickNodeResponse,
   TextNodeResponse,
-} from './NodeResponseList';
-import { CiImageOn } from 'react-icons/ci';
-import Image from 'next/image';
-import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
-import {
-  useGetNodeInformation,
-  useUpdateNodeInformation,
-} from '@/utils/nodeIntrection-api';
-import { toast } from 'sonner';
-import { axiosError } from '@/types/axiosTypes';
-import { TypeNodeInfo, TypeResponseList } from '@/types/node';
-import { usePlayground } from '../playgroundArea/PlaygroundContext';
-import { useParams } from 'next/navigation';
-import AWS from 'aws-sdk';
-import { initializeAWS } from './S3Operation';
+} from "./NodeResponseList";
+import { CiImageOn } from "react-icons/ci";
+import Image from "next/image";
+import { IoChevronDownOutline, IoChevronUpOutline } from "react-icons/io5";
+import { useGetNodeInformation, useUpdateNodeInformation } from "@/utils/nodeIntrection-api";
+import { toast } from "sonner";
+import { axiosError } from "@/types/axiosTypes";
+import { TypeNodeInfo, TypeResponseList } from "@/types/node";
+import { usePlayground } from "../playgroundArea/PlaygroundContext";
+import { useParams } from "next/navigation";
+import AWS from "aws-sdk";
+import { initializeAWS } from "./S3Operation";
+import { axiosInstance } from "@/utils/axiosInstance";
+import { Attribute } from "../AttributesDialog";
 
 type ValidationError = {
   field: string;
   message: string;
 };
 
-const BotResponseDialog = ({
-  trigger,
-  nodeId,
-}: {
-  trigger: React.ReactNode;
-  nodeId: string;
-}) => {
+interface FetchAttributesResponse {
+  statusCode: number;
+  data: Attribute[];
+  message: string;
+  success: boolean;
+}
+
+const BotResponseDialog = ({ trigger, nodeId }: { trigger: React.ReactNode; nodeId: string }) => {
   const [isAWSInitialized, setIsAWSInitialized] = useState(false);
   useEffect(() => {
     const awsInitialized = initializeAWS();
@@ -63,54 +63,68 @@ const BotResponseDialog = ({
   const [deletingIndices, setDeletingIndices] = useState<number[]>([]);
   const [pendingDeletions, setPendingDeletions] = useState<string[]>([]);
   const [isPendingS3Delete, setIsPendingS3Delete] = useState(false);
+  const [attributeList, setAttributeList] = useState<Attribute[]>([]);
+
+  const fetchAttributesHandler = async () => {
+    const response: FetchAttributesResponse = await axiosInstance.get(`/chatbot/${chatbotId}/attributes`);
+    if (response.success) {
+      setAttributeList(response.data);
+      return response.data;
+    } else {
+      setAttributeList([]);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    fetchAttributesHandler();
+  }, []);
+
   const renderNodeResponse = (item: TypeResponseList, index: number) => {
     const type = item.type;
     switch (type) {
-      case 'text':
+      case "text":
         return (
           <TextNodeResponse
-            info={{ description: item.info.description || '' }}
+            info={{ description: item.info.description || "" }}
             setResponseList={setResponseList}
             index={index}
+            attributes={attributeList}
           />
         );
-      case 'image':
+      case "image":
         return (
-          <ImageNodeResponse
-            info={{ file: item.info.file || '' }}
-            setResponseList={setResponseList}
-            index={index}
-          />
+          <ImageNodeResponse info={{ file: item.info.file || "" }} setResponseList={setResponseList} index={index} />
         );
-      case 'gallery':
+      case "gallery":
         return (
           <GalleryNodeResponse
             info={{
-              description: item.info.description || '',
-              title: item.info.title || '',
+              description: item.info.description || "",
+              title: item.info.title || "",
               button: item.info.button || [],
-              file: item.info.file || '',
+              file: item.info.file || "",
             }}
             setResponseList={setResponseList}
             index={index}
           />
         );
-      case 'quick':
+      case "quick":
         return (
           <QuickNodeResponse
             info={{
-              description: item.info.description || '',
+              description: item.info.description || "",
               button: item.info.button || [],
             }}
             setResponseList={setResponseList}
             index={index}
           />
         );
-      case 'button':
+      case "button":
         return (
           <ButtonNodeResponse
             info={{
-              description: item.info.description || '',
+              description: item.info.description || "",
               button: item.info.button || [],
             }}
             setResponseList={setResponseList}
@@ -121,6 +135,7 @@ const BotResponseDialog = ({
         return null;
     }
   };
+
   const removeResponse = (index: number) => {
     // Update error components by:
     // 1. Remove the current index if it exists in errors
@@ -128,62 +143,56 @@ const BotResponseDialog = ({
     setErrorComponents((prev) => {
       return prev
         .filter((errorIndex) => errorIndex !== index)
-        .map((errorIndex) =>
-          errorIndex > index ? errorIndex - 1 : errorIndex
-        );
+        .map((errorIndex) => (errorIndex > index ? errorIndex - 1 : errorIndex));
     });
 
     // Remove the response at the given index
     setResponseList((prev) => prev.filter((_, i) => i !== index));
   };
+
   const scroll = () => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   };
+
   useEffect(() => {
     scroll();
   }, [responseList.length]);
-  const { mutate: fetchNodeInformation, isPending: fetchPending } =
-    useGetNodeInformation({
-      onSuccess(data) {
-        if (data.data.node) {
-          setNodeInfo(data.data.node);
-          if (
-            data.data.node.response &&
-            Array.isArray(data.data.node.response)
-          ) {
-            const response = data.data.node.response as TypeResponseList[];
-            setResponseList(response);
-          }
+
+  const { mutate: fetchNodeInformation, isPending: fetchPending } = useGetNodeInformation({
+    onSuccess(data) {
+      if (data.data.node) {
+        setNodeInfo(data.data.node);
+        if (data.data.node.response && Array.isArray(data.data.node.response)) {
+          const response = data.data.node.response as TypeResponseList[];
+          setResponseList(response);
         }
-        // toast.success(data?.message);
-      },
+      }
+      // toast.success(data?.message);
+    },
 
-      onError(error: axiosError) {
-        const errorMessage =
-          error?.response?.data?.errors?.message ||
-          error?.response?.data?.message ||
-          'failed to fetch node information';
-        toast.error(errorMessage);
-      },
-    });
-  const { mutate: updateNodeInformation, isPending: updatePending } =
-    useUpdateNodeInformation({
-      onSuccess(data) {
-        setIsDialog(false);
-        refetchHandler();
-        toast.success(data?.message);
-      },
+    onError(error: axiosError) {
+      const errorMessage =
+        error?.response?.data?.errors?.message || error?.response?.data?.message || "failed to fetch node information";
+      toast.error(errorMessage);
+    },
+  });
 
-      onError(error: axiosError) {
-        const errorMessage =
-          error?.response?.data?.errors?.message ||
-          error?.response?.data?.message ||
-          'failed to update node information';
-        toast.error(errorMessage);
-      },
-    });
+  const { mutate: updateNodeInformation, isPending: updatePending } = useUpdateNodeInformation({
+    onSuccess(data) {
+      setIsDialog(false);
+      refetchHandler();
+      toast.success(data?.message);
+    },
+
+    onError(error: axiosError) {
+      const errorMessage =
+        error?.response?.data?.errors?.message || error?.response?.data?.message || "failed to update node information";
+      toast.error(errorMessage);
+    },
+  });
+
   useEffect(() => {
     if (nodeId && chatbotId && isDialog) {
       fetchNodeInformation({
@@ -192,10 +201,8 @@ const BotResponseDialog = ({
       });
     }
   }, [fetchNodeInformation, isDialog, nodeId, chatbotId]);
-  const validateBeforeSave = (
-    nodeInfo: TypeNodeInfo | null,
-    responseList: TypeResponseList[]
-  ): ValidationError[] => {
+
+  const validateBeforeSave = (nodeInfo: TypeNodeInfo | null, responseList: TypeResponseList[]): ValidationError[] => {
     const errors: ValidationError[] = [];
     const errorIndices: number[] = [];
 
@@ -203,7 +210,7 @@ const BotResponseDialog = ({
       let hasError = false;
 
       switch (response.type) {
-        case 'text':
+        case "text":
           if (!response.info.description?.trim()) {
             hasError = true;
             errors.push({
@@ -213,7 +220,7 @@ const BotResponseDialog = ({
           }
           break;
 
-        case 'gallery':
+        case "gallery":
           if (!response.info.title?.trim()) {
             hasError = true;
             errors.push({
@@ -225,7 +232,25 @@ const BotResponseDialog = ({
             hasError = true;
             errors.push({
               field: `response_${index}`,
-              message: `Gallery description at position ${
+              message: `Gallery description at position ${index + 1} cannot be empty`,
+            });
+          }
+          if (!response.info.button?.length) {
+            hasError = true;
+            errors.push({
+              field: `response_${index}`,
+              message: `Gallery at position ${index + 1} must have at least one button`,
+            });
+          }
+          break;
+
+        case "button":
+        case "quick":
+          if (!response.info.description?.trim()) {
+            hasError = true;
+            errors.push({
+              field: `response_${index}`,
+              message: `${response.type === "button" ? "Button" : "Quick reply"} description at position ${
                 index + 1
               } cannot be empty`,
             });
@@ -234,36 +259,14 @@ const BotResponseDialog = ({
             hasError = true;
             errors.push({
               field: `response_${index}`,
-              message: `Gallery at position ${
+              message: `${response.type === "button" ? "Button" : "Quick reply"} at position ${
                 index + 1
               } must have at least one button`,
             });
           }
           break;
 
-        case 'button':
-        case 'quick':
-          if (!response.info.description?.trim()) {
-            hasError = true;
-            errors.push({
-              field: `response_${index}`,
-              message: `${
-                response.type === 'button' ? 'Button' : 'Quick reply'
-              } description at position ${index + 1} cannot be empty`,
-            });
-          }
-          if (!response.info.button?.length) {
-            hasError = true;
-            errors.push({
-              field: `response_${index}`,
-              message: `${
-                response.type === 'button' ? 'Button' : 'Quick reply'
-              } at position ${index + 1} must have at least one button`,
-            });
-          }
-          break;
-
-        case 'image':
+        case "image":
           if (!response.info.file) {
             hasError = true;
             errors.push({
@@ -289,6 +292,7 @@ const BotResponseDialog = ({
       setSelectedGotoNode(null);
     }
   }, [isDialog, setSelectedGotoNode]);
+
   const updateDelay = (index: number, increment: boolean) => {
     setResponseList((prev) =>
       prev.map((item, i) => {
@@ -305,16 +309,16 @@ const BotResponseDialog = ({
 
   const handleS3Operations = async (responses: TypeResponseList[]) => {
     if (!isAWSInitialized) {
-      toast.error('AWS is not properly configured');
+      toast.error("AWS is not properly configured");
       return responses;
     }
-    const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
+    const s3 = new AWS.S3({ apiVersion: "2006-03-01" });
     const bucket = process.env.NEXT_PUBLIC_AWS_BUCKET as string;
 
     // Process files marked for deletion
     const deletePromises = pendingDeletions.map(async (fileUrl) => {
       try {
-        const key = fileUrl.split('/').pop() || '';
+        const key = fileUrl.split("/").pop() || "";
         await s3
           .deleteObject({
             Bucket: bucket,
@@ -322,7 +326,7 @@ const BotResponseDialog = ({
           })
           .promise();
       } catch (error) {
-        console.error('Error deleting file:', error);
+        console.error("Error deleting file:", error);
       }
     });
 
@@ -332,7 +336,7 @@ const BotResponseDialog = ({
     // Process current responses
     const processedResponses = await Promise.all(
       responses.map(async (response) => {
-        if (response.type !== 'image' && response.type !== 'gallery') {
+        if (response.type !== "image" && response.type !== "gallery") {
           return response;
         }
 
@@ -349,13 +353,13 @@ const BotResponseDialog = ({
                 Key: fileName,
                 Body: pendingFile,
                 ContentType: pendingFile.type,
-                ACL: 'public-read',
+                ACL: "public-read",
               })
               .promise();
 
             // Delete previous file if exists
             if (previousFileUrl) {
-              const previousKey = previousFileUrl.split('/').pop() || '';
+              const previousKey = previousFileUrl.split("/").pop() || "";
               await s3
                 .deleteObject({
                   Bucket: bucket,
@@ -375,8 +379,8 @@ const BotResponseDialog = ({
               },
             };
           } catch (error) {
-            console.error('Error processing file:', error);
-            throw new Error('Failed to process file');
+            console.error("Error processing file:", error);
+            throw new Error("Failed to process file");
           }
         }
 
@@ -394,11 +398,12 @@ const BotResponseDialog = ({
 
     return processedResponses;
   };
+
   // Modified updateHandler
   const updateHandler = async () => {
     if (nodeInfo && nodeId && chatbotId && isDialog) {
       if (!isAWSInitialized) {
-        toast.error('AWS is not properly configured');
+        toast.error("AWS is not properly configured");
         return true;
       }
       const validationErrors = validateBeforeSave(nodeInfo, responseList);
@@ -430,8 +435,8 @@ const BotResponseDialog = ({
         // Clear pending deletions after successful update
         setPendingDeletions([]);
       } catch (error) {
-        console.error('Error updating node:', error);
-        toast.error('Failed to update node');
+        console.error("Error updating node:", error);
+        toast.error("Failed to update node");
       } finally {
         setIsPendingS3Delete(false);
       }
@@ -444,80 +449,66 @@ const BotResponseDialog = ({
       setIsPendingS3Delete(false);
     }
   }, [isDialog]);
-  const removeResponseHandler = async (
-    data: TypeResponseList,
-    index: number
-  ) => {
+
+  const removeResponseHandler = async (data: TypeResponseList, index: number) => {
     setDeletingIndices((prev) => [...prev, index]);
     try {
-      if (
-        (data.type === 'image' || data.type === 'gallery') &&
-        data.info.file
-      ) {
-        setPendingDeletions((prev) =>
-          data.info.file ? [...prev, data.info.file] : prev
-        );
+      if ((data.type === "image" || data.type === "gallery") && data.info.file) {
+        setPendingDeletions((prev) => (data.info.file ? [...prev, data.info.file] : prev));
       }
       removeResponse(index);
     } catch (error) {
-      console.error('Error removing response:', error);
-      toast.error('Failed to remove response');
+      console.error("Error removing response:", error);
+      toast.error("Failed to remove response");
     } finally {
       setDeletingIndices((prev) => prev.filter((i) => i !== index));
     }
   };
+
   return (
     <Dialog open={isDialog} onOpenChange={setIsDialog}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className='sm:-right-[17rem] shadow-none !bg-transparent fixed translate-y-0 !top-[4.9dvh] sm:left-[unset] gap-0 rounded-lg transform w-[90vw] max-w-[40rem] border-none p-0'>
+      <DialogContent className="sm:-right-[17rem] shadow-none !bg-transparent fixed translate-y-0 !top-[4.9dvh] sm:left-[unset] gap-0 rounded-lg transform w-[90vw] max-w-[40rem] border-none p-0">
         <DialogHeader>
-          <DialogTitle className='sr-only text-lg font-semibold text-gray-800'>
-            Bot Response Node
-          </DialogTitle>
-          <DialogDescription
-            id='dialog-description'
-            className='text-sm sr-only text-gray-600'
-          >
+          <DialogTitle className="sr-only text-lg font-semibold text-gray-800">Bot Response Node</DialogTitle>
+          <DialogDescription id="dialog-description" className="text-sm sr-only text-gray-600">
             Information related to the bot response node.
           </DialogDescription>
         </DialogHeader>
-        <div className='flex flex-col-reverse md:flex-row gap-6'>
-          <div className='hidden md:block'>
+        <div className="flex flex-col-reverse md:flex-row gap-6">
+          <div className="hidden md:block">
             <NodeResponseList setResponseList={setResponseList} />
           </div>
 
-          <div className='flex-1 relative flex flex-col max-h-[90.2dvh] sm:max-h-[84dvh]'>
+          <div className="flex-1 relative flex flex-col max-h-[90.2dvh] sm:max-h-[84dvh]">
             {(fetchPending || updatePending || isPendingS3Delete) && (
-              <div className='absolute inset-0 z-50 flex items-center justify-center bg-[#a6dae41a] backdrop-blur-[3px]'>
-                <div role='status' className='flex flex-col items-center'>
-                  <div className='w-10 h-10 border-4 border-gray-200 border-t-[#3bc5dd] rounded-full animate-spin'></div>
-                  <span className='sr-only'>Loading...</span>
+              <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#a6dae41a] backdrop-blur-[3px]">
+                <div role="status" className="flex flex-col items-center">
+                  <div className="w-10 h-10 border-4 border-gray-200 border-t-[#3bc5dd] rounded-full animate-spin"></div>
+                  <span className="sr-only">Loading...</span>
                 </div>
               </div>
             )}
-            <div className='p-4 rounded-t-lg bg-white'>
-              <div className='flex items-center justify-between mb-4 mt-2'>
-                <div className='flex items-center gap-2'>
-                  <IoIosSend className='text-[#7A7A7A] text-lg' />
-                  <span className='text-[#7A7A7A] text-lg'>BOT RESPONSE</span>
+            <div className="p-4 rounded-t-lg bg-white">
+              <div className="flex items-center justify-between mb-4 mt-2">
+                <div className="flex items-center gap-2">
+                  <IoIosSend className="text-[#7A7A7A] text-lg" />
+                  <span className="text-[#7A7A7A] text-lg">BOT RESPONSE</span>
                 </div>
-                <div className='flex items-center gap-2'>
+                <div className="flex items-center gap-2">
                   <DialogClose>
-                    <div className='p-1 bg-[#7A7A7A] rounded-sm'>
-                      <IoMdClose className='text-white' />
+                    <div className="p-1 bg-[#7A7A7A] rounded-sm">
+                      <IoMdClose className="text-white" />
                     </div>
                   </DialogClose>
-                  <div
-                    className='p-1 bg-[#7A7A7A] rounded-sm cursor-pointer'
-                    onClick={updateHandler}
-                  >
-                    <IoMdCheckmark className='text-white' />
+                  <div className="p-1 bg-[#7A7A7A] rounded-sm cursor-pointer" onClick={updateHandler}>
+                    <IoMdCheckmark className="text-white" />
                   </div>
                 </div>
               </div>
               <Input
-                id='Message'
-                value={nodeInfo?.data?.message ?? ''}
+                id="Message"
+                value={nodeInfo?.data?.message ?? ""}
                 onChange={(e) => {
                   setNodeInfo((prev) => {
                     if (prev === null) {
@@ -532,89 +523,68 @@ const BotResponseDialog = ({
                     };
                   });
                 }}
-                className='px-4 py-3 mt-1 mb-2 rounded text-black  hover:border-[#57C0DD] focus-visible:ring-0 focus-visible:border-[#57C0DD] placeholder:text-sm placeholder:font-light w-full'
-                placeholder='Enter Your Message'
+                className="px-4 py-3 mt-1 mb-2 rounded text-black  hover:border-[#57C0DD] focus-visible:ring-0 focus-visible:border-[#57C0DD] placeholder:text-sm placeholder:font-light w-full"
+                placeholder="Enter Your Message"
               />
             </div>
 
-            <div
-              ref={scrollRef}
-              className='rounded-b-lg flex-1  overflow-y-auto'
-            >
-              <div className='flex flex-col gap-4 bg-[#F1F1F1] p-4 min-h-[153px]'>
+            <div ref={scrollRef} className="rounded-b-lg flex-1  overflow-y-auto">
+              <div className="flex flex-col gap-4 bg-[#F1F1F1] p-4 min-h-[153px]">
                 {responseList.length > 0 ? (
                   responseList.map((item, index) => (
                     <div
                       className={`flex flex-col gap-4 ${
-                        errorComponents.includes(index)
-                          ? 'border-2 border-red-500 bg-red-50'
-                          : ''
+                        errorComponents.includes(index) ? "border-2 border-red-500 bg-red-50" : ""
                       } rounded-lg p-2 relative`}
                       key={index}
                     >
                       {deletingIndices.includes(index) && (
-                        <div className='absolute inset-0 z-10 flex items-center justify-center bg-white/50 backdrop-blur-[1px] rounded-lg'>
-                          <div className='w-10 h-10 border-4 border-gray-200 border-t-[#3bc5dd] rounded-full animate-spin'></div>
+                        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/50 backdrop-blur-[1px] rounded-lg">
+                          <div className="w-10 h-10 border-4 border-gray-200 border-t-[#3bc5dd] rounded-full animate-spin"></div>
                         </div>
                       )}
-                      <div className='flex justify-between items-center'>
-                        <div className='flex gap-2 items-center '>
-                          <div className='flex items-center rounded-3xl gap-1 w-fit py-2 px-3 bg-[#424D50] min-w-[137.5px] '>
-                            <PiClockCounterClockwise className='text-white text-lg' />
-                            <span className='text-white text-sm'>
-                              {item?.delay / 1000} sec delay
-                            </span>
+                      <div className="flex justify-between items-center">
+                        <div className="flex gap-2 items-center ">
+                          <div className="flex items-center rounded-3xl gap-1 w-fit py-2 px-3 bg-[#424D50] min-w-[137.5px] ">
+                            <PiClockCounterClockwise className="text-white text-lg" />
+                            <span className="text-white text-sm">{item?.delay / 1000} sec delay</span>
                           </div>
                           <div>
                             <IoChevronUpOutline
                               className={`cursor-pointer  ${
-                                item?.delay < 6000
-                                  ? 'hover:text-[#57C0DD]'
-                                  : 'opacity-10'
+                                item?.delay < 6000 ? "hover:text-[#57C0DD]" : "opacity-10"
                               }`}
                               onClick={() => updateDelay(index, true)}
                             />
                             <IoChevronDownOutline
-                              className={`cursor-pointer  ${
-                                item?.delay > 500
-                                  ? 'hover:text-[#57C0DD]'
-                                  : 'opacity-10'
-                              }`}
+                              className={`cursor-pointer  ${item?.delay > 500 ? "hover:text-[#57C0DD]" : "opacity-10"}`}
                               onClick={() => updateDelay(index, false)}
                             />
                           </div>
                         </div>
                         <div
                           className={`${
-                            deletingIndices.includes(index)
-                              ? 'cursor-wait'
-                              : 'cursor-pointer hover:bg-red-100'
+                            deletingIndices.includes(index) ? "cursor-wait" : "cursor-pointer hover:bg-red-100"
                           } flex items-center justify-center bg-white rounded-full w-10 h-10 p-2 transition-all duration-200`}
-                          title={
-                            deletingIndices.includes(index)
-                              ? 'Deleting...'
-                              : 'Delete'
-                          }
+                          title={deletingIndices.includes(index) ? "Deleting..." : "Delete"}
                           onClick={() => {
                             if (!deletingIndices.includes(index)) {
                               removeResponseHandler(item, index);
                             }
                           }}
                         >
-                          <RiDeleteBinLine className='text-red-500' />
+                          <RiDeleteBinLine className="text-red-500" />
                         </div>
                       </div>
                       {renderNodeResponse(item, index)}
                     </div>
                   ))
                 ) : (
-                  <div className='flex items-center justify-center mt-auto mb-auto'>
-                    Not added any response
-                  </div>
+                  <div className="flex items-center justify-center mt-auto mb-auto">Not added any response</div>
                 )}
               </div>
 
-              <div className='bg-white block md:hidden'>
+              <div className="bg-white block md:hidden">
                 <NodeResponseList setResponseList={setResponseList} />
               </div>
             </div>
@@ -625,114 +595,100 @@ const BotResponseDialog = ({
   );
 };
 export default BotResponseDialog;
+
 const generateShortId = (title: string) => {
   const timestamp = Date.now();
   return `Chatbot${(timestamp & 0xffffff).toString(16)}${title}`;
 };
+
 export const NodeResponseList = ({
   setResponseList,
 }: {
   setResponseList: React.Dispatch<React.SetStateAction<TypeResponseList[]>>;
 }) => {
   const responseTypes: {
-    type: 'text' | 'image' | 'button' | 'quick' | 'gallery';
+    type: "text" | "image" | "button" | "quick" | "gallery";
     icon: JSX.Element;
     label: string;
     content: TypeResponseList;
   }[] = [
     {
-      type: 'text',
-      icon: <MdOutlineFormatSize className='text-[#7A7A7A] text-xl' />,
-      label: 'Text',
+      type: "text",
+      icon: <MdOutlineFormatSize className="text-[#7A7A7A] text-xl" />,
+      label: "Text",
       content: {
-        type: 'text',
+        type: "text",
         delay: 2000,
-        info: { description: '' },
+        info: { description: "" },
       },
     },
     {
-      type: 'image',
-      icon: <CiImageOn className='text-[#7A7A7A] text-xl' />,
-      label: 'Image',
+      type: "image",
+      icon: <CiImageOn className="text-[#7A7A7A] text-xl" />,
+      label: "Image",
       content: {
-        type: 'image',
+        type: "image",
         delay: 2000,
-        info: { file: '' },
+        info: { file: "" },
       },
     },
     {
-      type: 'gallery',
-      icon: (
-        <Image
-          src='/images/gallery_thumbnail.svg'
-          alt='Gallery Icon'
-          width={22}
-          height={22}
-          quality={100}
-        />
-      ),
-      label: 'Gallery',
+      type: "gallery",
+      icon: <Image src="/images/gallery_thumbnail.svg" alt="Gallery Icon" width={22} height={22} quality={100} />,
+      label: "Gallery",
       content: {
-        type: 'gallery',
+        type: "gallery",
         delay: 2000,
         info: {
-          file: '',
-          title: '',
-          description: '',
+          file: "",
+          title: "",
+          description: "",
           button: [
             {
-              id: generateShortId('gallery'),
-              title: 'button',
-              type: 'message',
-              message: 'message',
+              id: generateShortId("gallery"),
+              title: "button",
+              type: "message",
+              message: "message",
             },
           ],
         },
       },
     },
     {
-      type: 'button',
-      icon: (
-        <Image
-          src='/images/buttons.svg'
-          alt='Button Icon'
-          width={18}
-          height={18}
-          quality={100}
-        />
-      ),
-      label: 'Button',
+      type: "button",
+      icon: <Image src="/images/buttons.svg" alt="Button Icon" width={18} height={18} quality={100} />,
+      label: "Button",
       content: {
-        type: 'button',
+        type: "button",
         delay: 2000,
         info: {
-          description: '',
+          description: "",
           button: [
             {
-              id: generateShortId('gallery'),
-              title: 'button',
-              type: 'message',
-              message: 'message',
+              id: generateShortId("gallery"),
+              title: "button",
+              type: "message",
+              message: "message",
             },
           ],
         },
       },
     },
     {
-      type: 'quick',
-      icon: <MdAutorenew className='text-[#7A7A7A] text-xl' />,
-      label: 'Quick reply',
+      type: "quick",
+      icon: <MdAutorenew className="text-[#7A7A7A] text-xl" />,
+      label: "Quick reply",
       content: {
-        type: 'quick',
+        type: "quick",
         delay: 2000,
         info: {
-          description: '',
+          description: "",
           button: [
             {
-              id: generateShortId('gallery'),
-              title: 'button',
-              type: 'message',
-              message: 'message',
+              id: generateShortId("gallery"),
+              title: "button",
+              type: "message",
+              message: "message",
             },
           ],
         },
@@ -753,21 +709,17 @@ export const NodeResponseList = ({
     setResponseList((prev) => [...prev, contentWithUniqueIds]);
   };
   return (
-    <div className='p-4 h-fit bg-white rounded-lg'>
-      <div className='text-black text-lg font-semibold mb-2'>Response</div>
-      <div className='grid grid-cols-2 md:grid-cols-1 lg:grid-cols-2 gap-3'>
+    <div className="p-4 h-fit bg-white rounded-lg">
+      <div className="text-black text-lg font-semibold mb-2">Response</div>
+      <div className="grid grid-cols-2 md:grid-cols-1 lg:grid-cols-2 gap-3">
         {responseTypes.map(({ type, icon, label, content }) => (
           <div
             key={type}
-            className='flex flex-col items-center gap-[1px] cursor-pointer'
+            className="flex flex-col items-center gap-[1px] cursor-pointer"
             onClick={() => addResponseWithUniqueIds(content)}
           >
-            <div className='border border-[#7A7A7A] py-3 px-7 h-[46px] flex items-center justify-center'>
-              {icon}
-            </div>
-            <span className='text-[#7A7A7A] font-normal text-center text-xs'>
-              {label}
-            </span>
+            <div className="border border-[#7A7A7A] py-3 px-7 h-[46px] flex items-center justify-center">{icon}</div>
+            <span className="text-[#7A7A7A] font-normal text-center text-xs">{label}</span>
           </div>
         ))}
       </div>
