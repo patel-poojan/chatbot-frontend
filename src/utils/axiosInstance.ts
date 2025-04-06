@@ -49,40 +49,40 @@ const errorInterceptor = (error: AxiosError) => {
     return Promise.reject(error);
   }
 
-  // if (error.response.status === 401) {
-  //   window.location.replace('/login');
-  //   toast.error('Authentication required, please log in');
-  // } else if (error.response.status === 403) {
-  //   // Define a more accurate type for the response data
-  //   interface ErrorResponseData {
-  //     data?: {
-  //       user?: {
-  //         permissions?: string[];
-  //       };
-  //     };
-  //   }
+  if (error.response.status === 401) {
+    window.location.replace("/login");
+    toast.error("Authentication required, please log in");
+  } else if (error.response.status === 403) {
+    // Define a more accurate type for the response data
+    interface ErrorResponseData {
+      data?: {
+        user?: {
+          permissions?: string[];
+        };
+      };
+    }
 
-  //   try {
-  //     const responseData = error.response.data as ErrorResponseData;
-  //     const permissionList = responseData?.data?.user?.permissions;
+    try {
+      const responseData = error.response.data as ErrorResponseData;
+      const permissionList = responseData?.data?.user?.permissions;
 
-  //     if (permissionList && Array.isArray(permissionList)) {
-  //       console.log('Updating permissions:', permissionList);
-  //       Cookies.set('permissions', JSON.stringify(permissionList), {
-  //         path: '/',
-  //         sameSite: 'Lax',
-  //         secure: true,
-  //       });
-  //     }
+      if (permissionList && Array.isArray(permissionList)) {
+        console.log("Updating permissions:", permissionList);
+        Cookies.set("permissions", JSON.stringify(permissionList), {
+          path: "/",
+          sameSite: "Lax",
+          secure: true,
+        });
+      }
 
-  //     // Optionally redirect after permission update
-  //     setTimeout(() => {
-  //       window.location.replace('/chatbotlist');
-  //     }, 200);
-  //   } catch (err) {
-  //     console.error('Error updating permissions:', err);
-  //   }
-  // }
+      // Optionally redirect after permission update
+      setTimeout(() => {
+        window.location.replace("/chatbotlist");
+      }, 200);
+    } catch (err) {
+      console.error("Error updating permissions:", err);
+    }
+  }
 
   return Promise.reject(error);
 };
