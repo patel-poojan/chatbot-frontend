@@ -67,6 +67,10 @@ type FetchPlaygroundResponse = {
   data: {
     _id: string;
     chatbotName: string;
+    chatbotIcon: {
+      url: string;
+      localPath: string;
+    };
     chatbotId: string;
     createdAt: string;
     updatedAt: string;
@@ -282,7 +286,6 @@ const MainComponent = ({ botId }: { botId: string }) => {
     },
     []
   );
-
   const onDragOver = useCallback(
     (event: React.DragEvent): void => {
       setActionDialog(false);
@@ -584,7 +587,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
             <div className=' flex items-center gap-3'>
               {playgroundData?.chatbotName ? (
                 <div
-                  className='p-3 h-9  flex items-center cursor-pointer justify-center rounded-lg bg-white'
+                  className='p-3 h-9  flex items-center  justify-center rounded-lg bg-white'
                   style={{ boxShadow: '0px 0px 4px 0px #0000001F' }}
                 >
                   {playgroundData?.chatbotName}
@@ -749,7 +752,13 @@ const MainComponent = ({ botId }: { botId: string }) => {
             </ReactFlow>
           )}
           {actionDialog && <ActionDialog actionHandler={actionHandler} />}
-          {chatBotDialog && <ChatBotDialog chatBotHandler={chatBotHandler} />}
+          {chatBotDialog && (
+            <ChatBotDialog
+              chatBotHandler={chatBotHandler}
+              chatbotName={playgroundData?.chatbotName ?? ''}
+              botIcon={playgroundData?.chatbotIcon?.url ?? ''}
+            />
+          )}
           {attributesDialog && (
             <AttributesDialog
               attributesHandler={attributesHandler}
