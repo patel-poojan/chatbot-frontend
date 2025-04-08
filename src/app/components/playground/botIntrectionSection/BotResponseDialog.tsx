@@ -39,7 +39,7 @@ type ValidationError = {
   message: string;
 };
 
-interface FetchAttributesResponse {
+export interface FetchAttributesResponse {
   statusCode: number;
   data: Attribute[];
   message: string;
