@@ -33,9 +33,9 @@ const UpdateChatbotDialog = ({
   refetchPlayground: () => void;
 }) => {
   const [name, setName] = React.useState<string>(chatbotName ?? '');
-  const [icon, setIcon] = React.useState<string>('');
+  const [icon, setIcon] = React.useState<string | null>(null);
+  const [imgError, setImgError] = React.useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  console.log('botIcon', botIcon);
   const { mutate: onUpdateBot, isPending: updatePending } = useUpdateChatbot({
     onSuccess(data) {
       toast.success(data?.message);
@@ -155,7 +155,7 @@ const UpdateChatbotDialog = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={updateHandler}>
+    <Dialog open={isOpen}>
       <DialogContent className='max-w-[87vw] gap-0 sm:max-w-[425px] rounded-lg'>
         {updatePending ? <Loader /> : null}
         <DialogHeader>
@@ -171,9 +171,11 @@ const UpdateChatbotDialog = ({
             <div className='text-primary text-xl font-medium'>
               Edit ChatAgent
             </div>
-            <DialogClose>
-              <IoCloseOutline className='text-lg' />
-            </DialogClose>
+
+            <IoCloseOutline
+              className='text-lg cursor-pointer'
+              onClick={() => updateHandler()}
+            />
           </div>
 
           {/* Bot name input */}
@@ -206,15 +208,18 @@ const UpdateChatbotDialog = ({
                 onChange={handleFileUpload}
               />
 
-              {icon || botIcon ? (
+              {icon || (botIcon && !imgError) ? (
                 <div className='flex items-center gap-3 w-full'>
                   <div className='w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border border-[#E0E0E0]'>
                     <Image
-                      src={icon ?? botIcon ?? ''}
+                      src={icon || botIcon}
                       alt='Bot Icon'
                       width={48}
                       height={48}
                       className='w-full h-full object-cover'
+                      unoptimized={true}
+                      onError={() => setImgError(true)}
+                      loader={({ src }) => src} // Custom loader to handle external URLs
                     />
                   </div>
                   <div className='flex-1 min-w-0'>
