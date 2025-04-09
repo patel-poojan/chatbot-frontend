@@ -22,6 +22,7 @@ import { useQuery } from '@tanstack/react-query';
 import { axiosInstance } from '@/utils/axiosInstance';
 import { Loader } from '@/app/components/Loader';
 import { toast } from 'sonner';
+import useWindowDimensions from '@/utils/windowSize';
 
 // Define TypeScript interfaces for the data structure
 interface SessionData {
@@ -96,7 +97,8 @@ interface FetchStatisticsResponse {
   success: boolean;
 }
 
-const StatisticsDashboard = () => {
+const Page = () => {
+  const { width: screenWidth } = useWindowDimensions();
   const fetchStatistics = async () => {
     const response: FetchStatisticsResponse = await axiosInstance.get(
       `/metrics`
@@ -315,11 +317,11 @@ const StatisticsDashboard = () => {
                   cx='50%'
                   cy='50%'
                   labelLine={true}
-                  outerRadius={window.innerWidth < 640 ? 60 : 80}
+                  outerRadius={screenWidth < 640 ? 60 : 80}
                   fill='#8884d8'
                   dataKey='value'
                   label={({ name, percent }) =>
-                    window.innerWidth < 640
+                    screenWidth < 640
                       ? `${(percent * 100).toFixed(0)}%`
                       : `${name}: ${(percent * 100).toFixed(0)}%`
                   }
@@ -352,22 +354,22 @@ const StatisticsDashboard = () => {
                   top: 5,
                   right: 20,
                   left: 0,
-                  bottom: window.innerWidth < 640 ? 70 : 5,
+                  bottom: screenWidth < 640 ? 70 : 5,
                 }}
               >
                 <CartesianGrid strokeDasharray='3 3' />
                 <XAxis
                   dataKey='name'
-                  angle={window.innerWidth < 640 ? -45 : 0}
-                  textAnchor={window.innerWidth < 640 ? 'end' : 'middle'}
-                  height={window.innerWidth < 640 ? 70 : 30}
-                  tick={{ fontSize: window.innerWidth < 640 ? 10 : 12 }}
+                  angle={screenWidth < 640 ? -45 : 0}
+                  textAnchor={screenWidth < 640 ? 'end' : 'middle'}
+                  height={screenWidth < 640 ? 70 : 30}
+                  tick={{ fontSize: screenWidth < 640 ? 10 : 12 }}
                 />
                 <YAxis yAxisId='left' orientation='left' stroke='#58C8DD' />
                 <YAxis yAxisId='right' orientation='right' stroke='#6366F1' />
                 <Tooltip />
                 <Legend
-                  wrapperStyle={{ fontSize: window.innerWidth < 640 ? 10 : 12 }}
+                  wrapperStyle={{ fontSize: screenWidth < 640 ? 10 : 12 }}
                 />
                 <Bar
                   yAxisId='left'
@@ -427,8 +429,8 @@ const StatisticsDashboard = () => {
                       <Image
                         src='/images/bot-icon.svg'
                         alt='bot icon'
-                        width={window.innerWidth < 640 ? 20 : 24}
-                        height={window.innerWidth < 640 ? 20 : 24}
+                        width={screenWidth < 640 ? 20 : 24}
+                        height={screenWidth < 640 ? 20 : 24}
                         className='bg-[#58C8DD] rounded-full p-1'
                       />
                       {chatbot.name}
@@ -523,4 +525,4 @@ const StatisticsDashboard = () => {
   );
 };
 
-export default StatisticsDashboard;
+export default Page;
