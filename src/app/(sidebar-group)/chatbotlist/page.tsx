@@ -75,7 +75,7 @@ const Page = () => {
     } else if (!updatedName.trim()) {
       toast.error('Name cannot be empty.');
     }
-    setEditingId(null); // Close the input field after renaming
+    setEditingId(null);
   };
 
   const fetchChatbotList = async () => {

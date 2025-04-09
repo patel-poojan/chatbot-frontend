@@ -104,6 +104,9 @@ const ChatBotDialog = ({
   const { mutate: fetchBotResponse } = useGetChatbotResponse({
     onSuccess(data) {
       if (data?.closeChat) {
+        if (data.closeChat === 'START') {
+          setShowCloseDialog(true);
+        }
         setCloseChatPosition(data.closeChat);
       }
       setApiLoading(false);
@@ -213,14 +216,7 @@ const ChatBotDialog = ({
       });
     }
   };
-  useEffect(() => {
-    const hasCloseChat = visibleMessages.some(
-      (item) => item.type === 'closeChat'
-    );
-    if (hasCloseChat) {
-      setShowCloseDialog(true);
-    }
-  }, [visibleMessages]);
+
   const closeChatBotHandler = () => {
     if (closeChatPosition === 'END') {
       setShowCloseDialog(true);
@@ -232,7 +228,13 @@ const ChatBotDialog = ({
     setShowCloseDialog(false);
     closeChatPosition === 'END' && chatBotHandler();
   };
-  console.log('chatbotName', chatbotName, botIcon);
+  console.log(
+    'chatbotName',
+    chatbotName,
+    botIcon,
+    showCloseDialog,
+    closeChatPosition
+  );
   return (
     <div
       className=' min-[425px]:right-6 max-[425px]:w-[calc(100vw-48px)] top-32 min-[699px]:top-20 flex flex-col min-[425px]:w-[375px] h-[65vh] max-[425px]:mx-6 min-[500px]:h-[60vh] rounded-lg overflow-hidden absolute '
@@ -336,7 +338,7 @@ const ChatBotDialog = ({
             <div className='bg-white rounded-xl p-4 w-[90%] max-w-[340px] mx-auto border border-[#53A7DD]/20 shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(83,167,221,0.12)] transition-shadow duration-300'>
               <div className='flex justify-between items-center mb-4'>
                 <h3 className='text-lg font-semibold text-[#1E255E]'>
-                  Before you go
+                  Please Enter Details
                 </h3>
                 <IoClose
                   className='text-[#1E255E] text-xl cursor-pointer'

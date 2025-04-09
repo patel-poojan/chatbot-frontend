@@ -57,6 +57,7 @@ import { TypePlaygroundNode } from '@/types/node';
 import PublishDialog from '@/app/components/playground/PublishDialog';
 import ContactGatheringDialog from '@/app/components/playground/ContactGatheringDialog';
 import Image from 'next/image';
+import UpdateChatbotDialog from '@/app/components/playground/UpdateChatbotDialog';
 
 const ReactFlow = dynamic(
   () => import('@xyflow/react').then((mod) => mod.ReactFlow),
@@ -160,6 +161,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
   const [aiSection, setAiSection] = useState(false);
   const [chatBotDialog, setChatBotDialog] = useState(false);
   const [attributesDialog, setAttributesDialog] = useState(false);
+  const [updateChatbotDialog, setUpdateChatbotDialog] = useState(false);
   const [contactGatheringEnabled, setContactGatheringEnabled] = useState(false);
   const { screenToFlowPosition } = useReactFlow();
   // const { type, label } = usePlayground();
@@ -538,22 +540,36 @@ const MainComponent = ({ botId }: { botId: string }) => {
       setActionDialog(false);
       setAttributesDialog(false);
       setContactGatheringEnabled(false);
+      setUpdateChatbotDialog(false);
     }
   };
   const actionHandler = () => {
     setChatBotDialog(false);
     setAttributesDialog(false);
     setContactGatheringEnabled(false);
+    setUpdateChatbotDialog(false);
     if (actionDialog) {
       setActionDialog(false);
     } else {
       setActionDialog(true);
     }
   };
+  const updateHandler = () => {
+    setChatBotDialog(false);
+    setAttributesDialog(false);
+    setContactGatheringEnabled(false);
+    setActionDialog(false);
+    if (updateChatbotDialog) {
+      setUpdateChatbotDialog(false);
+    } else {
+      setUpdateChatbotDialog(true);
+    }
+  };
   const attributesHandler = () => {
     setChatBotDialog(false);
     setActionDialog(false);
     setContactGatheringEnabled(false);
+    setUpdateChatbotDialog(false);
     if (attributesDialog) {
       setAttributesDialog(false);
     } else {
@@ -564,6 +580,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
     setChatBotDialog(false);
     setActionDialog(false);
     setAttributesDialog(false);
+    setUpdateChatbotDialog(false);
     if (contactGatheringEnabled) {
       setContactGatheringEnabled(false);
     } else {
@@ -586,12 +603,27 @@ const MainComponent = ({ botId }: { botId: string }) => {
           <div className='absolute top-6 flex items-center justify-normal gap-3 flex-wrap-reverse md:justify-between w-full left-0 px-6 z-10'>
             <div className=' flex items-center gap-3'>
               {playgroundData?.chatbotName ? (
-                <div
-                  className='p-3 h-9  flex items-center  justify-center rounded-lg bg-white'
-                  style={{ boxShadow: '0px 0px 4px 0px #0000001F' }}
-                >
-                  {playgroundData?.chatbotName}
-                </div>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        className='p-3 h-9  flex items-center cursor-pointer  justify-center rounded-lg bg-white'
+                        style={{ boxShadow: '0px 0px 4px 0px #0000001F' }}
+                        onClick={() => updateHandler()}
+                      >
+                        {playgroundData?.chatbotName}
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      side='bottom'
+                      align='center'
+                      style={{ boxShadow: '0px 0px 4px 0px #0000001F' }}
+                      className=' mt-1  p-1 bg-[#57C0DD] text-white !z-50'
+                    >
+                      Update ChatAgent
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               ) : null}
 
               <TooltipProvider>
@@ -750,6 +782,16 @@ const MainComponent = ({ botId }: { botId: string }) => {
             >
               <Controls showFitView />
             </ReactFlow>
+          )}
+          {updateChatbotDialog && (
+            <UpdateChatbotDialog
+              updateHandler={updateHandler}
+              isOpen={updateChatbotDialog}
+              chatbotName={playgroundData?.chatbotName ?? ''}
+              botIcon={playgroundData?.chatbotIcon?.url ?? ''}
+              chatbotId={botId}
+              refetchPlayground={refetchPlayground}
+            />
           )}
           {actionDialog && <ActionDialog actionHandler={actionHandler} />}
           {chatBotDialog && (

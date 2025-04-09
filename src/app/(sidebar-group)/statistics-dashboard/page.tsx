@@ -227,69 +227,73 @@ const StatisticsDashboard = () => {
   ];
 
   return (
-    <div className='flex flex-col h-full overflow-y-auto'>
+    <div className='flex flex-col h-full overflow-y-auto p-4 sm:p-6'>
       {isLoading ? <Loader /> : null}
-      <div className='mb-6'>
-        <h1 className='text-2xl font-bold text-[#1e255e]'>
+      <div className='mb-4 sm:mb-6'>
+        <h1 className='text-xl sm:text-2xl font-bold text-[#1e255e]'>
           Statistics Dashboard
         </h1>
-        <p className='text-[#1e255eb2]'>
+        <p className='text-sm sm:text-base text-[#1e255eb2]'>
           Overview of your ChatAgent performance
         </p>
       </div>
 
       {/* Stats Cards */}
-      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6'>
-        <div className='p-4 border border-[#F3F3F3] rounded-xl shadow-sm bg-white'>
-          <div className='flex items-center gap-3'>
-            <div className='p-3 rounded-full bg-[#58C8DD]/20'>
-              <IoStatsChart className='text-[#58C8DD] text-xl' />
+      <div className='grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6'>
+        <div className='p-3 sm:p-4 border border-[#F3F3F3] rounded-xl shadow-sm bg-white'>
+          <div className='flex items-center gap-2 sm:gap-3'>
+            <div className='p-2 sm:p-3 rounded-full bg-[#58C8DD]/20'>
+              <IoStatsChart className='text-lg sm:text-xl text-[#58C8DD]' />
             </div>
             <div>
-              <p className='text-[#1e255eb2] text-sm'>Total Requests</p>
-              <p className='text-[#1e255e] text-xl font-bold'>
+              <p className='text-xs sm:text-sm text-[#1e255eb2]'>
+                Total Requests
+              </p>
+              <p className='text-lg sm:text-xl font-bold text-[#1e255e]'>
                 {stats.totalRequests}
               </p>
             </div>
           </div>
         </div>
 
-        <div className='p-4 border border-[#F3F3F3] rounded-xl shadow-sm bg-white'>
-          <div className='flex items-center gap-3'>
-            <div className='p-3 rounded-full bg-[#6366F1]/20'>
-              <LuUsers className='text-[#6366F1] text-xl' />
+        <div className='p-3 sm:p-4 border border-[#F3F3F3] rounded-xl shadow-sm bg-white'>
+          <div className='flex items-center gap-2 sm:gap-3'>
+            <div className='p-2 sm:p-3 rounded-full bg-[#6366F1]/20'>
+              <LuUsers className='text-lg sm:text-xl text-[#6366F1]' />
             </div>
             <div>
-              <p className='text-[#1e255eb2] text-sm'>Total Sessions</p>
-              <p className='text-[#1e255e] text-xl font-bold'>
+              <p className='text-xs sm:text-sm text-[#1e255eb2]'>
+                Total Sessions
+              </p>
+              <p className='text-lg sm:text-xl font-bold text-[#1e255e]'>
                 {stats.totalSessions}
               </p>
             </div>
           </div>
         </div>
 
-        <div className='p-4 border border-[#F3F3F3] rounded-xl shadow-sm bg-white'>
-          <div className='flex items-center gap-3'>
-            <div className='p-3 rounded-full bg-[#10B981]/20'>
-              <MdOutlineQueryStats className='text-[#10B981] text-xl' />
+        <div className='p-3 sm:p-4 border border-[#F3F3F3] rounded-xl shadow-sm bg-white'>
+          <div className='flex items-center gap-2 sm:gap-3'>
+            <div className='p-2 sm:p-3 rounded-full bg-[#10B981]/20'>
+              <MdOutlineQueryStats className='text-lg sm:text-xl text-[#10B981]' />
             </div>
             <div>
-              <p className='text-[#1e255eb2] text-sm'>ChatAgents</p>
-              <p className='text-[#1e255e] text-xl font-bold'>
+              <p className='text-xs sm:text-sm text-[#1e255eb2]'>ChatAgents</p>
+              <p className='text-lg sm:text-xl font-bold text-[#1e255e]'>
                 {stats.uniqueChatbots}
               </p>
             </div>
           </div>
         </div>
 
-        <div className='p-4 border border-[#F3F3F3] rounded-xl shadow-sm bg-white'>
-          <div className='flex items-center gap-3'>
-            <div className='p-3 rounded-full bg-[#F59E0B]/20'>
-              <BsClock className='text-[#F59E0B] text-xl' />
+        <div className='p-3 sm:p-4 border border-[#F3F3F3] rounded-xl shadow-sm bg-white'>
+          <div className='flex items-center gap-2 sm:gap-3'>
+            <div className='p-2 sm:p-3 rounded-full bg-[#F59E0B]/20'>
+              <BsClock className='text-lg sm:text-xl text-[#F59E0B]' />
             </div>
             <div>
-              <p className='text-[#1e255eb2] text-sm'>Usage Time</p>
-              <p className='text-[#1e255e] text-xl font-bold'>
+              <p className='text-xs sm:text-sm text-[#1e255eb2]'>Usage Time</p>
+              <p className='text-lg sm:text-xl font-bold text-[#1e255e]'>
                 {stats.totalUsageTime}m
               </p>
             </div>
@@ -298,12 +302,12 @@ const StatisticsDashboard = () => {
       </div>
 
       {/* Charts */}
-      <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6'>
-        <div className='p-4 border border-[#F3F3F3] rounded-xl shadow-sm bg-white'>
-          <h2 className='text-lg font-semibold text-[#1e255e] mb-4'>
+      <div className='grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6'>
+        <div className='p-3 sm:p-4 border border-[#F3F3F3] rounded-xl shadow-sm bg-white'>
+          <h2 className='text-base sm:text-lg font-semibold text-[#1e255e] mb-2 sm:mb-4'>
             ChatAgent Distribution
           </h2>
-          <div className='h-72 flex justify-center items-center'>
+          <div className='h-56 sm:h-72 flex justify-center items-center'>
             <ResponsiveContainer width='100%' height='100%'>
               <PieChart>
                 <Pie
@@ -311,11 +315,13 @@ const StatisticsDashboard = () => {
                   cx='50%'
                   cy='50%'
                   labelLine={true}
-                  outerRadius={80}
+                  outerRadius={window.innerWidth < 640 ? 60 : 80}
                   fill='#8884d8'
                   dataKey='value'
                   label={({ name, percent }) =>
-                    `${name}: ${(percent * 100).toFixed(0)}%`
+                    window.innerWidth < 640
+                      ? `${(percent * 100).toFixed(0)}%`
+                      : `${name}: ${(percent * 100).toFixed(0)}%`
                   }
                 >
                   {stats.chatbotDistributionData.map((entry, index) => (
@@ -334,19 +340,35 @@ const StatisticsDashboard = () => {
           </div>
         </div>
 
-        <div className='p-4 border border-[#F3F3F3] rounded-xl shadow-sm bg-white'>
-          <h2 className='text-lg font-semibold text-[#1e255e] mb-4'>
+        <div className='p-3 sm:p-4 border border-[#F3F3F3] rounded-xl shadow-sm bg-white'>
+          <h2 className='text-base sm:text-lg font-semibold text-[#1e255e] mb-2 sm:mb-4'>
             Requests vs Usage Time
           </h2>
-          <div className='h-72'>
+          <div className='h-56 sm:h-72'>
             <ResponsiveContainer width='100%' height='100%'>
-              <BarChart data={stats.chatbotStats}>
+              <BarChart
+                data={stats.chatbotStats}
+                margin={{
+                  top: 5,
+                  right: 20,
+                  left: 0,
+                  bottom: window.innerWidth < 640 ? 70 : 5,
+                }}
+              >
                 <CartesianGrid strokeDasharray='3 3' />
-                <XAxis dataKey='name' />
+                <XAxis
+                  dataKey='name'
+                  angle={window.innerWidth < 640 ? -45 : 0}
+                  textAnchor={window.innerWidth < 640 ? 'end' : 'middle'}
+                  height={window.innerWidth < 640 ? 70 : 30}
+                  tick={{ fontSize: window.innerWidth < 640 ? 10 : 12 }}
+                />
                 <YAxis yAxisId='left' orientation='left' stroke='#58C8DD' />
                 <YAxis yAxisId='right' orientation='right' stroke='#6366F1' />
                 <Tooltip />
-                <Legend />
+                <Legend
+                  wrapperStyle={{ fontSize: window.innerWidth < 640 ? 10 : 12 }}
+                />
                 <Bar
                   yAxisId='left'
                   dataKey='requests'
@@ -366,30 +388,30 @@ const StatisticsDashboard = () => {
       </div>
 
       {/* Bot Performance */}
-      <div className='p-4 border border-[#F3F3F3] rounded-xl shadow-sm mb-6 bg-white'>
-        <h2 className='text-lg font-semibold text-[#1e255e] mb-4'>
+      <div className='p-3 sm:p-4 border border-[#F3F3F3] rounded-xl shadow-sm mb-4 sm:mb-6 bg-white'>
+        <h2 className='text-base sm:text-lg font-semibold text-[#1e255e] mb-2 sm:mb-4'>
           ChatAgent Performance
         </h2>
-        <div className='overflow-x-auto'>
+        <div className='overflow-x-auto -mx-3 sm:mx-0'>
           <table className='min-w-full'>
             <thead>
               <tr className='bg-gray-50 border-b border-[#F3F3F3]'>
-                <th className='px-6 py-3 text-left text-xs font-medium text-[#1e255eb2] uppercase tracking-wider'>
+                <th className='px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-[#1e255eb2] uppercase tracking-wider'>
                   ChatAgent
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-[#1e255eb2] uppercase tracking-wider'>
+                <th className='px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-[#1e255eb2] uppercase tracking-wider'>
                   Type
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-[#1e255eb2] uppercase tracking-wider'>
+                <th className='px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-[#1e255eb2] uppercase tracking-wider'>
                   Creator
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-[#1e255eb2] uppercase tracking-wider'>
+                <th className='px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-[#1e255eb2] uppercase tracking-wider'>
                   Sessions
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-[#1e255eb2] uppercase tracking-wider'>
+                <th className='px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-[#1e255eb2] uppercase tracking-wider'>
                   Requests
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-[#1e255eb2] uppercase tracking-wider'>
+                <th className='px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-[#1e255eb2] uppercase tracking-wider'>
                   Status
                 </th>
               </tr>
@@ -400,33 +422,33 @@ const StatisticsDashboard = () => {
                   key={chatbot.id}
                   className='border-b border-[#F3F3F3] hover:bg-gray-50'
                 >
-                  <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-[#1e255e]'>
-                    <div className='flex items-center gap-2'>
+                  <td className='px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-[#1e255e]'>
+                    <div className='flex items-center gap-1 sm:gap-2'>
                       <Image
                         src='/images/bot-icon.svg'
                         alt='bot icon'
-                        width={24}
-                        height={24}
+                        width={window.innerWidth < 640 ? 20 : 24}
+                        height={window.innerWidth < 640 ? 20 : 24}
                         className='bg-[#58C8DD] rounded-full p-1'
                       />
                       {chatbot.name}
                     </div>
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-[#1e255eb2] capitalize'>
+                  <td className='px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-[#1e255eb2] capitalize'>
                     {chatbot.type}
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-[#1e255eb2]'>
+                  <td className='px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-[#1e255eb2]'>
                     {chatbot.creator}
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-[#1e255eb2]'>
+                  <td className='px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-[#1e255eb2]'>
                     {chatbot.sessions}
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-[#1e255eb2]'>
+                  <td className='px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-[#1e255eb2]'>
                     {chatbot.requests}
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
+                  <td className='px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap'>
                     <span
-                      className={`px-2 py-1 text-xs font-medium rounded-full ${
+                      className={`px-2 py-0.5 sm:py-1 text-xs font-medium rounded-full ${
                         chatbot.isActive
                           ? 'bg-green-100 text-green-800'
                           : 'bg-red-100 text-red-800'
@@ -443,27 +465,27 @@ const StatisticsDashboard = () => {
       </div>
 
       {/* Sessions Table */}
-      <div className='p-4 border border-[#F3F3F3] rounded-xl shadow-sm bg-white'>
-        <h2 className='text-lg font-semibold text-[#1e255e] mb-4'>
+      <div className='p-3 sm:p-4 border border-[#F3F3F3] rounded-xl shadow-sm bg-white'>
+        <h2 className='text-base sm:text-lg font-semibold text-[#1e255e] mb-2 sm:mb-4'>
           Recent Sessions
         </h2>
-        <div className='overflow-x-auto'>
+        <div className='overflow-x-auto -mx-3 sm:mx-0'>
           <table className='min-w-full'>
             <thead>
               <tr className='bg-gray-50 border-b border-[#F3F3F3]'>
-                <th className='px-6 py-3 text-left text-xs font-medium text-[#1e255eb2] uppercase tracking-wider'>
+                <th className='px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-[#1e255eb2] uppercase tracking-wider'>
                   Session ID
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-[#1e255eb2] uppercase tracking-wider'>
+                <th className='px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-[#1e255eb2] uppercase tracking-wider'>
                   ChatAgent
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-[#1e255eb2] uppercase tracking-wider'>
+                <th className='px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-[#1e255eb2] uppercase tracking-wider'>
                   Creator
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-[#1e255eb2] uppercase tracking-wider'>
+                <th className='px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-[#1e255eb2] uppercase tracking-wider'>
                   Requests
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-[#1e255eb2] uppercase tracking-wider'>
+                <th className='px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-[#1e255eb2] uppercase tracking-wider'>
                   Used Time
                 </th>
               </tr>
@@ -475,19 +497,19 @@ const StatisticsDashboard = () => {
                     key={sessionId}
                     className='border-b border-[#F3F3F3] hover:bg-gray-50'
                   >
-                    <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-[#1e255e]'>
+                    <td className='px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-[#1e255e]'>
                       {sessionId.substring(0, 8)}...
                     </td>
-                    <td className='px-6 py-4 whitespace-nowrap text-sm text-[#1e255eb2]'>
+                    <td className='px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-[#1e255eb2]'>
                       {item.chatbot.name}
                     </td>
-                    <td className='px-6 py-4 whitespace-nowrap text-sm text-[#1e255eb2]'>
+                    <td className='px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-[#1e255eb2]'>
                       {item.user.username}
                     </td>
-                    <td className='px-6 py-4 whitespace-nowrap text-sm text-[#1e255eb2]'>
+                    <td className='px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-[#1e255eb2]'>
                       {sessionData.totalChatbotAPIRequests}
                     </td>
-                    <td className='px-6 py-4 whitespace-nowrap text-sm text-[#1e255eb2]'>
+                    <td className='px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-[#1e255eb2]'>
                       {sessionData.totalChatbotUsedTime}m
                     </td>
                   </tr>
