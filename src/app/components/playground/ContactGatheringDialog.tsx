@@ -85,14 +85,16 @@ const ContactGatheringDialog = ({
         ? 'START'
         : 'END'
       : 'OFF';
-
+    const dataObject = {
+      customizations: {
+        closeChat,
+      },
+    };
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(dataObject));
     onUpdateBot({
       chatbotId: chatbotId,
-      details: {
-        customizations: {
-          closeChat,
-        },
-      },
+      details: formData,
     });
   }, [chatbotId, contactPopupTiming, onUpdateBot, showContactPopup]);
 
