@@ -52,6 +52,16 @@ export default function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/chatbotlist', request.url));
     }
 
+    if (
+      pathName === '/statistics-dashboard' &&
+      (role === 'user' ||
+        (role === 'subadmin' &&
+          !parsedPermissions.includes('STATISTICAL_DASHBOARD')))
+    ) {
+      toast.error('You do not have permission to access this resource');
+      return NextResponse.redirect(new URL('/chatbotlist', request.url));
+    }
+
     if (pathName === '/login' && token) {
       if (decoded.exp * 1000 > new Date().getTime()) {
         return NextResponse.redirect(new URL('/chatbotlist', request.url));
@@ -94,5 +104,6 @@ export const config = {
     '/dashboard',
     '/dashboard/:path*',
     '/bda',
+    '/statistics-dashboard',
   ],
 };

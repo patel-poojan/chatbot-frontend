@@ -32,8 +32,17 @@ import {
 import { Button } from '@/components/ui/button';
 import { Loader } from '../../Loader';
 import { isEmailValid, isPhoneValid } from '@/utils/validator';
+// import Image from 'next/image';
 
-const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
+const ChatBotDialog = ({
+  chatBotHandler,
+  chatbotName,
+  botIcon,
+}: {
+  chatBotHandler: () => void;
+  chatbotName: string;
+  botIcon: string;
+}) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [selectedModel, setSelectedModel] = useState('deepseek-v2:16b');
   const [isLoading, setIsLoading] = useState(false);
@@ -95,6 +104,9 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
   const { mutate: fetchBotResponse } = useGetChatbotResponse({
     onSuccess(data) {
       if (data?.closeChat) {
+        if (data.closeChat === 'START') {
+          setShowCloseDialog(true);
+        }
         setCloseChatPosition(data.closeChat);
       }
       setApiLoading(false);
@@ -204,14 +216,7 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
       });
     }
   };
-  useEffect(() => {
-    const hasCloseChat = visibleMessages.some(
-      (item) => item.type === 'closeChat'
-    );
-    if (hasCloseChat) {
-      setShowCloseDialog(true);
-    }
-  }, [visibleMessages]);
+
   const closeChatBotHandler = () => {
     if (closeChatPosition === 'END') {
       setShowCloseDialog(true);
@@ -223,6 +228,13 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
     setShowCloseDialog(false);
     closeChatPosition === 'END' && chatBotHandler();
   };
+  console.log(
+    'chatbotName',
+    chatbotName,
+    botIcon,
+    showCloseDialog,
+    closeChatPosition
+  );
   return (
     <div
       className=' min-[425px]:right-6 max-[425px]:w-[calc(100vw-48px)] top-32 min-[699px]:top-20 flex flex-col min-[425px]:w-[375px] h-[65vh] max-[425px]:mx-6 min-[500px]:h-[60vh] rounded-lg overflow-hidden absolute '
@@ -233,14 +245,16 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
         <div className='w-full p-4 bg-white justify-between flex items-center'>
           <div className='flex gap-3'>
             {/* <Image
-              src='/images/online_bot.svg'
+              src={botIcon ?? '/images/online_bot.svg'}
               alt='bot'
               width={40}
               height={40}
               quality={100}
             />
             <div className='flex flex-col my-1 justify-between'>
-              <p className='text-[#1E255E] font-medium text-sm'>Chatbot</p>
+              <p className='text-[#1E255E] font-medium text-sm'>
+                {chatbotName ?? 'chatbot'}
+              </p>
               <p className='text-[#1E255EB2] font-light text-sm'>Online</p>
             </div> */}
             <Select value={selectedModel} onValueChange={setSelectedModel}>
@@ -324,7 +338,7 @@ const ChatBotDialog = ({ chatBotHandler }: { chatBotHandler: () => void }) => {
             <div className='bg-white rounded-xl p-4 w-[90%] max-w-[340px] mx-auto border border-[#53A7DD]/20 shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(83,167,221,0.12)] transition-shadow duration-300'>
               <div className='flex justify-between items-center mb-4'>
                 <h3 className='text-lg font-semibold text-[#1E255E]'>
-                  Before you go
+                  Please Enter Details
                 </h3>
                 <IoClose
                   className='text-[#1E255E] text-xl cursor-pointer'

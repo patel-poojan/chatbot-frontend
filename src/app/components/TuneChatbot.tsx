@@ -26,6 +26,7 @@ import { useAddAttributes } from '@/utils/attributes-api';
 import { BiSolidEditAlt } from 'react-icons/bi';
 import { isValidUrl } from '@/utils/validator';
 import { ChatBotState } from './constant';
+import { FiUploadCloud } from 'react-icons/fi';
 
 const TuneChatbot = ({ botId }: { botId: string }) => {
   const router = useRouter();
@@ -38,10 +39,57 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
     { title: 'About Us', value: '' },
     { title: 'Domain Name', value: '' },
   ]);
+  const [botIcon, setBotIcon] = useState('');
   const [AboutUs, setAboutUs] = useState(true);
   const [welcomeMessage, setWelcomeMessage] = useState(
     `👋 Welcome to ChatAgent! I'm ChatAgent, your AI assistant 🤖. What can I do for you?`
   );
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (file) {
+      // Validate file format (Only PNG and JPEG allowed)
+      const fileType = file.type;
+      const validFormats = ['image/png', 'image/jpeg', 'image/jpg'];
+
+      if (!validFormats.includes(fileType)) {
+        toast.warning('Please upload PNG or JPEG files only');
+        // Reset the file input
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        return;
+      }
+
+      // Validate file size (max 15MB)
+      const maxSize = 15 * 1024 * 1024; // 15MB in bytes
+
+      if (file.size > maxSize) {
+        toast.warning('File size exceeds 15MB limit');
+        // Reset the file input
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        return;
+      }
+
+      // If validation passes, read and set the file
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setBotIcon(event.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Add this function to trigger file input click
+  const triggerFileUpload = () => {
+    fileInputRef.current?.click();
+  };
   const {
     mutate: onUpdateBot,
     isPending,
@@ -116,26 +164,62 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
     } else if (!botId) {
       toast.warning('something went wrong');
     } else {
+      const formData = new FormData();
+      const dataObject = {
+        name: attributes[0].value ?? 'ChatAgent',
+        aboutAs: attributes[3].value,
+        domainName: attributes[4].value,
+        welcomeMessage: welcomeMessage,
+        state: ChatBotState.active,
+        configuredButtons: [
+          {
+            type: 'faq',
+            isEnabled: FAQ,
+          },
+          {
+            type: 'aboutUs',
+            isEnabled: AboutUs,
+          },
+        ],
+      };
+      formData.append('data', JSON.stringify(dataObject));
+      if (botIcon && botIcon.startsWith('data:image')) {
+        // Extract mime type and base64 data
+        const matches = botIcon.match(/^data:(.+);base64,(.+)$/);
+        if (matches && matches.length === 3) {
+          const mimeType = matches[1];
+          const base64Data = matches[2];
+
+          // Convert base64 to binary
+          const binaryData = atob(base64Data);
+
+          // Create array buffer from binary
+          const arrayBuffer = new ArrayBuffer(binaryData.length);
+          const uint8Array = new Uint8Array(arrayBuffer);
+
+          for (let i = 0; i < binaryData.length; i++) {
+            uint8Array[i] = binaryData.charCodeAt(i);
+          }
+
+          // Create blob with correct mime type
+          const blob = new Blob([arrayBuffer], { type: mimeType });
+
+          // Create File from blob
+          const iconFile = new File(
+            [blob],
+            `chat_icon_${Date.now()}.${mimeType.split('/')[1]}`,
+            { type: mimeType }
+          );
+
+          // Add the file to FormData with key 'icon'
+          formData.append('icon', iconFile);
+        }
+      }
       onUpdateBot({
         chatbotId: botId,
-        details: {
-          name: attributes[0].value ?? 'ChatAgent',
-          aboutAs: attributes[3].value,
-          domainName: attributes[4].value,
-          welcomeMessage: welcomeMessage,
-          state: ChatBotState.active,
-          configuredButtons: [
-            {
-              type: 'faq',
-              isEnabled: FAQ,
-            },
-            {
-              type: 'aboutUs',
-              isEnabled: AboutUs,
-            },
-          ],
-        },
+        details: formData,
       });
+
       onAddAttributes({
         chatbotId: botId,
         details: {
@@ -252,6 +336,50 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
             </div>
           </div>
 
+          <div className='mb-4 sm:mb-6 w-full'>
+            <p className='text-black font-normal text-lg mb-3'>
+              Upload Bot Icon
+            </p>
+            <div
+              className='flex items-center justify-center border border-dashed border-[#57C0DD] rounded-xl p-3 cursor-pointer bg-[#FAFAFA] hover:bg-[#F5F5F5] h-20'
+              onClick={triggerFileUpload}
+            >
+              <input
+                type='file'
+                ref={fileInputRef}
+                className='hidden'
+                accept='image/*'
+                onChange={handleFileUpload}
+              />
+              {botIcon ? (
+                <div className='flex items-center gap-3'>
+                  <div className='relative w-12 h-12 rounded-full overflow-hidden'>
+                    <Image
+                      src={botIcon}
+                      alt='Bot Icon'
+                      className='w-full h-full object-cover'
+                      width={48} // Adjust width as needed
+                      height={48} // Adjust height as needed
+                      quality={100} // Optional: Adjust quality as needed
+                    />
+                  </div>
+                  <p className='text-[#1E255EB2] text-sm'>
+                    Click to change icon
+                  </p>
+                </div>
+              ) : (
+                <div className='flex items-center gap-3'>
+                  <div className='w-12 h-12 flex items-center justify-center rounded-full bg-[#57C0DD] bg-opacity-10'>
+                    <FiUploadCloud className='w-6 h-6 text-[#57C0DD]' />
+                  </div>
+                  <p className='text-[#1E255EB2] text-sm'>
+                    Click to upload bot icon
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
           <p className='text-black font-normal text-lg mb-3'>
             Set up attributes
           </p>
@@ -295,11 +423,11 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
         <div className='hidden lg:w-2/5 lg:flex flex-col gap-3 border-t-[40px] rounded-[30px] border-r-[40px] border-b-0 border-l-[40px] border-[#57C0DD] p-4'>
           <div className='flex gap-3'>
             <Image
-              src='/images/online_bot.svg'
+              src={botIcon || '/images/online_bot.svg'}
               alt='bot'
               width={50}
               height={50}
-              className='flex-shrink-0'
+              className='flex-shrink-0 rounded-full'
               quality={100}
             />
             <div className='flex flex-col my-1 justify-between min-w-0'>
@@ -363,12 +491,14 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
               <SheetTitle className='w-full flex justify-between items-center'>
                 <div className='flex gap-3'>
                   <Image
-                    src='/images/online_bot.svg'
+                    src={botIcon || '/images/online_bot.svg'}
                     alt='bot'
                     width={40}
                     height={40}
+                    className='rounded-full'
                     quality={100}
                   />
+
                   <div className='flex flex-col my-1 justify-between'>
                     <p className='text-[#1E255E] font-medium text-sm'>
                       {attributes[0].value}
