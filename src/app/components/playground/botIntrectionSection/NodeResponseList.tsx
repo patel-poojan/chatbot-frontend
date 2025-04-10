@@ -6,8 +6,6 @@ import UploadImage from "./UploadImage";
 import { ResponseInfo, TypeResponseList } from "@/types/node";
 import { Attribute } from "../AttributesDialog";
 import { useEffect, useRef, useState } from "react";
-import { MentionsInput, Mention } from "react-mentions";
-
 const generateShortId = (title: string) => {
   const timestamp = Date.now();
   return `Chatbot${(timestamp & 0xffffff).toString(16)}${title}`;
@@ -28,16 +26,30 @@ export const TextNodeResponse = ({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [cursor, setCursor] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const highlightRef = useRef<HTMLDivElement>(null);
 
   const handleSelect = (item: string) => {
     const before = value.slice(0, cursor);
-    const after = value.slice(cursor + 1); // skip @
-    const rest = after.replace(/^\w*/, ""); // remove whatever was typed after @
+    const after = value.slice(cursor);
 
-    const newText = `${before}{{${item}}}${rest}`;
+    const lastAt = before.lastIndexOf("@");
+    if (lastAt === -1) return;
+
+    const prefix = value.slice(0, lastAt); // before the @
+    const suffix = after.replace(/^\w*/, ""); // removes typed attribute after @
+
+    const newText = `${prefix}{{${item}}}${suffix}`;
     setValue(newText);
     setShowSuggestions(false);
-    textareaRef.current?.focus();
+
+    // Move cursor after the inserted {{item}}
+    const newCursor = `${prefix}{{${item}}}`.length;
+    setTimeout(() => {
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+        textareaRef.current.setSelectionRange(newCursor, newCursor);
+      }
+    }, 0);
   };
 
   useEffect(() => {
@@ -49,85 +61,68 @@ export const TextNodeResponse = ({
     });
   }, [value]);
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const val = e.target.value;
+    setValue(val);
+
+    const caret = e.target.selectionStart;
+    setCursor(caret);
+
+    const beforeCaret = val.slice(0, caret);
+    const lastAt = beforeCaret.lastIndexOf("@");
+    const typed = beforeCaret.slice(lastAt + 1);
+
+    if (lastAt !== -1 && /^[\w\s]*$/.test(typed)) {
+      const matches = attributes.filter((attr) => attr.name.toLowerCase().startsWith(typed.toLowerCase()));
+      // setSearchText(typed);
+      setSuggestions(matches);
+      setShowSuggestions(true);
+    } else {
+      setShowSuggestions(false);
+    }
+  };
+
+  const getHighlightedText = () => {
+    const regex = /{{(.*?)}}/g;
+    return value.replace(regex, (_, match) => `<mark>{{${match}}}</mark>`);
+  };
+
+  const handleScroll = () => {
+    if (textareaRef.current && highlightRef.current) {
+      highlightRef.current.scrollTop = textareaRef.current.scrollTop;
+    }
+  };
   return (
-    <>
-      {/* <Textarea
+    <div className="relative w-full max-w-xl">
+      <div
+        className="absolute text-sm top-0 left-0 w-full h-full whitespace-pre-wrap p-3 text-transparent pointer-events-none overflow-auto border border-gray-300 rounded-md bg-white font-mono"
+        style={{ zIndex: 0 }}
+        ref={highlightRef}
+        aria-hidden
+        dangerouslySetInnerHTML={{
+          __html: getHighlightedText().replace(/\n/g, "<br/>"),
+        }}
+      />
+      <Textarea
+        ref={textareaRef}
         value={info.description}
-        onChange={(event) => {
-          const val = event.target.value;
-          setValue(val);
-
-          const lastAt = val.lastIndexOf("@");
-          const textAfterAt = val.slice(lastAt + 1);
-
-          if (val[lastAt] === "@" && textAfterAt.length >= 0) {
-            const filtered = attributes.filter((attr) => attr.name.startsWith(textAfterAt.toLowerCase()));
-            setSuggestions(filtered);
-            setShowSuggestions(true);
-            setCursor(lastAt);
-          } else {
-            setShowSuggestions(false);
-          }
-          // setResponseList((prev) => {
-          //   const newList = [...prev];
-          //   newList[index].info.description = event.target.value;
-          //   return newList;
-          // });
-        }}
+        onChange={handleInputChange}
         placeholder="Entre bot response"
-        rows={3}
-        maxLength={1024}
-        className="resize-none w-10/12 border border-transparent bg-white p-3 rounded-md shadow-none focus:outline-none hover:border-[#57C0DD] focus-visible:ring-0 overflow-y-auto"
-      /> */}
-      <MentionsInput
-        value={info.description}
-        onChange={(event) => {
-          const val = event.target.value;
-          setValue(val);
-
-          const lastAt = val.lastIndexOf("@");
-          const textAfterAt = val.slice(lastAt + 1);
-
-          if (val[lastAt] === "@" && textAfterAt.length >= 0) {
-            const filtered = attributes.filter((attr) => attr.name.startsWith(textAfterAt.toLowerCase()));
-            setSuggestions(filtered);
-            setShowSuggestions(true);
-            setCursor(lastAt);
-          } else {
-            setShowSuggestions(false);
+        className="relative z-10 w-full p-3 resize-none bg-transparent border border-gray-300 rounded-md outline-none font-mono"
+        onKeyUp={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+          const textarea = e.currentTarget;
+          function calcHeight(value: string) {
+            let numberOfLineBreaks = (value.match(/\n/g) || []).length;
+            // min-height + lines x line-height + padding + border
+            let newHeight = 20 + numberOfLineBreaks * 20 + 12 + 2;
+            return newHeight;
           }
-          // setResponseList((prev) => {
-          //   const newList = [...prev];
-          //   newList[index].info.description = event.target.value;
-          //   return newList;
-          // });
+
+          textarea.style.height = calcHeight(textarea.value) + "px";
         }}
-        placeholder="Entre bot response"
-        rows={3}
-        className="resize-none w-10/12 border border-transparent bg-white p-3 rounded-md shadow-none focus:outline-none hover:border-[#57C0DD] focus-visible:ring-0 overflow-y-auto"
-        style={{
-          control: {
-            fontSize: 16,
-            fontWeight: "normal",
-          },
-          highlighter: {
-            overflow: "hidden",
-          },
-          input: {
-            margin: 0,
-          },
-        }}
-      >
-        <Mention
-          trigger="@"
-          data={attributes.map((a) => ({ id: a.name, display: a.name }))}
-          markup="{{__id__}}"
-          displayTransform={(id) => `{{${id}}}`}
-          appendSpaceOnAdd
-        />
-      </MentionsInput>
+      />
       {showSuggestions && suggestions.length > 0 && (
-        <ul className="absolute z-10 bg-white border shadow mt-1 w-48 rounded">
+        <ul className="fixed z-10 bg-white border shadow mt-1 w-48 rounded">
           {suggestions.map((s) => (
             <li key={s._id} onClick={() => handleSelect(s.name)} className="px-3 py-1 hover:bg-gray-100 cursor-pointer">
               {s.name}
@@ -135,7 +130,7 @@ export const TextNodeResponse = ({
           ))}
         </ul>
       )}
-    </>
+    </div>
   );
 };
 
