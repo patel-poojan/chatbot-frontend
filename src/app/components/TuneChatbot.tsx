@@ -292,7 +292,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
       )}
 
       <div className='flex-1 flex flex-col lg:flex-row gap-6 w-full overflow-hidden'>
-        <div className='w-full lg:w-3/5 flex-1 flex flex-col h-full overflow-y-auto overflow-x-hidden'>
+        <div className='w-full lg:w-3/5 flex-1 flex flex-col h-full overflow-y-auto overflow-x-hidden show-scrollbar pr-4'>
           <div className='mb-4 sm:mb-6'>
             <h2 className='text-black font-semibold text-2xl'>
               Tune your ChatAgent
@@ -420,16 +420,18 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
           </div>
         </div>
 
-        <div className='hidden lg:w-2/5 lg:flex flex-col gap-3 border-t-[40px] rounded-[30px] border-r-[40px] border-b-0 border-l-[40px] border-[#57C0DD] p-4'>
+        <div className='hidden lg:w-2/5 overflow-y-auto lg:flex flex-col gap-3 border-t-[40px] rounded-[30px] border-r-[40px] border-b-0 border-l-[40px] border-[#57C0DD] p-4 '>
           <div className='flex gap-3'>
-            <Image
-              src={botIcon || '/images/online_bot.svg'}
-              alt='bot'
-              width={50}
-              height={50}
-              className='flex-shrink-0 rounded-full'
-              quality={100}
-            />
+            <div className='relative h-12 w-12 rounded-full bg-transparent overflow-hidden'>
+              <Image
+                src={botIcon || '/images/online_bot.svg'}
+                alt='bot'
+                fill
+                sizes='100px'
+                className='object-contain p-1'
+                quality={100}
+              />
+            </div>
             <div className='flex flex-col my-1 justify-between min-w-0'>
               <p className='text-[#1E255E] font-medium text-sm truncate'>
                 {attributes[0].value}
@@ -477,27 +479,31 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
       <div className='fixed lg:hidden bottom-16 right-4'>
         <Sheet>
           <SheetTrigger>
-            <Image
-              src='/images/bot-icon.svg'
-              alt='bot'
-              className='rounded-full bg-white'
-              width={40}
-              height={40}
-              quality={100}
-            />
+            <div className='p-2 rounded-full bg-white shadow-md cursor-pointer z-10'>
+              <Image
+                src='/images/bot-icon.svg'
+                alt='bot'
+                className='rounded-full bg-white'
+                width={40}
+                height={40}
+                quality={100}
+              />
+            </div>
           </SheetTrigger>
           <SheetContent side='bottom' className='rounded-t-[30px] max-h-[80vh]'>
             <SheetHeader>
               <SheetTitle className='w-full flex justify-between items-center'>
                 <div className='flex gap-3'>
-                  <Image
-                    src={botIcon || '/images/online_bot.svg'}
-                    alt='bot'
-                    width={40}
-                    height={40}
-                    className='rounded-full'
-                    quality={100}
-                  />
+                  <div className='w-12 h-12 rounded-full bg-transparent flex items-center justify-center overflow-hidden'>
+                    <Image
+                      src={botIcon || '/images/online_bot.svg'}
+                      alt='bot'
+                      width={40}
+                      height={40}
+                      className='object-contain'
+                      quality={100}
+                    />
+                  </div>
 
                   <div className='flex flex-col my-1 justify-between'>
                     <p className='text-[#1E255E] font-medium text-sm'>
@@ -512,7 +518,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
                   <Cross2Icon className='h-4 w-4' />
                 </SheetClose>
               </SheetTitle>
-              <SheetDescription className='flex pt-2 flex-col gap-4 overflow-y-auto'>
+              <SheetDescription className='flex pt-2 flex-col gap-4 overflow-y-auto show-scrollbar'>
                 <div className='text-white text-base font-medium p-4 rounded-xl bg-[#57C0DD] shadow-sm'>
                   {welcomeMessage}
                 </div>

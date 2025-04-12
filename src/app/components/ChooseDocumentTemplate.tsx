@@ -199,8 +199,8 @@ const ChooseDocumentTemplate: React.FC<DocumentTemplateProps> = ({
   };
 
   const { mutate: onTrainBot, isPending } = useTrainBot({
-    onSuccess(data) {
-      toast.success(data?.message);
+    onSuccess() {
+      // toast.success(data?.message);
       stepHandler('up');
     },
     onError(error: axiosError) {
@@ -221,7 +221,7 @@ const ChooseDocumentTemplate: React.FC<DocumentTemplateProps> = ({
       if (data.data.urls) {
         setActiveTrainingURLS(data.data.urls.map((url) => url.url));
       }
-      toast.success(data?.message);
+      // toast.success(data?.message);
     },
     onError(error: axiosError) {
       const errorMessage =
