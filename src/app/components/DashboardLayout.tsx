@@ -16,6 +16,7 @@ import {
   MdOutlineLogout,
   MdOutlinePeopleAlt,
   MdOutlineQuickreply,
+  MdShowChart,
 } from 'react-icons/md';
 import { PiNotepadBold } from 'react-icons/pi';
 import TopBar from '../components/TopBar';
@@ -210,6 +211,31 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                 </Tooltip>
               </TooltipProvider>
             )}
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link href={'/statistics-dashboard-user'}>
+                    <div
+                      className={`${
+                        pathName === '/statistics-dashboard-user'
+                          ? 'bg-[#3D3D4A]'
+                          : 'bg-transparent'
+                      } hover:bg-[#3D3D4A] h-11 w-11 flex items-center justify-center rounded-md cursor-pointer`}
+                    >
+                      <MdShowChart className='text-2xl text-white cursor-pointer' />
+                    </div>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent
+                  className='bg-[#1B1B20]'
+                  side='right'
+                  align='center'
+                  sideOffset={14}
+                >
+                  <p>User Statistics</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             {showStatistics && (
               <TooltipProvider>
                 <Tooltip>
@@ -421,6 +447,40 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                         </div>
                       </Link>
                     )}
+                    <Link href={'/statistics-dashboard-user'}>
+                      <div
+                        className={`flex gap-3 items-center rounded-lg py-3 ${
+                          pathName === '/statistics-dashboard-user'
+                            ? 'px-3 blue-gradient'
+                            : ''
+                        }`}
+                      >
+                        <div
+                          className={
+                            pathName === '/statistics-dashboard-user'
+                              ? 'p-2 rounded-md bg-[#3D3D4A33] '
+                              : ''
+                          }
+                        >
+                          <MdShowChart
+                            className={
+                              pathName === '/statistics-dashboard-user'
+                                ? 'text-white text-xl'
+                                : 'text-2xl text-[#1e255eb2]'
+                            }
+                          />
+                        </div>
+                        <p
+                          className={`text-base ${
+                            pathName === '/statistics-dashboard-user'
+                              ? 'text-white'
+                              : 'text-[#1e255eb2]'
+                          } font-medium`}
+                        >
+                          User Statistics
+                        </p>
+                      </div>
+                    </Link>
                     {showStatistics && (
                       <Link href={'/statistics-dashboard'}>
                         <div

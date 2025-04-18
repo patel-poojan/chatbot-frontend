@@ -105,5 +105,6 @@ export const config = {
     '/dashboard/:path*',
     '/bda',
     '/statistics-dashboard',
+    '/statistics-dashboard-user',
   ],
 };

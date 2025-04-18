@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 const Page = () => {
   // Fetch statistics data
   const fetchStatistics = async () => {
-    const response = await axiosInstance.get('/metrics');
+    const response = await axiosInstance.get('/metrics/user');
     return response.data;
   };
 
@@ -17,7 +17,7 @@ const Page = () => {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ['fetch', 'statistics'],
+    queryKey: ['fetch', 'statistics', 'user'],
     queryFn: fetchStatistics,
   });
 

@@ -27,7 +27,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "server.js",
-    "src/app/(sidebar-group)/statistics-dashboard/Components/DistributionChart,tsx"
+    "src/app/components/statisticsDashboard/Components/DistributionChart,tsx"
   ],
   "exclude": ["node_modules"]
 }
