@@ -15,15 +15,18 @@ import { toast } from "sonner";
 import { useUpdateTrainData } from "@/utils/botCreation-api";
 import { axiosError } from "@/types/axiosTypes";
 
+interface IDocumentContent {
+  active: boolean;
+  url: string;
+  localPath: string;
+  name: string;
+}
+
 interface TrainDataType {
   statusCode: number;
   data: {
     chatbotId: string;
-    documentContent: {
-      active: boolean;
-      url: string;
-      localPath: string;
-    }[];
+    documentContent: IDocumentContent[];
     websiteContent: {
       active: boolean;
       url: string;
@@ -53,6 +56,7 @@ const AIKnowledge = ({
       active: boolean;
       url: string;
       localPath: string;
+      name: string;
     }[]
   >([]);
   const [listOfWebsites, setListOfWebsites] = useState<
@@ -330,7 +334,7 @@ const AIKnowledge = ({
                       <TableHead className="py-2 text-start w-[40%] md:w-[45%]">
                         <div className="flex items-center flex-wrap justify-start gap-1">
                           <span className="text-[#1E255E] font-medium">
-                            {tab === "websites" ? "Website URL" : "Document URL"}
+                            {tab === "websites" ? "Website URL" : "Document Name"}
                           </span>
                         </div>
                       </TableHead>
@@ -356,7 +360,9 @@ const AIKnowledge = ({
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <div className="flex text-[#1E255E] font-normal items-center justify-start">
-                                    {detail?.url
+                                    {tab === "documents"
+                                      ? (detail as IDocumentContent).name ?? "-"
+                                      : detail?.url
                                       ? detail.url.length > 30
                                         ? detail.url.substring(0, 30) + "..."
                                         : detail.url
@@ -371,7 +377,7 @@ const AIKnowledge = ({
                                   }}
                                   className="p-1 bg-[#57C0DD] text-white !z-50 max-w-[300px]"
                                 >
-                                  {detail?.url ?? ""}
+                                  {tab === "documents" ? (detail as IDocumentContent)?.name ?? "" : detail?.url ?? ""}
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
