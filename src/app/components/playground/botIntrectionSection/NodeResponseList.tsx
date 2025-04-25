@@ -87,11 +87,11 @@ export const TextNodeResponse = ({
     return value.replace(regex, (_, match) => `<mark>{{${match}}}</mark>`);
   };
 
-  const handleScroll = () => {
-    if (textareaRef.current && highlightRef.current) {
-      highlightRef.current.scrollTop = textareaRef.current.scrollTop;
-    }
-  };
+  // const handleScroll = () => {
+  //   if (textareaRef.current && highlightRef.current) {
+  //     highlightRef.current.scrollTop = textareaRef.current.scrollTop;
+  //   }
+  // };
   return (
     <div className="relative w-full max-w-xl">
       <div
@@ -112,9 +112,9 @@ export const TextNodeResponse = ({
         onKeyUp={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
           const textarea = e.currentTarget;
           function calcHeight(value: string) {
-            let numberOfLineBreaks = (value.match(/\n/g) || []).length;
+            const numberOfLineBreaks = (value.match(/\n/g) || []).length;
             // min-height + lines x line-height + padding + border
-            let newHeight = 20 + numberOfLineBreaks * 20 + 12 + 2;
+            const newHeight = 20 + numberOfLineBreaks * 20 + 12 + 2;
             return newHeight;
           }
 
