@@ -14,7 +14,7 @@ import { FaQuoteLeft } from 'react-icons/fa';
 import DashboardLayout from '@/app/components/DashboardLayout';
 import { axiosInstance } from '@/utils/axiosInstance';
 import { useQuery } from '@tanstack/react-query';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { Loader } from '@/app/components/Loader';
 import { StringToDateFormatter } from '@/utils/formatter';
 import { useTrainDeleteData } from '@/utils/training-api';
@@ -24,6 +24,7 @@ import TrainingDialog from '@/app/components/TrainingDialog';
 import { TypeResponseList } from '@/types/node';
 import { ReactFlowProvider } from '@xyflow/react';
 import { PlaygroundProvider } from '@/app/components/playground/playgroundArea/PlaygroundContext';
+import { MdArrowBack } from 'react-icons/md';
 
 interface TrainingTableProps {
   _id: string;
@@ -201,6 +202,7 @@ const TrainingTable = ({ type }: { type: string }) => {
   );
 };
 const Page = () => {
+  const router = useRouter();
   const [tab, setTab] = useState(0);
 
   return (
@@ -208,17 +210,14 @@ const Page = () => {
       <PlaygroundProvider>
         <DashboardLayout>
           <div className='flex flex-1 overflow-hidden flex-col max-[500px]:p-4 gap-4 sm:gap-6'>
-            <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-3'>
+            <div className='flex items-center gap-2'>
+              <MdArrowBack
+                className='text-xl sm:text-2xl cursor-pointer'
+                onClick={() => router.back()}
+              />
               <p className='text-xl sm:text-2xl font-semibold text-black'>
                 Training
               </p>
-              {/* <div className='flex items-center py-0 md:py-1 px-3 gap-2 rounded-xl bg-[#F8F8F8] w-full sm:w-auto'>
-                <IoSearchSharp className='text-lg' />
-                <Input
-                  className='w-full sm:w-32 border-none placeholder:text-[#1E255E] p-0 shadow-none focus-visible:ring-0'
-                  placeholder='Search'
-                />
-              </div> */}
             </div>
 
             <div className='flex items-center gap-4'>
