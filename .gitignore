@@ -39,3 +39,7 @@ next-env.d.ts
 # cPanel specific
 tmp/
 app.js
+git-auto-pull.sh
+git-webhook.php
+git-pull.log
+

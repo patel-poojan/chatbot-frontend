@@ -58,6 +58,8 @@ import PublishDialog from '@/app/components/playground/PublishDialog';
 import ContactGatheringDialog from '@/app/components/playground/ContactGatheringDialog';
 import Image from 'next/image';
 import UpdateChatbotDialog from '@/app/components/playground/UpdateChatbotDialog';
+import { MdOutlineQuickreply } from 'react-icons/md';
+import Link from 'next/link';
 
 const ReactFlow = dynamic(
   () => import('@xyflow/react').then((mod) => mod.ReactFlow),
@@ -651,6 +653,30 @@ const MainComponent = ({ botId }: { botId: string }) => {
                     className=' mt-1  p-1 bg-[#57C0DD] text-white !z-50'
                   >
                     AI knowledge
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link href={`/training/${botId}`}>
+                      <div
+                        className='py-2 px-3 h-9 flex items-center justify-center bg-white rounded-lg cursor-pointer'
+                        style={{ boxShadow: '0px 0px 4px 0px #0000001F' }}
+                      >
+                        <MdOutlineQuickreply
+                          className={`text-xl cursor-pointer `}
+                        />
+                      </div>
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    side='bottom'
+                    align='center'
+                    style={{ boxShadow: '0px 0px 4px 0px #0000001F' }}
+                    className=' mt-1  p-1 bg-[#57C0DD] text-white !z-50'
+                  >
+                    Training
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>

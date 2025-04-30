@@ -15,12 +15,11 @@ import {
   MdLockReset,
   MdOutlineLogout,
   MdOutlinePeopleAlt,
-  MdOutlineQuickreply,
   MdShowChart,
 } from 'react-icons/md';
 import { PiNotepadBold } from 'react-icons/pi';
 import TopBar from '../components/TopBar';
-import { useParams, usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   Popover,
   PopoverContent,
@@ -41,8 +40,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [permissions, setPermissions] = useState<string[]>([]);
   // const [isOpenPopup, setIsOpenPopup] = useState<boolean>(false);
   const router = useRouter();
-  const params = useParams();
-  const chatbotId = params.id;
   const { mutate, isPending } = useLogout({
     onSuccess(data) {
       toast.success(data?.message);
@@ -157,33 +154,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                 </Tooltip>
               </TooltipProvider>
             )}
-            {chatbotId && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Link href={`/training/${chatbotId}`}>
-                      <div
-                        className={`${
-                          pathName.includes('/training')
-                            ? 'bg-[#3D3D4A]'
-                            : 'bg-transparent'
-                        } hover:bg-[#3D3D4A] h-11 w-11 flex items-center justify-center rounded-md cursor-pointer`}
-                      >
-                        <MdOutlineQuickreply className='text-2xl text-white cursor-pointer' />
-                      </div>
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent
-                    className='bg-[#1B1B20]'
-                    side='right'
-                    align='center'
-                    sideOffset={14}
-                  >
-                    <p>training</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
+
             {showBda && (
               <TooltipProvider>
                 <Tooltip>
@@ -377,42 +348,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                         </div>
                       </Link>
                     )}
-                    {chatbotId && (
-                      <Link href={`/training/${chatbotId}`}>
-                        <div
-                          className={`flex gap-3 items-center  rounded-lg py-3 ${
-                            pathName.includes('/training')
-                              ? 'px-3 blue-gradient'
-                              : ''
-                          }`}
-                        >
-                          <div
-                            className={
-                              pathName.includes('/training')
-                                ? 'p-2 rounded-md bg-[#3D3D4A33]'
-                                : ''
-                            }
-                          >
-                            <MdOutlineQuickreply
-                              className={
-                                pathName.includes('/training')
-                                  ? 'text-white text-xl'
-                                  : 'text-2xl text-[#1e255eb2]'
-                              }
-                            />
-                          </div>
-                          <p
-                            className={`text-base  ${
-                              pathName.includes('/training')
-                                ? 'text-white'
-                                : 'text-[#1e255eb2]'
-                            }  font-medium`}
-                          >
-                            Training
-                          </p>
-                        </div>
-                      </Link>
-                    )}
+
                     {showBda && (
                       <Link href={'/bda'}>
                         <div
