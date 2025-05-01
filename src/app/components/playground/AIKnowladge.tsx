@@ -367,7 +367,7 @@ const AIKnowledge = ({
                         <div className='flex items-center flex-wrap justify-start gap-1'>
                           <span className='text-[#1E255E] font-medium'>
                             {tab === 'websites'
-                              ? 'Website URL'
+                              ? 'Website  Name'
                               : 'Document Name'}
                           </span>
                         </div>
