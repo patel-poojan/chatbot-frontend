@@ -107,6 +107,7 @@ type TrainBotRequest = {
     websiteUrl?: string;
     scanType?: string;
     urls_to_scrape?: string[];
+    urls_to_ignore?: string[];
   };
 };
 
@@ -147,6 +148,7 @@ const createFormData = (details: TrainBotRequest["details"]) => {
   if (details.websiteUrl) formData.append("websiteUrl", details.websiteUrl);
   if (details.scanType) formData.append("scanType", details.scanType);
   if (details.urls_to_scrape) formData.append("urls_to_scrape", JSON.stringify(details.urls_to_scrape));
+  if (details.urls_to_ignore) formData.append("urls_to_ignore", JSON.stringify(details.urls_to_ignore));
 
   return formData;
 };
