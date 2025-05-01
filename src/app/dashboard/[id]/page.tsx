@@ -802,7 +802,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
               defaultViewport={{ x: 0, y: 200, zoom: 1 }}
               className='bg-[#F6F6F6]'
               proOptions={{ hideAttribution: true }}
-              minZoom={0.8}
+              minZoom={0.1}
               maxZoom={1.5}
               panOnScrollSpeed={0.5}
             >
