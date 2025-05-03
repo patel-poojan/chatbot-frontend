@@ -37,7 +37,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
     { title: 'Company Name', value: '' },
     { title: 'Company Address', value: '' },
     { title: 'About Us', value: '' },
-    { title: 'Domain Name', value: '' },
+    { title: 'Website URL', value: '' },
   ]);
   const [botIcon, setBotIcon] = useState('');
   const [AboutUs, setAboutUs] = useState(true);

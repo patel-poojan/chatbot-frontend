@@ -15,6 +15,7 @@ import {
 } from '@/utils/attributes-api';
 import { axiosError } from '@/types/axiosTypes';
 import { ToSnakeCase } from '@/utils/text-conveter';
+import { isValidUrl } from '@/utils/validator';
 
 export interface Attribute {
   _id: string;
@@ -97,47 +98,78 @@ const AttributesDialog = ({
         toast.error(errorMessage);
       },
     });
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!name) {
       toast.warning('Please enter name');
-    } else if (!value) {
-      toast.warning('Please enter value');
-    } else {
-      onAddAttributes({
-        chatbotId: chatbotId,
-        details: {
-          attributes: [
-            {
-              name: name,
-              alias: ToSnakeCase(name),
-              value: value,
-            },
-          ],
-        },
-      });
+      return;
     }
-  };
-  const handleEditClick = () => {
-    nameInputRef.current?.focus();
-  };
-  const handleUpdate = (attributeId: string) => {
-    if (!name) {
-      toast.warning('Please enter name');
-    } else if (!value) {
+
+    if (!value) {
       toast.warning('Please enter value');
-    } else {
-      if (originalName !== name || originalValue !== value) {
-        onUpdateAttributes({
-          chatbotId: chatbotId,
-          attributeId: attributeId,
-          details: {
+      return;
+    }
+
+    // Special validation for Website URL
+    if (name === 'Website URL') {
+      const isValidUrlData = await isValidUrl(value);
+      if (!isValidUrlData) {
+        toast.warning('Please enter a valid website url');
+        return;
+      }
+    }
+
+    // If all validations pass, add the attributes
+    onAddAttributes({
+      chatbotId: chatbotId,
+      details: {
+        attributes: [
+          {
             name: name,
             alias: ToSnakeCase(name),
             value: value,
           },
-        });
+        ],
+      },
+    });
+  };
+  const handleEditClick = () => {
+    nameInputRef.current?.focus();
+  };
+  const handleUpdate = async (attributeId: string) => {
+    if (!name) {
+      toast.warning('Please enter name');
+      return;
+    }
+
+    if (!value) {
+      toast.warning('Please enter value');
+      return;
+    }
+
+    // Special validation for Website URL
+    if (name === 'Website URL') {
+      const isValidUrlData = await isValidUrl(value);
+      if (!isValidUrlData) {
+        toast.warning('Please enter a valid website url');
+        return;
       }
     }
+
+    // Only update if something has changed
+    if (originalName === name && originalValue === value) {
+      return; // No changes, no need to update
+    }
+
+    // If all validations pass and there are changes, update the attributes
+    onUpdateAttributes({
+      chatbotId: chatbotId,
+      attributeId: attributeId,
+      details: {
+        name: name,
+        alias: ToSnakeCase(name),
+        value: value,
+      },
+    });
   };
   const fetchAttributesHandler = async () => {
     const response: FetchAttributesResponse = await axiosInstance.get(
@@ -193,7 +225,7 @@ const AttributesDialog = ({
     'Company Name',
     'Company Address',
     'About Us',
-    'Domain Name',
+    'Website URL',
   ];
   return (
     <div
@@ -273,7 +305,8 @@ const AttributesDialog = ({
                   onBlur={() => handleUpdate(editId)}
                   onKeyDown={(e) => e.key === 'Enter' && handleUpdate(editId)}
                   placeholder='Add title'
-                  className='p-0 max-w-[200px] !shadow-none text-primary font-medium text-lg bg-transparent !w-fit border-none rounded focus-visible:px-2 placeholder:text-sm'
+                  disabled={disabledAttributes.includes(name)}
+                  className='p-0 max-w-[200px] !shadow-none text-primary font-medium text-lg bg-transparent !w-fit border-none rounded focus-visible:px-2 placeholder:text-sm disabled:opacity-100 disabled:text-primary disabled:bg-transparent'
                 />
                 <div
                   className={`flex gap-2 items-center ${

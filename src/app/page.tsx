@@ -5,7 +5,7 @@ import Image from 'next/image';
 import MarketingTemplate from './components/MarketingTemplate';
 import CommentCard from './components/CommentCard';
 import BottomBar from './components/BottomBar';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import Head from 'next/head';
 
@@ -53,7 +53,7 @@ export default function Home() {
   const [loopNum, setLoopNum] = useState(0);
   const [charIndex, setCharIndex] = useState(0);
 
-  const texts = ['AI based', '24/7'];
+  const texts = useMemo(() => ['AI based', '24/7'], []);
   const typingSpeed = isDeleting ? 120 : 300;
 
   useEffect(() => {

@@ -133,7 +133,15 @@ const ButtonInteractionDialog = ({
   };
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+      <PopoverTrigger
+        asChild
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen(true);
+        }}
+      >
+        {trigger}
+      </PopoverTrigger>
       <PopoverContent
         side={screenWidth > 890 ? 'left' : 'bottom'}
         align={screenWidth > 890 ? 'center' : 'center'}

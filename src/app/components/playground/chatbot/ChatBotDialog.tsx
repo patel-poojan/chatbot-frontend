@@ -144,6 +144,7 @@ const ChatBotDialog = ({
       });
       initialCallMade.current = true;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatbotId, fetchBotResponse]);
 
   const onTextSearch = () => {
