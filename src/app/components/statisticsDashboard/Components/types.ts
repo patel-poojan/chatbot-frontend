@@ -1,10 +1,12 @@
 // types.ts
 export interface SessionData {
+  visitedWebsiteCount: number;
   chatbotAPIRequests: number[];
   totalChatbotAPIRequests: number;
   averageChatbotAPIRequests: number;
   chatbotUsedTime: number[];
   totalChatbotUsedTime: number;
+  totalVisitedWebsites: number;
 }
 
 export interface Chatbot {
@@ -48,6 +50,7 @@ export interface ChatbotStat {
   requests: number;
   usageTime: number;
   uniqueUsers: number;
+  visitedWebsiteCount: number;
 }
 
 export interface ChartData {
@@ -57,14 +60,13 @@ export interface ChartData {
   isOthers?: boolean;
   items?: ChartData[];
 }
-;
-
 export interface SessionDisplayData {
   id: string;
   chatbotName: string;
   creator: string;
   requests: number;
   usageTime: number;
+  visitedWebsiteCount: number;
 }
 
 export interface ProcessedStats {
@@ -76,4 +78,5 @@ export interface ProcessedStats {
   chatbotStats: ChatbotStat[];
   chatbotDistributionData: ChartData[];
   sessionsData: SessionDisplayData[];
+  totalVisitedWebsites: number;
 }

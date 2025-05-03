@@ -22,6 +22,7 @@ export const processStatisticsData = (
       totalSessions: 0,
       totalRequests: 0,
       totalUsageTime: 0,
+      totalVisitedWebsites: 0,
       chatbotStats: [],
       chatbotDistributionData: [],
       sessionsData: [],
@@ -44,6 +45,7 @@ export const processStatisticsData = (
   let totalSessions = 0;
   let totalRequests = 0;
   let totalUsageTime = 0;
+  let totalVisitedWebsites = 0;
   const sessionsData: SessionDisplayData[] = [];
 
   // Create per chatbot data
@@ -76,6 +78,7 @@ export const processStatisticsData = (
         requests: 0,
         usageTime: 0,
         uniqueUsers: 0,
+        visitedWebsiteCount: 0,
       });
     }
 
@@ -91,12 +94,16 @@ export const processStatisticsData = (
 
       const requests = session.totalChatbotAPIRequests || 0;
       const usageTime = session.totalChatbotUsedTime || 0;
+      const visitedWebsiteCount = session.visitedWebsiteCount || 0;
 
       totalRequests += requests;
       totalUsageTime += usageTime;
+      totalVisitedWebsites += visitedWebsiteCount;
 
       chatbot.requests += requests;
       chatbot.usageTime += usageTime;
+      chatbot.visitedWebsiteCount =
+        (chatbot.visitedWebsiteCount || 0) + visitedWebsiteCount;
 
       // Add to sessions display data
       sessionsData.push({
@@ -105,6 +112,7 @@ export const processStatisticsData = (
         creator: item.user.username,
         requests,
         usageTime,
+        visitedWebsiteCount,
       });
     });
   });
@@ -144,6 +152,7 @@ export const processStatisticsData = (
     totalSessions,
     totalRequests,
     totalUsageTime,
+    totalVisitedWebsites,
     chatbotStats,
     chatbotDistributionData,
     sessionsData: sortedSessions,

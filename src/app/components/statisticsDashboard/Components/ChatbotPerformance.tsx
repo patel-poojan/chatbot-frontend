@@ -8,6 +8,7 @@ interface ChatbotPerformanceProps {
 }
 
 const ChatbotPerformance: React.FC<ChatbotPerformanceProps> = ({ data }) => {
+  console.log('Chatbot Performance Data:', data);
   return (
     <div className='p-3 md:p-4 border border-gray-100 rounded-xl shadow-sm mb-4 md:mb-6 bg-white'>
       <h2 className='text-base md:text-lg font-semibold text-indigo-900 mb-2 md:mb-4'>
@@ -21,6 +22,9 @@ const ChatbotPerformance: React.FC<ChatbotPerformanceProps> = ({ data }) => {
                 Creator
               </th>
               <th className='px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-indigo-900/70 uppercase tracking-wider'>
+                ChatAgent
+              </th>
+              <th className='px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-indigo-900/70 uppercase tracking-wider'>
                 VISITORS
               </th>
               <th className='px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-indigo-900/70 uppercase tracking-wider'>
@@ -28,6 +32,9 @@ const ChatbotPerformance: React.FC<ChatbotPerformanceProps> = ({ data }) => {
               </th>
               <th className='px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-indigo-900/70 uppercase tracking-wider'>
                 Status
+              </th>
+              <th className='px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-indigo-900/70 uppercase tracking-wider'>
+                Websites Visited
               </th>
             </tr>
           </thead>
@@ -53,6 +60,9 @@ const ChatbotPerformance: React.FC<ChatbotPerformanceProps> = ({ data }) => {
                     </div>
                   </td>
                   <td className='px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-indigo-900/70'>
+                    {chatbot.name}
+                  </td>
+                  <td className='px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-indigo-900/70'>
                     {chatbot.sessions}
                   </td>
                   <td className='px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-indigo-900/70'>
@@ -69,12 +79,15 @@ const ChatbotPerformance: React.FC<ChatbotPerformanceProps> = ({ data }) => {
                       {chatbot.isActive ? 'Active' : 'Inactive'}
                     </span>
                   </td>
+                  <td className='px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-indigo-900/70'>
+                    {chatbot.visitedWebsiteCount || 0}
+                  </td>
                 </tr>
               ))
             ) : (
               <tr className='border-b border-gray-100'>
                 <td
-                  colSpan={4}
+                  colSpan={5}
                   className='px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-indigo-900/70 text-center'
                 >
                   No data available

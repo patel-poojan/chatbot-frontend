@@ -1,12 +1,24 @@
 // components/RecentSessions.tsx
-import React from 'react';
+import React, { useMemo } from 'react';
 import { SessionDisplayData } from './types';
 
-interface RecentSessionsProps {
-  data: SessionDisplayData[];
-}
+const RecentSessions = ({ data }: { data: SessionDisplayData[] }) => {
+  // Use a memo to ensure we're not processing the same data multiple times
+  const uniqueSessionData = useMemo(() => {
+    // Create a Map using the ID as the key to ensure uniqueness
+    const uniqueMap = new Map();
 
-const RecentSessions: React.FC<RecentSessionsProps> = ({ data }) => {
+    // Only add each session once to the map, keyed by ID
+    data.forEach((session) => {
+      if (!uniqueMap.has(session.id)) {
+        uniqueMap.set(session.id, session);
+      }
+    });
+
+    // Convert the map values back to an array
+    return Array.from(uniqueMap.values());
+  }, [data]);
+
   return (
     <div className='p-3 md:p-4 border border-gray-100 rounded-xl shadow-sm bg-white'>
       <h2 className='text-base md:text-lg font-semibold text-indigo-900 mb-2 md:mb-4'>
@@ -31,14 +43,19 @@ const RecentSessions: React.FC<RecentSessionsProps> = ({ data }) => {
               <th className='px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-indigo-900/70 uppercase tracking-wider'>
                 Used Time
               </th>
+              <th className='px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-indigo-900/70 uppercase tracking-wider'>
+                Websites Visited
+              </th>
             </tr>
           </thead>
           <tbody>
-            {data.length > 0 ? (
-              data.map((session) => (
+            {uniqueSessionData.length > 0 ? (
+              uniqueSessionData.map((session, index) => (
                 <tr
-                  key={session.id}
-                  className='border-b border-gray-100 hover:bg-gray-50'
+                  key={`${session.id}-${index}`}
+                  className={`border-b border-gray-100 hover:bg-gray-50 ${
+                    index % 2 === 0 ? 'bg-gray-50/30' : 'bg-white'
+                  }`}
                 >
                   <td className='px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm font-medium text-indigo-900'>
                     {session.id.substring(0, 8)}...
@@ -55,12 +72,15 @@ const RecentSessions: React.FC<RecentSessionsProps> = ({ data }) => {
                   <td className='px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-indigo-900/70'>
                     {session.usageTime}m
                   </td>
+                  <td className='px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-indigo-900/70'>
+                    {session.visitedWebsiteCount || 0}
+                  </td>
                 </tr>
               ))
             ) : (
               <tr className='border-b border-gray-100'>
                 <td
-                  colSpan={5}
+                  colSpan={6}
                   className='px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-indigo-900/70 text-center'
                 >
                   No data available

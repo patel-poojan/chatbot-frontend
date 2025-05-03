@@ -689,7 +689,7 @@ export const NodeResponseList = ({
       label: 'Text',
       content: {
         type: 'text',
-        delay: 2000,
+        delay: 500,
         info: { description: '' },
       },
     },
@@ -699,7 +699,7 @@ export const NodeResponseList = ({
       label: 'Image',
       content: {
         type: 'image',
-        delay: 2000,
+        delay: 500,
         info: { file: '' },
       },
     },
@@ -717,7 +717,7 @@ export const NodeResponseList = ({
       label: 'Gallery',
       content: {
         type: 'gallery',
-        delay: 2000,
+        delay: 500,
         info: {
           file: '',
           title: '',
@@ -747,7 +747,7 @@ export const NodeResponseList = ({
       label: 'Button',
       content: {
         type: 'button',
-        delay: 2000,
+        delay: 500,
         info: {
           description: '',
           button: [
@@ -767,7 +767,7 @@ export const NodeResponseList = ({
       label: 'Quick reply',
       content: {
         type: 'quick',
-        delay: 2000,
+        delay: 500,
         info: {
           description: '',
           button: [

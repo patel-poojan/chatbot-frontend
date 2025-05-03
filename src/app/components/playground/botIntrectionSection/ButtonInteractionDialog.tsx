@@ -140,7 +140,7 @@ const ButtonInteractionDialog = ({
           setOpen(true);
         }}
       >
-        {trigger}
+        <button className='w-full'>{trigger}</button>
       </PopoverTrigger>
       <PopoverContent
         side={screenWidth > 890 ? 'left' : 'bottom'}

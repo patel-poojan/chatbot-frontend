@@ -24,6 +24,7 @@ const Page = () => {
   const { mutate: onLogin, isPending } = useLogin({
     onSuccess(data) {
       const token = data.data.accessToken;
+      const userRole = data.data.user.userRole;
       if (token) {
         if (data.data.user.username) {
           Cookies.set('username', data.data.user.username, {
@@ -60,8 +61,22 @@ const Page = () => {
           sameSite: 'Lax',
           secure: true,
         });
-
-        router.push('/chatbotlist');
+        if (userRole === 'user') {
+          router.push('/statistics-dashboard-user');
+        } else if (userRole === 'admin') {
+          router.push('/statistics-dashboard');
+        } else if (userRole === 'subadmin') {
+          if (
+            data.data.user.permissions &&
+            data.data.user.permissions.includes('STATISTICAL_DASHBOARD')
+          ) {
+            router.push('/statistics-dashboard');
+          } else {
+            router.push('/statistics-dashboard-user');
+          }
+        } else {
+          router.push('/chatbotlist');
+        }
       }
       toast.success(data?.message);
     },

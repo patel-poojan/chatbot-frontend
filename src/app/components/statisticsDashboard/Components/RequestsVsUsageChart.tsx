@@ -48,8 +48,8 @@ const RequestsVsUsageChart: React.FC<RequestsVsUsageChartProps> = ({
   const isMobile = screenWidth < 768;
 
   // Calculate max values for better y-axis scaling
-  const maxRequests = Math.max(...data.map((item) => item.requests));
-  const maxUsageTime = Math.max(...data.map((item) => item.usageTime));
+  const maxRequests = Math.max(...data.map((item) => item.requests), 1);
+  const maxUsageTime = Math.max(...data.map((item) => item.usageTime), 1);
 
   // Select data based on viewMode
   const chartData =
@@ -57,8 +57,43 @@ const RequestsVsUsageChart: React.FC<RequestsVsUsageChartProps> = ({
       ? [...transformedData].sort((a, b) => b.requests - a.requests).slice(0, 5)
       : transformedData;
 
+  // Calculate proper Y-axis values with nice rounded numbers for better display
+  const calculateYAxisDomain = (maxValue: number): [number, number] => {
+    if (maxValue <= 5) return [0, 5];
+    if (maxValue <= 10) return [0, 10];
+    if (maxValue <= 20) return [0, 20];
+
+    // For larger values, round up to a nice number
+    const roundUpTo = Math.pow(10, Math.floor(Math.log10(maxValue)));
+    const roundedMax = Math.ceil(maxValue / roundUpTo) * roundUpTo;
+
+    return [0, roundedMax];
+  };
+
+  // Generate tick values for a cleaner Y-axis
+  const generateYAxisTicks = (domain: [number, number]): number[] => {
+    const [min, max] = domain;
+    const result: number[] = [];
+    const tickCount = 5; // Can be adjusted based on height
+    const step = (max - min) / (tickCount - 1);
+
+    for (let i = 0; i < tickCount; i++) {
+      result.push(Math.round(min + step * i));
+    }
+
+    return result;
+  };
+
+  // Calculate domains for both Y axes
+  const requestsDomain: [number, number] = calculateYAxisDomain(maxRequests);
+  const usageTimeDomain: [number, number] = calculateYAxisDomain(maxUsageTime);
+
+  // Generate ticks
+  const requestsTicks = generateYAxisTicks(requestsDomain);
+  const usageTimeTicks = generateYAxisTicks(usageTimeDomain);
+
   return (
-    <div className='p-4 md:p-5 border border-gray-100 rounded-xl shadow-sm bg-white '>
+    <div className='p-4 md:p-5 border border-gray-100 rounded-xl shadow-sm bg-white'>
       <div className='flex justify-between items-center mb-3 md:mb-4'>
         <h2 className='text-base md:text-lg font-semibold text-indigo-900 flex items-center'>
           <span className='w-2 h-6 bg-cyan-500 rounded-full mr-2'></span>
@@ -173,7 +208,9 @@ const RequestsVsUsageChart: React.FC<RequestsVsUsageChartProps> = ({
                 axisLine={{ stroke: '#e5e7eb' }}
                 tickLine={false}
                 tick={{ fontSize: 10, fill: '#6b7280' }}
-                domain={[0, 'dataMax + 1']}
+                domain={[0, 'dataMax + 5']}
+                tickCount={5}
+                allowDecimals={false}
                 padding={{ left: 0, right: 10 }}
               />
 
@@ -253,16 +290,16 @@ const RequestsVsUsageChart: React.FC<RequestsVsUsageChartProps> = ({
             </BarChart>
           </ResponsiveContainer>
         ) : (
-          // Standard desktop visualization
+          // Standard desktop visualization - FIXED Y-AXIS
           <ResponsiveContainer width='100%' height='100%'>
             <BarChart
               data={chartData}
               layout={data.length > 10 ? 'vertical' : 'horizontal'}
               margin={{
-                top: 10,
+                top: 20,
                 right: 30,
                 left: data.length > 10 ? 100 : 0,
-                bottom: 5,
+                bottom: 20,
               }}
               barSize={data.length > 10 ? 12 : 24}
               barGap={8}
@@ -282,6 +319,8 @@ const RequestsVsUsageChart: React.FC<RequestsVsUsageChartProps> = ({
                   axisLine={{ stroke: '#e5e7eb' }}
                   tick={{ fontSize: 11, fill: '#6b7280' }}
                   domain={[0, Math.max(maxRequests, maxUsageTime) * 1.1]}
+                  allowDecimals={false}
+                  tickCount={5}
                 />
               ) : (
                 // Horizontal layout for fewer chatbots
@@ -314,25 +353,49 @@ const RequestsVsUsageChart: React.FC<RequestsVsUsageChartProps> = ({
                   }}
                 />
               ) : (
-                // Horizontal layout
+                // Horizontal layout - FIXED Y-AXIS CONFIG
                 <>
                   <YAxis
                     yAxisId='left'
                     orientation='left'
                     stroke='#58C8DD'
                     tickLine={false}
-                    axisLine={false}
-                    domain={[0, Math.max(maxRequests * 1.1, 5)]}
+                    axisLine={{ stroke: '#e5e7eb' }}
+                    domain={requestsDomain}
+                    ticks={requestsTicks}
                     tick={{ fontSize: 11, fill: '#6b7280' }}
+                    allowDecimals={false}
+                    label={{
+                      value: 'Requests',
+                      angle: -90,
+                      position: 'insideLeft',
+                      style: {
+                        textAnchor: 'middle',
+                        fill: '#58C8DD',
+                        fontSize: 12,
+                      },
+                    }}
                   />
                   <YAxis
                     yAxisId='right'
                     orientation='right'
                     stroke='#6366F1'
                     tickLine={false}
-                    axisLine={false}
-                    domain={[0, Math.max(maxUsageTime * 1.1, 5)]}
+                    axisLine={{ stroke: '#e5e7eb' }}
+                    domain={usageTimeDomain}
+                    ticks={usageTimeTicks}
                     tick={{ fontSize: 11, fill: '#6b7280' }}
+                    allowDecimals={false}
+                    label={{
+                      value: 'Usage Time (min)',
+                      angle: 90,
+                      position: 'insideRight',
+                      style: {
+                        textAnchor: 'middle',
+                        fill: '#6366F1',
+                        fontSize: 12,
+                      },
+                    }}
                   />
                 </>
               )}

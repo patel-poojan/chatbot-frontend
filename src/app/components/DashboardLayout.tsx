@@ -99,6 +99,58 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                 quality={100}
               />
             </Link>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link href={'/statistics-dashboard-user'}>
+                    <div
+                      className={`${
+                        pathName === '/statistics-dashboard-user'
+                          ? 'bg-[#3D3D4A]'
+                          : 'bg-transparent'
+                      } hover:bg-[#3D3D4A] h-11 w-11 flex items-center justify-center rounded-md cursor-pointer`}
+                    >
+                      <MdShowChart className='text-2xl text-white cursor-pointer' />
+                    </div>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent
+                  className='bg-[#1B1B20]'
+                  side='right'
+                  align='center'
+                  sideOffset={14}
+                >
+                  <p>User Statistics</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            {showStatistics && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link href={'/statistics-dashboard'}>
+                      <div
+                        className={`${
+                          pathName === '/statistics-dashboard'
+                            ? 'bg-[#3D3D4A]'
+                            : 'bg-transparent'
+                        } hover:bg-[#3D3D4A] h-11 w-11 flex items-center justify-center rounded-md cursor-pointer`}
+                      >
+                        <IoStatsChart className='text-2xl text-white cursor-pointer' />
+                      </div>
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    className='bg-[#1B1B20]'
+                    side='right'
+                    align='center'
+                    sideOffset={14}
+                  >
+                    <p>Statistics</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
 
             <TooltipProvider>
               <Tooltip>
@@ -182,58 +234,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                 </Tooltip>
               </TooltipProvider>
             )}
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Link href={'/statistics-dashboard-user'}>
-                    <div
-                      className={`${
-                        pathName === '/statistics-dashboard-user'
-                          ? 'bg-[#3D3D4A]'
-                          : 'bg-transparent'
-                      } hover:bg-[#3D3D4A] h-11 w-11 flex items-center justify-center rounded-md cursor-pointer`}
-                    >
-                      <MdShowChart className='text-2xl text-white cursor-pointer' />
-                    </div>
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent
-                  className='bg-[#1B1B20]'
-                  side='right'
-                  align='center'
-                  sideOffset={14}
-                >
-                  <p>User Statistics</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            {showStatistics && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Link href={'/statistics-dashboard'}>
-                      <div
-                        className={`${
-                          pathName === '/statistics-dashboard'
-                            ? 'bg-[#3D3D4A]'
-                            : 'bg-transparent'
-                        } hover:bg-[#3D3D4A] h-11 w-11 flex items-center justify-center rounded-md cursor-pointer`}
-                      >
-                        <IoStatsChart className='text-2xl text-white cursor-pointer' />
-                      </div>
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent
-                    className='bg-[#1B1B20]'
-                    side='right'
-                    align='center'
-                    sideOffset={14}
-                  >
-                    <p>Statistics</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
           </div>
           <Popover>
             <PopoverTrigger>
@@ -272,6 +272,76 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
               content={
                 <div className='h-full flex flex-col w-full bg-white pt-3'>
                   <div className='w-full  flex-1'>
+                    <Link href={'/statistics-dashboard-user'}>
+                      <div
+                        className={`flex gap-3 items-center rounded-lg py-3 ${
+                          pathName === '/statistics-dashboard-user'
+                            ? 'px-3 blue-gradient'
+                            : ''
+                        }`}
+                      >
+                        <div
+                          className={
+                            pathName === '/statistics-dashboard-user'
+                              ? 'p-2 rounded-md bg-[#3D3D4A33] '
+                              : ''
+                          }
+                        >
+                          <MdShowChart
+                            className={
+                              pathName === '/statistics-dashboard-user'
+                                ? 'text-white text-xl'
+                                : 'text-2xl text-[#1e255eb2]'
+                            }
+                          />
+                        </div>
+                        <p
+                          className={`text-base ${
+                            pathName === '/statistics-dashboard-user'
+                              ? 'text-white'
+                              : 'text-[#1e255eb2]'
+                          } font-medium`}
+                        >
+                          User Statistics
+                        </p>
+                      </div>
+                    </Link>
+                    {showStatistics && (
+                      <Link href={'/statistics-dashboard'}>
+                        <div
+                          className={`flex gap-3 items-center rounded-lg py-3 ${
+                            pathName === '/statistics-dashboard'
+                              ? 'px-3 blue-gradient'
+                              : ''
+                          }`}
+                        >
+                          <div
+                            className={
+                              pathName === '/statistics-dashboard'
+                                ? 'p-2 rounded-md bg-[#3D3D4A33] '
+                                : ''
+                            }
+                          >
+                            <IoStatsChart
+                              className={
+                                pathName === '/statistics-dashboard'
+                                  ? 'text-white text-xl'
+                                  : 'text-2xl text-[#1e255eb2]'
+                              }
+                            />
+                          </div>
+                          <p
+                            className={`text-base ${
+                              pathName === '/statistics-dashboard'
+                                ? 'text-white'
+                                : 'text-[#1e255eb2]'
+                            } font-medium`}
+                          >
+                            Statistics
+                          </p>
+                        </div>
+                      </Link>
+                    )}
                     <Link href={'/chatbotlist'}>
                       <div
                         className={`flex gap-3 items-center  rounded-lg py-3 ${
@@ -379,76 +449,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                             }  font-medium`}
                           >
                             BDA
-                          </p>
-                        </div>
-                      </Link>
-                    )}
-                    <Link href={'/statistics-dashboard-user'}>
-                      <div
-                        className={`flex gap-3 items-center rounded-lg py-3 ${
-                          pathName === '/statistics-dashboard-user'
-                            ? 'px-3 blue-gradient'
-                            : ''
-                        }`}
-                      >
-                        <div
-                          className={
-                            pathName === '/statistics-dashboard-user'
-                              ? 'p-2 rounded-md bg-[#3D3D4A33] '
-                              : ''
-                          }
-                        >
-                          <MdShowChart
-                            className={
-                              pathName === '/statistics-dashboard-user'
-                                ? 'text-white text-xl'
-                                : 'text-2xl text-[#1e255eb2]'
-                            }
-                          />
-                        </div>
-                        <p
-                          className={`text-base ${
-                            pathName === '/statistics-dashboard-user'
-                              ? 'text-white'
-                              : 'text-[#1e255eb2]'
-                          } font-medium`}
-                        >
-                          User Statistics
-                        </p>
-                      </div>
-                    </Link>
-                    {showStatistics && (
-                      <Link href={'/statistics-dashboard'}>
-                        <div
-                          className={`flex gap-3 items-center rounded-lg py-3 ${
-                            pathName === '/statistics-dashboard'
-                              ? 'px-3 blue-gradient'
-                              : ''
-                          }`}
-                        >
-                          <div
-                            className={
-                              pathName === '/statistics-dashboard'
-                                ? 'p-2 rounded-md bg-[#3D3D4A33] '
-                                : ''
-                            }
-                          >
-                            <IoStatsChart
-                              className={
-                                pathName === '/statistics-dashboard'
-                                  ? 'text-white text-xl'
-                                  : 'text-2xl text-[#1e255eb2]'
-                              }
-                            />
-                          </div>
-                          <p
-                            className={`text-base ${
-                              pathName === '/statistics-dashboard'
-                                ? 'text-white'
-                                : 'text-[#1e255eb2]'
-                            } font-medium`}
-                          >
-                            Statistics
                           </p>
                         </div>
                       </Link>

@@ -31,6 +31,7 @@ const Page = () => {
     <StatisticsDashboard
       rawStatisticsData={rawStatisticsData}
       isLoading={isLoading}
+      type='user'
     />
   );
 };

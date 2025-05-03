@@ -22,10 +22,23 @@ const CreateUserDialog = ({
   trigger,
   type,
   refetch,
+  loadPermissionsDetails,
+  permissionList,
 }: {
   trigger: React.ReactNode;
   type: string;
   refetch: () => void;
+  loadPermissionsDetails: boolean;
+  permissionList: {
+    _id: string;
+    name: string;
+    description: string;
+    actions: string[];
+    resource: string;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+  }[];
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [passwordType, setPasswordType] = useState<string>('password');
@@ -36,23 +49,7 @@ const CreateUserDialog = ({
   const togglePassword = () => {
     setPasswordType((prev) => (prev === 'password' ? 'text' : 'password'));
   };
-  const permissionList = [
-    {
-      _id: '66f976fda5b821f637e6e5de',
-      name: 'Create users',
-      resource: 'CREATE_USER',
-    },
-    {
-      _id: '66fc0285fe41bcac253e598f',
-      name: 'Access to user data',
-      resource: 'ACCESS_TO_USER_DATA',
-    },
-    {
-      _id: '66fc086bfe41bcac253e59a2',
-      name: 'Subscription management',
-      resource: 'SUBSCRIPTION_MANAGEMENT',
-    },
-  ];
+
   const { mutate: onAdd, isPending } = useAddUser({
     onSuccess(data) {
       toast.success(data?.message);
@@ -126,7 +123,7 @@ const CreateUserDialog = ({
           e.preventDefault();
         }}
       >
-        {isPending && <Loader />}
+        {(isPending || loadPermissionsDetails) && <Loader />}
         <DialogHeader>
           <DialogTitle className='sr-only'>Create user</DialogTitle>
           <DialogDescription id='dialog-description' className='sr-only'>

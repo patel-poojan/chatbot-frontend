@@ -67,15 +67,42 @@ interface FetchSubAdminResponse {
   message: string;
   success: boolean;
 }
-
+interface TypePermissionList {
+  message: string;
+  data: {
+    _id: string;
+    name: string;
+    description: string;
+    actions: string[];
+    resource: string;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+  }[];
+  success: boolean;
+  statusCode: number;
+}
 const Details = ({
   type,
   details,
   refetch,
+  permissionList,
+  loadPermissionsDetails,
 }: {
   type: string;
   details: User[] | SubAdmin[];
   refetch: () => void;
+  loadPermissionsDetails: boolean;
+  permissionList: {
+    _id: string;
+    name: string;
+    description: string;
+    actions: string[];
+    resource: string;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+  }[];
 }) => {
   const [userOrAdminDetails, setUserOrAdminDetails] = useState<
     User[] | SubAdmin[] | []
@@ -185,6 +212,8 @@ const Details = ({
                         adminId={detail._id ?? ''}
                         permissions={detail.permissions ?? []}
                         name={detail.username ?? ''}
+                        permissionList={permissionList ?? []}
+                        loadPermissionsDetails={loadPermissionsDetails}
                         trigger={
                           <div className='cursor-pointer'>
                             <VscSettings className='text-lg rotate-90 cursor-pointer' />
@@ -311,7 +340,25 @@ const Page = () => {
       toast.error(errorMessage);
     }
   }, [errorInSubAdminDetails, errorInUsersDetails]);
-
+  const fetchPermissionsList = async () => {
+    const response: TypePermissionList = await axiosInstance.get(
+      `/admin/permissions`
+    );
+    return response.data;
+  };
+  const {
+    data: permissionList,
+    isLoading: loadPermissionsDetails,
+    isError: errorInPermissionsDetails,
+  } = useQuery({
+    queryKey: ['permissions', 'list'],
+    queryFn: fetchPermissionsList,
+  });
+  useEffect(() => {
+    if (errorInPermissionsDetails) {
+      toast.error('Error in fetching permissions list');
+    }
+  }, [errorInPermissionsDetails]);
   return (
     <>
       {(loadUsersDetails || loadSubAdminDetails || isUserRoleLoading) && (
@@ -348,6 +395,8 @@ const Page = () => {
               <CreateUserDialog
                 type={tab === 1 ? 'user' : 'subAdmin'}
                 refetch={tab === 1 ? refetchUsers : refetchSubAdmins}
+                permissionList={permissionList ?? []}
+                loadPermissionsDetails={loadPermissionsDetails}
                 trigger={
                   <div>
                     <TooltipProvider>
@@ -389,6 +438,8 @@ const Page = () => {
             type='admin'
             refetch={refetchSubAdmins}
             details={errorInSubAdminDetails ? [] : subAdminDetails ?? []}
+            permissionList={permissionList ?? []}
+            loadPermissionsDetails={loadPermissionsDetails}
           />
         )}
         {tab === 1 && (
@@ -396,6 +447,8 @@ const Page = () => {
             type='user'
             refetch={refetchUsers}
             details={errorInUsersDetails ? [] : usersDetails ?? []}
+            permissionList={permissionList ?? []}
+            loadPermissionsDetails={loadPermissionsDetails}
           />
         )}
       </div>

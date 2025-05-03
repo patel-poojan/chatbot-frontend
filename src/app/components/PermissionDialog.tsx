@@ -14,29 +14,13 @@ import { toast } from 'sonner';
 import { axiosError } from '../../types/axiosTypes';
 import { useUpdatePermission } from '@/utils/user-api';
 import { Loader } from './Loader';
-import { useQuery } from '@tanstack/react-query';
-import { axiosInstance } from '@/utils/axiosInstance';
-
-type TypePermissionList = {
-  message: string;
-  data: {
-    _id: string;
-    name: string;
-    description: string;
-    actions: string[];
-    resource: string;
-    createdAt: string;
-    updatedAt: string;
-    __v: number;
-  }[];
-  success: boolean;
-  statusCode: number;
-};
 const PermissionDialog = ({
   name,
   trigger,
   adminId,
   permissions,
+  loadPermissionsDetails,
+  permissionList,
 }: {
   name: string;
   trigger: React.ReactNode;
@@ -45,6 +29,17 @@ const PermissionDialog = ({
     _id: string;
     name: string;
     resource: string;
+  }[];
+  loadPermissionsDetails: boolean;
+  permissionList: {
+    _id: string;
+    name: string;
+    description: string;
+    actions: string[];
+    resource: string;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
   }[];
 }) => {
   const [selectedPermission, setSelectedPermission] = useState<
@@ -57,26 +52,6 @@ const PermissionDialog = ({
   useEffect(() => {
     setSelectedPermission(permissions);
   }, [permissions]);
-
-  const fetchPermissionsList = async () => {
-    const response: TypePermissionList = await axiosInstance.get(
-      `/admin/permissions`
-    );
-    return response.data;
-  };
-  const {
-    data: permissionList,
-    isLoading: loadPermissionsDetails,
-    isError: errorInPermissionsDetails,
-  } = useQuery({
-    queryKey: ['permissions', 'list'],
-    queryFn: fetchPermissionsList,
-  });
-  useEffect(() => {
-    if (errorInPermissionsDetails) {
-      toast.error('Error in fetching permissions list');
-    }
-  }, [errorInPermissionsDetails]);
 
   const { mutate: onUpdatePermission, isPending: isPendingToUpdate } =
     useUpdatePermission({
