@@ -35,7 +35,9 @@ const StatCards: React.FC<StatCardsProps> = ({ stats }) => {
             <LuUsers className='text-base md:text-xl text-indigo-500' />
           </div>
           <div>
-            <p className='text-xs md:text-sm text-indigo-900/70'>Total Users</p>
+            <p className='text-xs md:text-sm text-indigo-900/70'>
+              Total VISITORS
+            </p>
             <p className='text-lg md:text-xl font-bold text-indigo-900'>
               {stats.totalSessions}
             </p>

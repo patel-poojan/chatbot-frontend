@@ -1,4 +1,3 @@
-// components/DistributionChart.tsx
 import React from 'react';
 import {
   PieChart,
@@ -85,9 +84,7 @@ const DistributionChart: React.FC<DistributionChartProps> = ({
                     dataKey='value'
                     nameKey='name'
                     label={({ percent }) => {
-                      return percent > 0.05
-                        ? `${(percent * 100).toFixed(0)}%`
-                        : '';
+                      return `${(percent * 100).toFixed(0)}%`;
                     }}
                   >
                     {processedData.map((entry, index) => (

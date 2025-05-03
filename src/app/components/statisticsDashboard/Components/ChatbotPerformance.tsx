@@ -21,7 +21,7 @@ const ChatbotPerformance: React.FC<ChatbotPerformanceProps> = ({ data }) => {
                 Creator
               </th>
               <th className='px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-indigo-900/70 uppercase tracking-wider'>
-                Users
+                VISITORS
               </th>
               <th className='px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-indigo-900/70 uppercase tracking-wider'>
                 Requests

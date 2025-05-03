@@ -251,7 +251,10 @@ const UpdateChatbotDialog = ({
 
           <div className='grid grid-cols-2 gap-2 sm:gap-3 items-center w-full'>
             <DialogClose>
-              <Button className='border border-[#57C0DD] text-xs w-full text-[#57C0DD] py-2 bg-transparent rounded-full hover:bg-[#f0faff]'>
+              <Button
+                className='border border-[#57C0DD] text-xs w-full text-[#57C0DD] py-2 bg-transparent rounded-full hover:bg-[#f0faff]'
+                onClick={() => updateHandler()}
+              >
                 Cancel
               </Button>
             </DialogClose>
