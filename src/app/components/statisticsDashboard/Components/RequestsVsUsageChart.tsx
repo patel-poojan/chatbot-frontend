@@ -365,16 +365,16 @@ const RequestsVsUsageChart: React.FC<RequestsVsUsageChartProps> = ({
                     ticks={requestsTicks}
                     tick={{ fontSize: 11, fill: '#6b7280' }}
                     allowDecimals={false}
-                    label={{
-                      value: 'Requests',
-                      angle: -90,
-                      position: 'insideLeft',
-                      style: {
-                        textAnchor: 'middle',
-                        fill: '#58C8DD',
-                        fontSize: 12,
-                      },
-                    }}
+                    // label={{
+                    //   value: 'Requests',
+                    //   angle: -90,
+                    //   position: 'insideLeft',
+                    //   style: {
+                    //     textAnchor: 'middle',
+                    //     fill: '#58C8DD',
+                    //     fontSize: 12,
+                    //   },
+                    // }}
                   />
                   <YAxis
                     yAxisId='right'
@@ -386,16 +386,16 @@ const RequestsVsUsageChart: React.FC<RequestsVsUsageChartProps> = ({
                     ticks={usageTimeTicks}
                     tick={{ fontSize: 11, fill: '#6b7280' }}
                     allowDecimals={false}
-                    label={{
-                      value: 'Usage Time (min)',
-                      angle: 90,
-                      position: 'insideRight',
-                      style: {
-                        textAnchor: 'middle',
-                        fill: '#6366F1',
-                        fontSize: 12,
-                      },
-                    }}
+                    // label={{
+                    //   value: 'Usage Time (min)',
+                    //   angle: 90,
+                    //   position: 'insideRight',
+                    //   style: {
+                    //     textAnchor: 'middle',
+                    //     fill: '#6366F1',
+                    //     fontSize: 12,
+                    //   },
+                    // }}
                   />
                 </>
               )}

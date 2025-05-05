@@ -41,17 +41,40 @@ const StatisticsDashboard = ({
     if (!searchTerms.trim()) return dataSource;
 
     return dataSource.filter((item) =>
-      item.chatbot?.name.toLowerCase().includes(searchTerms.toLowerCase())
+      item.user?.username.toLowerCase().includes(searchTerms.toLowerCase())
     );
   }, [dataSource, searchTerms]);
 
-  // Date filtering logic (static for now as requested)
-  // In a real implementation, this would filter based on actual dates
-  // But for now, we're just passing through the filtered data
+  // Filter data based on date
+  const dateFilteredData = useMemo(() => {
+    if (!filteredData || filteredData.length === 0) return filteredData;
+
+    const currentDate = new Date();
+    const filterDate = new Date();
+
+    // Set filter date based on selected option
+    if (dateFilter === '1day') {
+      filterDate.setDate(currentDate.getDate() - 1);
+    } else if (dateFilter === '2days') {
+      filterDate.setDate(currentDate.getDate() - 2);
+    } else if (dateFilter === '30days') {
+      filterDate.setDate(currentDate.getDate() - 30);
+    } else if (dateFilter === '1year') {
+      filterDate.setFullYear(currentDate.getFullYear() - 1);
+    } else if (dateFilter === 'all') {
+      // Return all data, no filtering
+      return filteredData;
+    }
+
+    // Filter the data based on updatedAt date
+    return filteredData.filter((item) => {
+      const itemDate = new Date(item.updatedAt);
+      return itemDate >= filterDate;
+    });
+  }, [filteredData, dateFilter]);
 
   // Process the filtered statistics data
-  const stats = processStatisticsData(filteredData);
-  console.log('kp:', stats);
+  const stats = processStatisticsData(dateFilteredData);
 
   return (
     <div className='flex flex-col h-full overflow-y-auto p-4 md:p-6 bg-gray-50'>
@@ -74,7 +97,7 @@ const StatisticsDashboard = ({
               onChange={(e) => setSearchTerms(e.target.value)}
               className='w-full sm:w-44 border-none shadow-none text-gray-600 placeholder:text-gray-400 bg-transparent focus-visible:ring-0 placeholder:font-normal text-base'
               type='text'
-              placeholder='Search chatbots'
+              placeholder='Search users'
             />
           </div>
 
@@ -84,6 +107,8 @@ const StatisticsDashboard = ({
               <SelectValue placeholder='Select period' />
             </SelectTrigger>
             <SelectContent className='bg-white border border-gray-100 shadow-md rounded-lg'>
+              <SelectItem value='1day'>Last 1 day</SelectItem>
+              <SelectItem value='2days'>Last 2 days</SelectItem>
               <SelectItem value='30days'>Last 30 days</SelectItem>
               <SelectItem value='1year'>Last 1 year</SelectItem>
               <SelectItem value='all'>All time</SelectItem>
@@ -121,10 +146,10 @@ const StatisticsDashboard = ({
         data={
           searchTerms.trim()
             ? stats.sessionsData.filter((session) =>
-                // Get all chatbot names from filtered data
-                filteredData
-                  .map((item) => item.chatbot?.name)
-                  .includes(session.chatbotName)
+                // Get all usernames from filtered data
+                dateFilteredData
+                  .map((item) => item.user?.username)
+                  .includes(session.creator)
               )
             : stats.sessionsData
         }

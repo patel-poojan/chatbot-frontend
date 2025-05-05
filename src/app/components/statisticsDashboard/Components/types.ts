@@ -7,6 +7,7 @@ export interface SessionData {
   chatbotUsedTime: number[];
   totalChatbotUsedTime: number;
   totalVisitedWebsites: number;
+  pageVisitedCount?: { [url: string]: number }; // Add this property
 }
 
 export interface Chatbot {
@@ -51,6 +52,7 @@ export interface ChatbotStat {
   usageTime: number;
   uniqueUsers: number;
   visitedWebsiteCount: number;
+  pageVisits?: { [url: string]: number }; // Add this property to store aggregated page visits
 }
 
 export interface ChartData {
@@ -60,6 +62,7 @@ export interface ChartData {
   isOthers?: boolean;
   items?: ChartData[];
 }
+
 export interface SessionDisplayData {
   id: string;
   chatbotName: string;
@@ -67,6 +70,7 @@ export interface SessionDisplayData {
   requests: number;
   usageTime: number;
   visitedWebsiteCount: number;
+  pageVisits?: { [url: string]: number }; // Add this property to store page visits for each session
 }
 
 export interface ProcessedStats {

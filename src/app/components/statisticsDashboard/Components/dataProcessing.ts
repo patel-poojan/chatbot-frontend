@@ -79,6 +79,7 @@ export const processStatisticsData = (
         usageTime: 0,
         uniqueUsers: 0,
         visitedWebsiteCount: 0,
+        pageVisits: {}, // Initialize empty page visits object
       });
     }
 
@@ -95,6 +96,7 @@ export const processStatisticsData = (
       const requests = session.totalChatbotAPIRequests || 0;
       const usageTime = session.totalChatbotUsedTime || 0;
       const visitedWebsiteCount = session.visitedWebsiteCount || 0;
+      const pageVisitedCount = session.pageVisitedCount || {};
 
       totalRequests += requests;
       totalUsageTime += usageTime;
@@ -105,6 +107,16 @@ export const processStatisticsData = (
       chatbot.visitedWebsiteCount =
         (chatbot.visitedWebsiteCount || 0) + visitedWebsiteCount;
 
+      // Aggregate page visits for the chatbot
+      if (chatbot.pageVisits && pageVisitedCount) {
+        Object.entries(pageVisitedCount).forEach(([url, count]) => {
+          if (!chatbot.pageVisits![url]) {
+            chatbot.pageVisits![url] = 0;
+          }
+          chatbot.pageVisits![url] += count;
+        });
+      }
+
       // Add to sessions display data
       sessionsData.push({
         id: sessionId,
@@ -113,6 +125,7 @@ export const processStatisticsData = (
         requests,
         usageTime,
         visitedWebsiteCount,
+        pageVisits: pageVisitedCount, // Add page visits to session data
       });
     });
   });
@@ -161,6 +174,61 @@ export const processStatisticsData = (
   return result;
 };
 
+// Helper function to format page visits for display// Replace your current formatPageVisits function with this one:
+
+export const formatPageVisits = (
+  pageVisits: { [url: string]: number } | undefined
+) => {
+  if (!pageVisits || Object.keys(pageVisits).length === 0) {
+    return 'None';
+  }
+
+  // Get top 3 most visited pages
+  const sortedVisits = Object.entries(pageVisits)
+    .sort(([, countA], [, countB]) => countB - countA)
+    .slice(0, 3);
+
+  // Format each visit as a string with display and count
+  const formattedVisits = sortedVisits.map(([url, count]) => {
+    try {
+      // Try to parse as URL
+      const urlObj = new URL(url);
+
+      // For dashboard paths, simplify to just show last part
+      if (urlObj.pathname.includes('/dashboard/')) {
+        const parts = urlObj.pathname.split('/');
+        // Truncate IDs to make them shorter (show only first 8 chars)
+        const id = parts[parts.length - 1];
+        const display =
+          id.length > 8
+            ? `/dashboard/...${id.substring(0, 8)}`
+            : urlObj.pathname;
+        return { display, count };
+      }
+
+      // For other paths
+      const displayUrl =
+        urlObj.pathname === '/'
+          ? urlObj.host
+          : urlObj.pathname.length > 12
+          ? `${urlObj.pathname.substring(0, 12)}...`
+          : urlObj.pathname;
+
+      return { display: displayUrl, count };
+    } catch (e) {
+      // If URL parsing fails, just use the string as is, but truncate if too long
+      return {
+        display: url.length > 15 ? `${url.substring(0, 15)}...` : url,
+        count,
+      };
+    }
+  });
+
+  // Return a simple string that can be used directly (no JSX)
+  return formattedVisits
+    .map((item) => `${item.display} (${item.count})`)
+    .join('\n');
+};
 // Colors for charts - using a distinct color palette
 export const CHART_COLORS = [
   '#58C8DD', // Cyan

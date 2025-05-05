@@ -88,7 +88,26 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         {isPending ? <Loader /> : <></>}
         <div className='pr-3 hidden min-[500px]:flex flex-col justify-between py-3  lg:items-center'>
           <div className='flex flex-col gap-3 items-center'>
-            <Link href={'/chatbotlist'}>
+            <Link
+              href={(() => {
+                if (role === 'user') {
+                  return '/statistics-dashboard-user';
+                } else if (role === 'admin') {
+                  return '/statistics-dashboard';
+                } else if (role === 'subadmin') {
+                  if (
+                    permissions &&
+                    permissions.includes('STATISTICAL_DASHBOARD')
+                  ) {
+                    return '/statistics-dashboard';
+                  } else {
+                    return '/statistics-dashboard-user';
+                  }
+                } else {
+                  return '/chatbotlist';
+                }
+              })()}
+            >
               <Image
                 className='bg-white rounded-full cursor-pointer p-1'
                 src='/images/bot-icon.svg'
