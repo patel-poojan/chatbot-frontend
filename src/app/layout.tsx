@@ -28,28 +28,6 @@ export default function RootLayout({
         <>
           <ClientProvider>{children}</ClientProvider>
         </>
-        <script defer src="https://cdn.tailwindcss.com"></script>
-        <script defer src="http://localhost:8000/script/chatbot-embed.js"></script>
-        <script
-          defer
-          dangerouslySetInnerHTML={{
-            __html: `
-        document.addEventListener('DOMContentLoaded', function() {
-          if (window.initializeChatbot) {
-            window.initializeChatbot("680bf5f6121a065b13cfd6aa");
-            return;
-          }
-          const checkInitialize = setInterval(function() {
-            if (window.initializeChatbot) {
-              window.initializeChatbot("680bf5f6121a065b13cfd6aa");
-              clearInterval(checkInitialize);
-            }
-          }, 100);
-          setTimeout(() => clearInterval(checkInitialize), 10000);
-        });
-      `,
-          }}
-        />
       </body>
     </html>
   );
