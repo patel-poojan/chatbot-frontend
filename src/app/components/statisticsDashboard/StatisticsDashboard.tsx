@@ -107,8 +107,8 @@ const StatisticsDashboard = ({
               <SelectValue placeholder='Select period' />
             </SelectTrigger>
             <SelectContent className='bg-white border border-gray-100 shadow-md rounded-lg'>
-              <SelectItem value='1day'>Last 1 day</SelectItem>
-              <SelectItem value='2days'>Last 2 days</SelectItem>
+              {/* <SelectItem value='1day'>Last 1 day</SelectItem>
+              <SelectItem value='2days'>Last 2 days</SelectItem> */}
               <SelectItem value='30days'>Last 30 days</SelectItem>
               <SelectItem value='1year'>Last 1 year</SelectItem>
               <SelectItem value='all'>All time</SelectItem>
