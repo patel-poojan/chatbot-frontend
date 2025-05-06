@@ -9,15 +9,7 @@ import DistributionChart from './Components/DistributionChart';
 import RequestsVsUsageChart from './Components/RequestsVsUsageChart';
 import ChatbotPerformance from './Components/ChatbotPerformance';
 import RecentSessions from './Components/RecentSessions';
-import { IoSearchSharp } from 'react-icons/io5';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import DashboardFilters from './Components/DashboardFilters';
 
 const StatisticsDashboard = ({
   rawStatisticsData,
@@ -32,22 +24,109 @@ const StatisticsDashboard = ({
   const [viewMode, setViewMode] = useState<'top5' | 'all'>('top5');
   const [searchTerms, setSearchTerms] = useState('');
   const [dateFilter, setDateFilter] = useState('30days');
+  const [selectedCreator, setSelectedCreator] = useState('all');
 
   // Use the mock data for development or the fetched data in production
   const dataSource = rawStatisticsData as StatisticsDataItem[];
+  // const dataSource = [
+  //   {
+  //     _id: '6813e1adbe8445b88f19db09',
+  //     chatbotId: '6813c8b0c5c84206f2e9b3a5',
+  //     userId: '680be9fffae3f02949298b92',
+  //     data: {
+  //       'fff679dd-c6f8-4543-9001-93ac305db88f': {
+  //         chatbotAPIRequests: [1, 1, 1, 1],
+  //         totalChatbotAPIRequests: 4,
+  //         averageChatbotAPIRequests: 1,
+  //         chatbotUsedTime: [0, 0, 0, 0],
+  //         totalChatbotUsedTime: 0,
+  //         visitedWebsiteCount: 4,
+  //         pageVisitedCount: {
+  //           'Create Next App': {
+  //             title: 'Create Next App',
+  //             url: 'http://localhost:3000/',
+  //             count: 1,
+  //           },
+  //         },
+  //         createdAt: '2025-05-03T15:59:11.229Z',
+  //         updatedAt: '2025-05-06T12:44:15.617Z',
+  //       },
+  //       'e1c239ba-7bed-43c2-bc27-2d9fe38e09fc': {
+  //         chatbotAPIRequests: [1],
+  //         totalChatbotAPIRequests: 1,
+  //         averageChatbotAPIRequests: 1,
+  //         chatbotUsedTime: [0],
+  //         totalChatbotUsedTime: 0,
+  //         visitedWebsiteCount: 1,
+  //         pageVisitedCount: {
+  //           'Create Next App': {
+  //             title: 'Create Next App',
+  //             url: 'http://localhost:3000/',
+  //             count: 1,
+  //           },
+  //         },
+  //         createdAt: '2025-05-06T12:46:19.010Z',
+  //         updatedAt: '2025-05-06T12:46:19.010Z',
+  //       },
+  //     },
+  //     createdAt: '2025-05-01T21:03:41.518Z',
+  //     updatedAt: '2025-05-01T21:20:26.624Z',
+  //     chatbot: {
+  //       _id: '6813c8b0c5c84206f2e9b3a5',
+  //       name: 'ChatAgent 01',
+  //       type: 'website',
+  //       isActive: true,
+  //       analyticsEnabled: true,
+  //       version: 1,
+  //       createdAt: '2025-05-01T19:17:04.924Z',
+  //       updatedAt: '2025-05-01T19:20:44.185Z',
+  //     },
+  //     user: {
+  //       _id: '680be9fffae3f02949298b92',
+  //       username: 'vijay',
+  //       email: 'vijay@evega.in',
+  //       role: 'user',
+  //     },
+  //   },
+  // ];
+
+  // Get unique creators for the dropdown
+  const uniqueCreators = useMemo(() => {
+    if (!dataSource || dataSource.length === 0) return [];
+
+    const creatorSet = new Set<string>();
+    dataSource.forEach((item) => {
+      if (item.user?.username) {
+        creatorSet.add(item.user.username);
+      }
+    });
+
+    return Array.from(creatorSet);
+  }, [dataSource]);
 
   // Filter data based on search terms (chatbot name)
   const filteredData = useMemo(() => {
     if (!searchTerms.trim()) return dataSource;
 
     return dataSource.filter((item) =>
-      item.user?.username.toLowerCase().includes(searchTerms.toLowerCase())
+      item.chatbot?.name.toLowerCase().includes(searchTerms.toLowerCase())
     );
   }, [dataSource, searchTerms]);
 
+  // Filter data based on selected creator
+  const creatorFilteredData = useMemo(() => {
+    if (!filteredData || filteredData.length === 0) return filteredData;
+    if (selectedCreator === 'all') return filteredData;
+
+    return filteredData.filter(
+      (item) => item.user?.username === selectedCreator
+    );
+  }, [filteredData, selectedCreator]);
+
   // Filter data based on date
   const dateFilteredData = useMemo(() => {
-    if (!filteredData || filteredData.length === 0) return filteredData;
+    if (!creatorFilteredData || creatorFilteredData.length === 0)
+      return creatorFilteredData;
 
     const currentDate = new Date();
     const filterDate = new Date();
@@ -63,60 +142,41 @@ const StatisticsDashboard = ({
       filterDate.setFullYear(currentDate.getFullYear() - 1);
     } else if (dateFilter === 'all') {
       // Return all data, no filtering
-      return filteredData;
+      return creatorFilteredData;
     }
 
     // Filter the data based on updatedAt date
-    return filteredData.filter((item) => {
+    return creatorFilteredData.filter((item) => {
       const itemDate = new Date(item.updatedAt);
       return itemDate >= filterDate;
     });
-  }, [filteredData, dateFilter]);
+  }, [creatorFilteredData, dateFilter]);
 
   // Process the filtered statistics data
   const stats = processStatisticsData(dateFilteredData);
-
+  console.log('dateFilteredData', dateFilteredData);
   return (
     <div className='flex flex-col h-full overflow-y-auto p-4 md:p-6 bg-gray-50'>
       {isLoading && <Loader />}
-      <div className='flex flex-col md:flex-row items-start md:items-center justify-between mb-4 md:mb-6'>
+      <div className='flex flex-col lg:flex-row flex-wrap  items-start lg:items-center justify-between mb-4 md:mb-6 gap-2'>
         <div>
-          <h1 className='text-xl md:text-2xl font-bold text-indigo-900'>
+          <h1 className='text-xl md:text-2xl font-bold text-indigo-900 '>
             {type === 'user' ? 'User Dashboard' : 'Admin Dashboard'}
           </h1>
           <p className='text-sm md:text-base text-indigo-700/70'>
             Overview of your ChatAgent performance
           </p>
         </div>
-
-        <div className='flex flex-col sm:flex-row gap-3 w-full md:w-auto mt-3 md:mt-0'>
-          {/* Search Bar - Matching the design in Image 1 & 2 */}
-          <div className='flex items-center h-12 px-4 rounded-lg bg-white shadow-sm border border-gray-100 w-full sm:w-auto'>
-            <IoSearchSharp className='text-primary-600 mr-2' />
-            <Input
-              onChange={(e) => setSearchTerms(e.target.value)}
-              className='w-full sm:w-44 border-none shadow-none text-gray-600 placeholder:text-gray-400 bg-transparent focus-visible:ring-0 placeholder:font-normal text-base'
-              type='text'
-              placeholder='Search users'
-            />
-          </div>
-
-          {/* Date Filter Dropdown - Matching the design in Image 1 & 2 */}
-          <Select value={dateFilter} onValueChange={setDateFilter}>
-            <SelectTrigger className='h-12 w-full sm:w-[180px] bg-white shadow-sm border border-gray-100 text-gray-600 rounded-lg px-4 justify-between'>
-              <SelectValue placeholder='Select period' />
-            </SelectTrigger>
-            <SelectContent className='bg-white border border-gray-100 shadow-md rounded-lg'>
-              {/* <SelectItem value='1day'>Last 1 day</SelectItem>
-              <SelectItem value='2days'>Last 2 days</SelectItem> */}
-              <SelectItem value='30days'>Last 30 days</SelectItem>
-              <SelectItem value='1year'>Last 1 year</SelectItem>
-              <SelectItem value='all'>All time</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <DashboardFilters
+          searchTerms={searchTerms}
+          setSearchTerms={setSearchTerms}
+          dateFilter={dateFilter}
+          setDateFilter={setDateFilter}
+          selectedCreator={selectedCreator}
+          setSelectedCreator={setSelectedCreator}
+          uniqueCreators={uniqueCreators}
+        />
       </div>
-
       {/* Stats Cards */}
       <StatCards stats={stats} />
 
@@ -146,10 +206,10 @@ const StatisticsDashboard = ({
         data={
           searchTerms.trim()
             ? stats.sessionsData.filter((session) =>
-                // Get all usernames from filtered data
-                dateFilteredData
-                  .map((item) => item.user?.username)
-                  .includes(session.creator)
+                // Get all chatbot names from filtered data
+                filteredData
+                  .map((item) => item.chatbot?.name)
+                  .includes(session.chatbotName)
               )
             : stats.sessionsData
         }

@@ -1,4 +1,17 @@
 // types.ts
+export interface PageVisitData {
+  title: string;
+  url: string;
+  count: number;
+}
+
+// For dialog display
+export interface PageVisitDialogData {
+  title: string;
+  url: string;
+  count: number;
+}
+
 export interface SessionData {
   visitedWebsiteCount: number;
   chatbotAPIRequests: number[];
@@ -6,8 +19,13 @@ export interface SessionData {
   averageChatbotAPIRequests: number;
   chatbotUsedTime: number[];
   totalChatbotUsedTime: number;
-  totalVisitedWebsites: number;
-  pageVisitedCount?: { [url: string]: number }; // Add this property
+  totalVisitedWebsites?: number;
+  // The updated format is now an object with PageVisitData
+  pageVisitedCount?: {
+    [key: string]: PageVisitData;
+  };
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Chatbot {
@@ -41,6 +59,7 @@ export interface StatisticsDataItem {
   user: User;
 }
 
+// Updated to support the new format
 export interface ChatbotStat {
   id: string;
   name: string;
@@ -52,7 +71,9 @@ export interface ChatbotStat {
   usageTime: number;
   uniqueUsers: number;
   visitedWebsiteCount: number;
-  pageVisits?: { [url: string]: number }; // Add this property to store aggregated page visits
+  pageVisits?: {
+    [key: string]: PageVisitData;
+  };
 }
 
 export interface ChartData {
@@ -63,6 +84,7 @@ export interface ChartData {
   items?: ChartData[];
 }
 
+// Updated to support the new format
 export interface SessionDisplayData {
   id: string;
   chatbotName: string;
@@ -70,7 +92,9 @@ export interface SessionDisplayData {
   requests: number;
   usageTime: number;
   visitedWebsiteCount: number;
-  pageVisits?: { [url: string]: number }; // Add this property to store page visits for each session
+  pageVisits?: {
+    [key: string]: PageVisitData;
+  };
 }
 
 export interface ProcessedStats {

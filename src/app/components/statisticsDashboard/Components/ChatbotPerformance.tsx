@@ -1,13 +1,30 @@
 // components/ChatbotPerformance.tsx
-import React from 'react';
-import { ChatbotStat } from './types';
-import { CHART_COLORS, formatPageVisits } from './dataProcessing';
+import React, { useState } from 'react';
+import { ChatbotStat, PageVisitDialogData } from './types';
+import {
+  CHART_COLORS,
+  hasDetailedPageVisits,
+  getDetailedPageVisitsData,
+} from './dataProcessing';
+import PageVisitsDialog from './PageVisitsDialog';
+import { Eye } from 'lucide-react';
 
 interface ChatbotPerformanceProps {
   data: ChatbotStat[];
 }
 
 const ChatbotPerformance: React.FC<ChatbotPerformanceProps> = ({ data }) => {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogData, setDialogData] = useState<PageVisitDialogData[]>([]);
+  const [dialogTitle, setDialogTitle] = useState('');
+
+  const handleViewPageVisits = (chatbot: ChatbotStat) => {
+    const detailedData = getDetailedPageVisitsData(chatbot.pageVisits);
+    setDialogData(detailedData);
+    setDialogTitle(`Page Visits - ${chatbot.name}`);
+    setDialogOpen(true);
+  };
+
   return (
     <div className='p-3 md:p-4 border border-gray-100 rounded-xl shadow-sm mb-4 md:mb-6 bg-white'>
       <h2 className='text-base md:text-lg font-semibold text-indigo-900 mb-2 md:mb-4'>
@@ -36,7 +53,7 @@ const ChatbotPerformance: React.FC<ChatbotPerformanceProps> = ({ data }) => {
                 Websites Visited
               </th>
               <th className='px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-indigo-900/70 uppercase tracking-wider'>
-                POPULAR PAGES
+                PAGES VISITED
               </th>
             </tr>
           </thead>
@@ -85,21 +102,17 @@ const ChatbotPerformance: React.FC<ChatbotPerformanceProps> = ({ data }) => {
                     {chatbot.visitedWebsiteCount || 0}
                   </td>
                   <td className='px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm text-indigo-900/70'>
-                    <div className='text-left'>
-                      {formatPageVisits(chatbot.pageVisits)
-                        .split('\n')
-                        .map((line, i) => (
-                          <div key={i} className='mb-1 font-medium'>
-                            {line}
-                          </div>
-                        ))}
-                      {chatbot.pageVisits &&
-                        Object.keys(chatbot.pageVisits).length > 3 && (
-                          <div className='text-xs text-indigo-900/50'>
-                            + {Object.keys(chatbot.pageVisits).length - 3} more
-                          </div>
-                        )}
-                    </div>
+                    {hasDetailedPageVisits(chatbot.pageVisits) ? (
+                      <button
+                        onClick={() => handleViewPageVisits(chatbot)}
+                        className='flex items-center px-2 py-1 text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-md'
+                      >
+                        <Eye className='h-3 w-3 mr-1' />
+                        View
+                      </button>
+                    ) : (
+                      <div className='text-gray-400'>No Data</div>
+                    )}
                   </td>
                 </tr>
               ))
@@ -116,6 +129,14 @@ const ChatbotPerformance: React.FC<ChatbotPerformanceProps> = ({ data }) => {
           </tbody>
         </table>
       </div>
+
+      {/* Page Visits Dialog */}
+      <PageVisitsDialog
+        isOpen={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        data={dialogData}
+        title={dialogTitle}
+      />
     </div>
   );
 };
