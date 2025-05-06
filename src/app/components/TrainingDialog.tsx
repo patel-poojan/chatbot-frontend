@@ -30,7 +30,7 @@ import {
 import { initializeAWS } from './playground/botIntrectionSection/S3Operation';
 import { FetchAttributesResponse } from './playground/botIntrectionSection/BotResponseDialog';
 import { axiosInstance } from '@/utils/axiosInstance';
-import { Attribute } from './playground/AttributesDialog';
+import { useQuery } from '@tanstack/react-query';
 
 type ValidationError = {
   field: string;
@@ -63,25 +63,32 @@ const TrainingDialog = ({
   const [pendingDeletions, setPendingDeletions] = useState<string[]>([]);
   const [isPendingS3Delete, setIsPendingS3Delete] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [attributeList, setAttributeList] = useState<Attribute[]>([]);
 
   const fetchAttributesHandler = async () => {
     const response: FetchAttributesResponse = await axiosInstance.get(
       `/chatbot/${chatbotId}/attributes`
     );
     if (response.success) {
-      setAttributeList(response.data);
       return response.data;
     } else {
-      setAttributeList([]);
       return [];
     }
   };
 
+  const {
+    data: attributeList,
+    isLoading: loadFetchAttributes,
+    isError: errorInFetchAttributes,
+  } = useQuery({
+    queryKey: ['Attributes', 'trainingDialog'],
+    queryFn: fetchAttributesHandler,
+    enabled: isDialog,
+  });
   useEffect(() => {
-    fetchAttributesHandler();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (errorInFetchAttributes) {
+      toast.error('Failed to fetch attributes. Please try again.');
+    }
+  }, [errorInFetchAttributes]);
 
   const renderNodeResponse = (item: TypeResponseList, index: number) => {
     const type = item.type;
@@ -92,7 +99,7 @@ const TrainingDialog = ({
             info={{ description: item.info.description || '' }}
             setResponseList={setResponseList}
             index={index}
-            attributes={attributeList}
+            attributes={attributeList ?? []}
           />
         );
       case 'image':
@@ -450,7 +457,7 @@ const TrainingDialog = ({
           </div>
 
           <div className='flex-1 relative flex flex-col max-h-[90.2dvh] sm:max-h-[84dvh]'>
-            {(isPendingS3Delete || isSubmitting) && (
+            {(isPendingS3Delete || isSubmitting || loadFetchAttributes) && (
               <div className='absolute inset-0 z-50 flex items-center justify-center bg-[#a6dae41a] backdrop-blur-[3px]'>
                 <div role='status' className='flex flex-col items-center'>
                   <div className='w-10 h-10 border-4 border-gray-200 border-t-[#3bc5dd] rounded-full animate-spin'></div>

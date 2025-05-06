@@ -95,7 +95,33 @@ type FetchPlaygroundResponse = {
   message: string;
   success: boolean;
 };
+export interface Attribute {
+  _id: string;
+  chatbotId: string;
+  name: string;
+  alias: string;
+  value: string;
+  __v: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface FetchAttributesResponse {
+  statusCode: number;
+  data: Attribute[];
+  message: string;
+  success: boolean;
+}
 const MainComponent = ({ botId }: { botId: string }) => {
+  const {
+    type,
+    reFetch,
+    notConnectableNode,
+    isPageLoader,
+    setListOfPlayGroundNode,
+    setAttributeState,
+    reFetchAttributes,
+  } = usePlayground();
   const fetchInitialPlayground = async () => {
     const response: FetchPlaygroundResponse = await axiosInstance.get(
       `/playground/${botId}`
@@ -159,6 +185,62 @@ const MainComponent = ({ botId }: { botId: string }) => {
     },
   });
 
+  const fetchAttributesHandler = async () => {
+    const response: FetchAttributesResponse = await axiosInstance.get(
+      `/chatbot/${botId}/attributes`
+    );
+    if (response.success) {
+      return response.data;
+    } else {
+      return [];
+    }
+  };
+
+  const {
+    data: attributesData,
+    isLoading: loadFetchAttributes,
+    isRefetching: refetchingAttributes,
+    isError: errorInFetchAttributes,
+    refetch: refetchPlaygroundAttributes,
+  } = useQuery({
+    queryKey: ['Attributes'],
+    queryFn: fetchAttributesHandler,
+    // enabled: attributeDialog === true ? true : false,
+  });
+  useEffect(() => {
+    if (attributesData && attributesData.length > 0) {
+      setAttributeState({
+        attributesData: attributesData,
+        attributesError: false,
+        attributesLoading: loadFetchAttributes || refetchingAttributes,
+      });
+    } else {
+      setAttributeState({
+        attributesData: [],
+        attributesError: false,
+        attributesLoading: loadFetchAttributes || refetchingAttributes,
+      });
+    }
+  }, [
+    attributesData,
+    loadFetchAttributes,
+    setAttributeState,
+    refetchingAttributes,
+  ]);
+  useEffect(() => {
+    refetchPlaygroundAttributes();
+  }, [reFetchAttributes, refetchPlaygroundAttributes]);
+  useEffect(() => {
+    if (errorInFetchAttributes) {
+      setAttributeState({
+        attributesData: [],
+        attributesError: true,
+        attributesLoading: false,
+      });
+      toast.error('Failed to fetch attributes');
+    }
+  }, [errorInFetchAttributes, setAttributeState]);
+
   const [actionDialog, setActionDialog] = useState(false);
   const [aiSection, setAiSection] = useState(false);
   const [chatBotDialog, setChatBotDialog] = useState(false);
@@ -167,13 +249,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
   const [contactGatheringEnabled, setContactGatheringEnabled] = useState(false);
   const { screenToFlowPosition } = useReactFlow();
   // const { type, label } = usePlayground();
-  const {
-    type,
-    reFetch,
-    notConnectableNode,
-    isPageLoader,
-    setListOfPlayGroundNode,
-  } = usePlayground();
+
   const { width: screenWidth } = useWindowDimensions();
   const nodeTypes = useMemo(
     () => ({
@@ -831,7 +907,6 @@ const MainComponent = ({ botId }: { botId: string }) => {
             <AttributesDialog
               attributesHandler={attributesHandler}
               chatbotId={botId}
-              attributeDialog={attributesDialog}
             />
           )}
           {contactGatheringEnabled && (

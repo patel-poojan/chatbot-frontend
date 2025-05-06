@@ -154,7 +154,6 @@ const StatisticsDashboard = ({
 
   // Process the filtered statistics data
   const stats = processStatisticsData(dateFilteredData);
-  console.log('dateFilteredData', dateFilteredData);
   return (
     <div className='flex flex-col h-full overflow-y-auto p-4 md:p-6 bg-gray-50'>
       {isLoading && <Loader />}

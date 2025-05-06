@@ -1,13 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useQuery } from '@tanstack/react-query';
 import React, { useEffect, useRef, useState } from 'react';
 import { BiEditAlt } from 'react-icons/bi';
 import { FaPlus } from 'react-icons/fa';
 import { IoCloseOutline } from 'react-icons/io5';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { toast } from 'sonner';
-import { axiosInstance } from '@/utils/axiosInstance';
 import {
   useAddAttributes,
   useDeleteAttribute,
@@ -16,6 +14,7 @@ import {
 import { axiosError } from '@/types/axiosTypes';
 import { ToSnakeCase } from '@/utils/text-conveter';
 import { isValidUrl } from '@/utils/validator';
+import { usePlayground } from './playgroundArea/PlaygroundContext';
 
 export interface Attribute {
   _id: string;
@@ -28,21 +27,12 @@ export interface Attribute {
   updatedAt: string;
 }
 
-interface FetchAttributesResponse {
-  statusCode: number;
-  data: Attribute[];
-  message: string;
-  success: boolean;
-}
-
 const AttributesDialog = ({
   attributesHandler,
   chatbotId,
-  attributeDialog,
 }: {
   attributesHandler: () => void;
   chatbotId: string;
-  attributeDialog: boolean;
 }) => {
   const [tab, setTab] = useState(0);
   const [name, setName] = useState<string>('');
@@ -51,8 +41,10 @@ const AttributesDialog = ({
   const [originalValue, setOriginalValue] = useState<string>('');
   const [editId, setEditId] = useState<string>('');
   const nameInputRef = useRef<HTMLInputElement>(null);
-  const [attributeList, setAttributeList] = useState<Attribute[]>([]);
-
+  const { refetchAttributesHandler, attributeState } = usePlayground();
+  const [attributeList, setAttributeList] = useState<Attribute[]>(
+    attributeState?.attributesData || []
+  );
   useEffect(() => {
     if (tab === 0) {
       setName('');
@@ -66,6 +58,7 @@ const AttributesDialog = ({
     {
       onSuccess(data) {
         setAttributeList(data?.data);
+        refetchAttributesHandler();
         setName('');
         setValue('');
         setEditId('');
@@ -85,6 +78,7 @@ const AttributesDialog = ({
   const { mutate: onUpdateAttributes, isPending: isUpdatePending } =
     useUpdateAttributes({
       onSuccess(data) {
+        refetchAttributesHandler();
         setAttributeList(data?.data);
         setOriginalName(name);
         setOriginalValue(value);
@@ -171,38 +165,11 @@ const AttributesDialog = ({
       },
     });
   };
-  const fetchAttributesHandler = async () => {
-    const response: FetchAttributesResponse = await axiosInstance.get(
-      `/chatbot/${chatbotId}/attributes`
-    );
-    if (response.success) {
-      setAttributeList(response.data);
-      return response.data;
-    } else {
-      setAttributeList([]);
-      return [];
-    }
-  };
-
-  const {
-    // data: fetchAttributes,
-    isLoading: loadFetchAttributes,
-    isRefetching: refetchingAttributes,
-    isError: errorInFetchAttributes,
-  } = useQuery({
-    queryKey: ['Attributes'],
-    queryFn: fetchAttributesHandler,
-    enabled: attributeDialog === true ? true : false,
-  });
-  useEffect(() => {
-    if (errorInFetchAttributes) {
-      toast.error('failed to fetch attributes');
-    }
-  }, [errorInFetchAttributes]);
   const { mutate: onDeleteAttribute, isPending: isPendingDelete } =
     useDeleteAttribute({
       onSuccess(data) {
         setTab(0);
+        refetchAttributesHandler();
         setAttributeList(data?.data);
         toast.success(data?.message);
       },
@@ -232,11 +199,7 @@ const AttributesDialog = ({
       className='absolute md:right-6 top-32 min-[699px]:top-20 px-4 pb-4 sm:px-6 sm:pb-4 pt-2 sm:pt-3 w-[-webkit-fill-available] bg-[#F8F8F8] md:w-[600px] min-[870px]:w-[700px] h-auto md:h-[70vh] mx-6 md:mx-0 rounded-lg overflow-hidden'
       style={{ boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)' }}
     >
-      {(loadFetchAttributes ||
-        isAddPending ||
-        isUpdatePending ||
-        refetchingAttributes ||
-        isPendingDelete) && (
+      {(isAddPending || isUpdatePending || isPendingDelete) && (
         <div className='absolute inset-0 bg-[#a6dae41a] z-50 flex items-center justify-center backdrop-blur-[3px]'>
           <div role='status'>
             <div className='w-10 h-10 border-4 border-gray-200 border-t-[#3bc5dd] rounded-full animate-spin'></div>

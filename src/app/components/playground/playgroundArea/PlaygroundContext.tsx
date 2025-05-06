@@ -10,7 +10,16 @@ import React, {
 import { toast } from 'sonner';
 import { axiosError } from '@/types/axiosTypes';
 import { TypePlaygroundNode } from '@/types/node';
-
+interface Attribute {
+  _id: string;
+  chatbotId: string;
+  name: string;
+  alias: string;
+  value: string;
+  __v: number;
+  createdAt: string;
+  updatedAt: string;
+}
 interface PlaygroundContextType {
   type: string | null;
   label: string | null;
@@ -32,6 +41,20 @@ interface PlaygroundContextType {
   >;
   selectedGoToNode: string | null;
   setSelectedGotoNode: React.Dispatch<React.SetStateAction<string | null>>;
+  attributeState: {
+    attributesData: Attribute[];
+    attributesError: boolean;
+    attributesLoading: boolean;
+  };
+  setAttributeState: React.Dispatch<
+    React.SetStateAction<{
+      attributesData: Attribute[];
+      attributesError: boolean;
+      attributesLoading: boolean;
+    }>
+  >;
+  reFetchAttributes: boolean;
+  refetchAttributesHandler: () => void;
 }
 
 const PlaygroundContext = createContext<PlaygroundContextType | undefined>(
@@ -53,6 +76,16 @@ export const PlaygroundProvider: React.FC<PlaygroundProviderProps> = ({
     TypePlaygroundNode[] | []
   >([]);
   const [selectedGoToNode, setSelectedGotoNode] = useState<string | null>(null);
+  const [attributeState, setAttributeState] = useState<{
+    attributesData: Attribute[];
+    attributesError: boolean;
+    attributesLoading: boolean;
+  }>({
+    attributesData: [],
+    attributesError: false,
+    attributesLoading: false,
+  });
+  const [reFetchAttributes, setReFetchAttributes] = useState(false);
   const notConnectableNode = useMemo(
     () => [
       'aiAssistNode',
@@ -67,7 +100,9 @@ export const PlaygroundProvider: React.FC<PlaygroundProviderProps> = ({
     ],
     []
   );
-
+  const refetchAttributesHandler = () => {
+    setReFetchAttributes((prev) => !prev);
+  };
   const refetchHandler = () => {
     setRefetch((prev) => !prev);
   };
@@ -127,6 +162,10 @@ export const PlaygroundProvider: React.FC<PlaygroundProviderProps> = ({
         setListOfPlayGroundNode,
         setSelectedGotoNode,
         selectedGoToNode,
+        attributeState,
+        setAttributeState,
+        reFetchAttributes,
+        refetchAttributesHandler,
       }}
     >
       {children}

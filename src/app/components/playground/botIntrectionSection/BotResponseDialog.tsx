@@ -34,7 +34,6 @@ import { usePlayground } from '../playgroundArea/PlaygroundContext';
 import { useParams } from 'next/navigation';
 import AWS from 'aws-sdk';
 import { initializeAWS } from './S3Operation';
-import { axiosInstance } from '@/utils/axiosInstance';
 import { Attribute } from '../AttributesDialog';
 
 type ValidationError = {
@@ -66,31 +65,39 @@ const BotResponseDialog = ({
   const [nodeInfo, setNodeInfo] = useState<TypeNodeInfo | null>(null);
   const params = useParams();
   const chatbotId = params.id;
-  const { refetchHandler, setSelectedGotoNode } = usePlayground();
+  const { refetchHandler, setSelectedGotoNode, attributeState } =
+    usePlayground();
   const [responseList, setResponseList] = useState<TypeResponseList[] | []>([]);
   const [errorComponents, setErrorComponents] = useState<number[]>([]);
   const [deletingIndices, setDeletingIndices] = useState<number[]>([]);
   const [pendingDeletions, setPendingDeletions] = useState<string[]>([]);
   const [isPendingS3Delete, setIsPendingS3Delete] = useState(false);
+
   const [attributeList, setAttributeList] = useState<Attribute[]>([]);
 
-  const fetchAttributesHandler = async () => {
-    const response: FetchAttributesResponse = await axiosInstance.get(
-      `/chatbot/${chatbotId}/attributes`
-    );
-    if (response.success) {
-      setAttributeList(response.data);
-      return response.data;
-    } else {
-      setAttributeList([]);
-      return [];
-    }
-  };
-
   useEffect(() => {
-    fetchAttributesHandler();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (attributeState.attributesData) {
+      setAttributeList(attributeState.attributesData);
+    }
+  }, [attributeState]);
+
+  // const fetchAttributesHandler = async () => {
+  //   const response: FetchAttributesResponse = await axiosInstance.get(
+  //     `/chatbot/${chatbotId}/attributes`
+  //   );
+  //   if (response.success) {
+  //     setAttributeList(response.data);
+  //     return response.data;
+  //   } else {
+  //     setAttributeList([]);
+  //     return [];
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchAttributesHandler();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   const renderNodeResponse = (item: TypeResponseList, index: number) => {
     const type = item.type;
@@ -528,7 +535,10 @@ const BotResponseDialog = ({
           </div>
 
           <div className='flex-1 relative flex flex-col max-h-[90.2dvh] sm:max-h-[84dvh]'>
-            {(fetchPending || updatePending || isPendingS3Delete) && (
+            {(fetchPending ||
+              updatePending ||
+              isPendingS3Delete ||
+              (attributeState && attributeState?.attributesLoading)) && (
               <div className='absolute inset-0 z-50 flex items-center justify-center bg-[#a6dae41a] backdrop-blur-[3px]'>
                 <div role='status' className='flex flex-col items-center'>
                   <div className='w-10 h-10 border-4 border-gray-200 border-t-[#3bc5dd] rounded-full animate-spin'></div>
