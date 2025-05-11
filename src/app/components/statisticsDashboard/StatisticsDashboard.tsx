@@ -21,11 +21,10 @@ const StatisticsDashboard = ({
   type: 'user' | 'admin';
 }) => {
   const { width: screenWidth } = useWindowDimensions();
-  const [viewMode, setViewMode] = useState<'top5' | 'all'>('top5');
   const [searchTerms, setSearchTerms] = useState('');
   const [dateFilter, setDateFilter] = useState('30days');
   const [selectedCreator, setSelectedCreator] = useState('all');
-
+  const [dateRange, setDateRange] = useState({ start: '', end: '' });
   // Use the mock data for development or the fetched data in production
   const dataSource = rawStatisticsData as StatisticsDataItem[];
   // const dataSource = [
@@ -131,8 +130,23 @@ const StatisticsDashboard = ({
     const currentDate = new Date();
     const filterDate = new Date();
 
-    // Set filter date based on selected option
-    if (dateFilter === '1day') {
+    // Handle different date filter options
+    if (dateFilter === 'custom') {
+      // Use custom date range
+      if (dateRange.start && dateRange.end) {
+        const startDate = new Date(dateRange.start);
+        const endDate = new Date(dateRange.end);
+        endDate.setHours(23, 59, 59, 999); // Include the end date
+
+        return creatorFilteredData.filter((item) => {
+          const itemDate = new Date(item.updatedAt);
+          return itemDate >= startDate && itemDate <= endDate;
+        });
+      } else {
+        // If custom range is selected but dates aren't provided, return all data
+        return creatorFilteredData;
+      }
+    } else if (dateFilter === '1day') {
       filterDate.setDate(currentDate.getDate() - 1);
     } else if (dateFilter === '2days') {
       filterDate.setDate(currentDate.getDate() - 2);
@@ -150,7 +164,7 @@ const StatisticsDashboard = ({
       const itemDate = new Date(item.updatedAt);
       return itemDate >= filterDate;
     });
-  }, [creatorFilteredData, dateFilter]);
+  }, [creatorFilteredData, dateFilter, dateRange]);
 
   // Process the filtered statistics data
   const stats = processStatisticsData(dateFilteredData);
@@ -171,6 +185,8 @@ const StatisticsDashboard = ({
           setSearchTerms={setSearchTerms}
           dateFilter={dateFilter}
           setDateFilter={setDateFilter}
+          dateRange={dateRange}
+          setDateRange={setDateRange}
           selectedCreator={selectedCreator}
           setSelectedCreator={setSelectedCreator}
           uniqueCreators={uniqueCreators}
@@ -192,8 +208,6 @@ const StatisticsDashboard = ({
         <RequestsVsUsageChart
           data={stats.chatbotStats}
           screenWidth={screenWidth}
-          viewMode={viewMode}
-          setViewMode={setViewMode}
         />
       </div>
 

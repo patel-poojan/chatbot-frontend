@@ -250,6 +250,10 @@ const Page = () => {
 
   const isAdmin = userRole === 'admin';
 
+  const haveAdminPermission =
+    isAdmin ||
+    (userRole === 'subadmin' && permissions?.includes('ADMIN_DASHBOARD'));
+
   // Set default tab based on user role
   const [tab, setTab] = useState(isAdmin ? 0 : 1);
   const [searchTerms, setSearchTerms] = useState('');
@@ -388,7 +392,7 @@ const Page = () => {
                     : 'text-sm sm:text-base text-black font-light'
                 }`}
               >
-                User
+                Users
               </div>
             </div>
             {(userRole === 'admin' || permissions?.includes('CREATE_USER')) && (
@@ -433,7 +437,7 @@ const Page = () => {
           </div>
         </div>
 
-        {tab === 0 && isAdmin && (
+        {tab === 0 && haveAdminPermission && (
           <Details
             type='admin'
             refetch={refetchSubAdmins}

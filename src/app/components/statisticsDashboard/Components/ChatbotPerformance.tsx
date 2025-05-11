@@ -46,9 +46,9 @@ const ChatbotPerformance: React.FC<ChatbotPerformanceProps> = ({ data }) => {
               <th className='px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-indigo-900/70 uppercase tracking-wider'>
                 Requests
               </th>
-              <th className='px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-indigo-900/70 uppercase tracking-wider'>
+              {/* <th className='px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-indigo-900/70 uppercase tracking-wider'>
                 Status
-              </th>
+              </th> */}
               <th className='px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-indigo-900/70 uppercase tracking-wider'>
                 Websites Visited
               </th>
@@ -87,7 +87,7 @@ const ChatbotPerformance: React.FC<ChatbotPerformanceProps> = ({ data }) => {
                   <td className='px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-indigo-900/70'>
                     {chatbot.requests}
                   </td>
-                  <td className='px-3 md:px-6 py-2 md:py-4 whitespace-nowrap'>
+                  {/* <td className='px-3 md:px-6 py-2 md:py-4 whitespace-nowrap'>
                     <span
                       className={`px-2 py-0.5 md:py-1 text-xs font-medium rounded-full ${
                         chatbot.isActive
@@ -97,7 +97,7 @@ const ChatbotPerformance: React.FC<ChatbotPerformanceProps> = ({ data }) => {
                     >
                       {chatbot.isActive ? 'Active' : 'Inactive'}
                     </span>
-                  </td>
+                  </td> */}
                   <td className='px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-indigo-900/70'>
                     {chatbot.visitedWebsiteCount || 0}
                   </td>
@@ -119,7 +119,7 @@ const ChatbotPerformance: React.FC<ChatbotPerformanceProps> = ({ data }) => {
             ) : (
               <tr className='border-b border-gray-100'>
                 <td
-                  colSpan={7}
+                  colSpan={6}
                   className='px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-indigo-900/70 text-center'
                 >
                   No data available

@@ -1,5 +1,5 @@
 // components/RequestsVsUsageChart.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import {
   BarChart,
   Bar,
@@ -11,51 +11,56 @@ import {
   ResponsiveContainer,
   LabelList,
 } from 'recharts';
-import { BiBarChart } from 'react-icons/bi';
+import { BiBarChart, BiChevronLeft, BiChevronRight } from 'react-icons/bi';
 import { ChatbotStat } from './types';
-import { CHART_COLORS } from './dataProcessing';
 
 interface RequestsVsUsageChartProps {
   data: ChatbotStat[];
   screenWidth: number;
-  viewMode: 'top5' | 'all';
-  setViewMode: (mode: 'top5' | 'all') => void;
 }
 
 const RequestsVsUsageChart: React.FC<RequestsVsUsageChartProps> = ({
   data,
   screenWidth,
-  viewMode,
-  setViewMode,
 }) => {
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage =
+    (screenWidth >= 1024 && screenWidth <= 1500) || screenWidth < 768 ? 3 : 4;
+
+  // Calculate pagination values
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, data.length);
+
+  // Get current page data
+  const paginatedData = data.slice(startIndex, endIndex);
+
   // Transform data for better mobile display - improves axis readability
   const transformedData = React.useMemo(() => {
-    return data.map((item) => ({
+    return paginatedData.map((item) => ({
       ...item,
       // For mobile, truncate the name to make it more compact
       displayName:
         screenWidth < 768
-          ? item.name.length > 8
-            ? `${item.name.substring(0, 6)}...`
+          ? item.name.length > 10
+            ? `${item.name.substring(0, 9)}...`
             : item.name
           : item.name.length > 15
           ? `${item.name.substring(0, 12)}...`
           : item.name,
     }));
-  }, [data, screenWidth]);
-
-  // For mobile, we'll use a custom rendering that's more compact
-  const isMobile = screenWidth < 768;
+  }, [paginatedData, screenWidth]);
 
   // Calculate max values for better y-axis scaling
-  const maxRequests = Math.max(...data.map((item) => item.requests), 1);
-  const maxUsageTime = Math.max(...data.map((item) => item.usageTime), 1);
-
-  // Select data based on viewMode
-  const chartData =
-    viewMode === 'top5' || data.length > 20
-      ? [...transformedData].sort((a, b) => b.requests - a.requests).slice(0, 5)
-      : transformedData;
+  const maxRequests = Math.max(
+    ...paginatedData.map((item) => item.requests),
+    1
+  );
+  const maxUsageTime = Math.max(
+    ...paginatedData.map((item) => item.usageTime),
+    1
+  );
 
   // Calculate proper Y-axis values with nice rounded numbers for better display
   const calculateYAxisDomain = (maxValue: number): [number, number] => {
@@ -92,40 +97,86 @@ const RequestsVsUsageChart: React.FC<RequestsVsUsageChartProps> = ({
   const requestsTicks = generateYAxisTicks(requestsDomain);
   const usageTimeTicks = generateYAxisTicks(usageTimeDomain);
 
+  // Pagination handlers
+  const handlePreviousPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
+
+  const handlePageClick = (page: number) => {
+    setCurrentPage(page);
+  };
+
   return (
-    <div className='p-4 md:p-5 border border-gray-100 rounded-xl shadow-sm bg-white'>
-      <div className='flex justify-between items-center mb-3 md:mb-4'>
+    <div className='py-4 md:py-5 border border-gray-100 rounded-xl shadow-sm bg-white'>
+      <div className='flex justify-between items-center mb-3 md:mb-4 px-4 md:px-5'>
         <h2 className='text-base md:text-lg font-semibold text-indigo-900 flex items-center'>
           <span className='w-2 h-6 bg-cyan-500 rounded-full mr-2'></span>
           Requests vs Usage Time
         </h2>
 
-        {/* Data view toggle for large datasets */}
-        {data.length > 5 && (
-          <div className='flex text-xs'>
+        {/* Pagination controls */}
+        {data.length > itemsPerPage && (
+          <div className='flex items-center space-x-2 '>
             <button
-              className={`px-2 py-1 rounded-l-md border border-gray-200 ${
-                viewMode === 'top5'
-                  ? 'bg-indigo-50 text-indigo-600 font-medium'
-                  : 'bg-white text-gray-600'
-              }`}
-              onClick={() => setViewMode('top5')}
+              onClick={handlePreviousPage}
+              disabled={currentPage === 1}
+              className='p-1 rounded-md border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50'
             >
-              Top 5
+              <BiChevronLeft className='h-4 w-4 text-gray-600' />
             </button>
+
+            <div className='flex space-x-1'>
+              {Array.from({ length: Math.min(3, totalPages) }, (_, i) => {
+                if (totalPages <= 3) {
+                  return i + 1;
+                }
+
+                // Determine page numbers to display
+                let startPage = Math.max(1, currentPage - 1);
+                const endPage = Math.min(totalPages, startPage + 2);
+
+                // Adjust if we're near the end
+                if (endPage === totalPages && totalPages > 3) {
+                  startPage = Math.max(1, endPage - 2);
+                }
+
+                return startPage + i;
+              }).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => handlePageClick(page)}
+                  className={`px-2 py-1 text-xs rounded-md ${
+                    currentPage === page
+                      ? 'bg-indigo-50 text-indigo-600 font-medium border border-indigo-200'
+                      : 'border border-gray-200 hover:bg-gray-50'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+            </div>
+
             <button
-              className={`px-2 py-1 rounded-r-md border border-gray-200 border-l-0 ${
-                viewMode === 'all'
-                  ? 'bg-indigo-50 text-indigo-600 font-medium'
-                  : 'bg-white text-gray-600'
-              }`}
-              onClick={() => setViewMode('all')}
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className='p-1 rounded-md border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50'
             >
-              All
+              <BiChevronRight className='h-4 w-4 text-gray-600' />
             </button>
           </div>
         )}
       </div>
+
+      {/* Page info for larger datasets */}
+      {data.length > itemsPerPage && (
+        <div className='text-xs text-gray-500 mb-3 px-4 md:px-5 '>
+          Showing {startIndex + 1}-{endIndex} of {data.length} chatbots
+        </div>
+      )}
 
       <div className='h-60 md:h-72'>
         {data.length === 0 ? (
@@ -133,272 +184,64 @@ const RequestsVsUsageChart: React.FC<RequestsVsUsageChartProps> = ({
             <BiBarChart className='h-12 w-12 mb-2' />
             <p>No data available</p>
           </div>
-        ) : data.length > 20 && viewMode === 'all' ? (
-          // Special case for very large datasets in "all" mode - use a table instead
-          <div className='h-full flex flex-col'>
-            <div className='text-sm text-gray-500 mb-2 italic'>
-              Displaying all {data.length} chatbots - consider using Top 5 view
-              for better visualization
-            </div>
-            <div className='flex-1 overflow-y-auto pr-1 custom-scrollbar'>
-              <table className='min-w-full text-sm'>
-                <thead className='bg-gray-50'>
-                  <tr>
-                    <th className='px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                      Chatbot
-                    </th>
-                    <th className='px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                      Requests
-                    </th>
-                    <th className='px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                      Usage (min)
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data
-                    .sort((a, b) => b.requests - a.requests)
-                    .map((bot, index) => (
-                      <tr
-                        key={bot.id}
-                        className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
-                      >
-                        <td className='px-3 py-2 whitespace-nowrap text-xs font-medium text-gray-700 flex items-center'>
-                          <div
-                            className='w-2 h-2 rounded-full mr-2'
-                            style={{
-                              backgroundColor:
-                                CHART_COLORS[index % CHART_COLORS.length],
-                            }}
-                          ></div>
-                          {bot.name.length > 20
-                            ? bot.name.substring(0, 18) + '...'
-                            : bot.name}
-                        </td>
-                        <td className='px-3 py-2 whitespace-nowrap text-xs text-right font-medium text-cyan-600'>
-                          {bot.requests}
-                        </td>
-                        <td className='px-3 py-2 whitespace-nowrap text-xs text-right font-medium text-indigo-600'>
-                          {bot.usageTime}m
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        ) : isMobile ? (
-          // Mobile-optimized visualization - more compact and readable
-          <ResponsiveContainer width='100%' height='100%'>
-            <BarChart
-              data={chartData}
-              layout='vertical'
-              margin={{ top: 10, right: 50, left: 10, bottom: 5 }}
-              barGap={6}
-              barSize={14}
-            >
-              <CartesianGrid
-                strokeDasharray='3 3'
-                horizontal={true}
-                vertical={false}
-              />
-
-              <XAxis
-                type='number'
-                axisLine={{ stroke: '#e5e7eb' }}
-                tickLine={false}
-                tick={{ fontSize: 10, fill: '#6b7280' }}
-                domain={[0, 'dataMax + 5']}
-                tickCount={5}
-                allowDecimals={false}
-                padding={{ left: 0, right: 10 }}
-              />
-
-              <YAxis
-                dataKey='displayName'
-                type='category'
-                width={60}
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: 10, fill: '#6b7280' }}
-              />
-
-              <Tooltip
-                contentStyle={{ fontSize: '11px', padding: '8px' }}
-                formatter={(value: number, name: string) => [
-                  value + (name === 'Usage Time (min)' ? 'm' : ''),
-                  name,
-                ]}
-                labelStyle={{ fontSize: '11px', fontWeight: 600 }}
-              />
-
-              <Legend
-                verticalAlign='bottom'
-                align='center'
-                iconSize={8}
-                iconType='circle'
-                wrapperStyle={{ fontSize: 10, paddingTop: 15 }}
-              />
-
-              <Bar
-                dataKey='requests'
-                name='Requests'
-                fill='#58C8DD'
-                radius={[0, 4, 4, 0] as [number, number, number, number]}
-                layout='vertical'
-                animationDuration={1000}
-                isAnimationActive={true}
-                label={
-                  {
-                    position: 'right',
-                    fontSize: 9,
-                    fill: '#374151',
-                    formatter: (value: number) => (value > 0 ? value : ''),
-                  } as {
-                    position: 'right';
-                    fontSize: number;
-                    fill: string;
-                    formatter: (value: number) => string | number;
-                  }
-                }
-              />
-
-              <Bar
-                dataKey='usageTime'
-                name='Usage Time (min)'
-                fill='#6366F1'
-                radius={[0, 4, 4, 0] as [number, number, number, number]}
-                layout='vertical'
-                animationDuration={1000}
-                animationBegin={200}
-                isAnimationActive={true}
-                label={
-                  {
-                    position: 'right',
-                    fontSize: 9,
-                    fill: '#374151',
-                    formatter: (value: number) =>
-                      value > 0 ? `${value}m` : '',
-                  } as {
-                    position: 'right';
-                    fontSize: number;
-                    fill: string;
-                    formatter: (value: number) => string | number;
-                  }
-                }
-              />
-            </BarChart>
-          </ResponsiveContainer>
         ) : (
-          // Standard desktop visualization - FIXED Y-AXIS
+          // Standard desktop visualization
           <ResponsiveContainer width='100%' height='100%'>
             <BarChart
-              data={chartData}
-              layout={data.length > 10 ? 'vertical' : 'horizontal'}
+              data={transformedData}
               margin={{
                 top: 20,
-                right: 30,
-                left: data.length > 10 ? 100 : 0,
+                right: 10,
+                left: 0,
                 bottom: 20,
               }}
-              barSize={data.length > 10 ? 12 : 24}
+              barSize={24}
               barGap={8}
             >
               <CartesianGrid
                 strokeDasharray='3 3'
                 stroke='#f0f0f0'
-                vertical={data.length <= 10}
+                vertical={true}
                 horizontal={true}
               />
 
-              {data.length > 10 ? (
-                // Vertical layout for many chatbots
-                <XAxis
-                  type='number'
-                  tickLine={false}
-                  axisLine={{ stroke: '#e5e7eb' }}
-                  tick={{ fontSize: 11, fill: '#6b7280' }}
-                  domain={[0, Math.max(maxRequests, maxUsageTime) * 1.1]}
-                  allowDecimals={false}
-                  tickCount={5}
-                />
-              ) : (
-                // Horizontal layout for fewer chatbots
-                <XAxis
-                  dataKey='displayName'
-                  angle={0} // Improved for readability
-                  textAnchor='middle'
-                  height={30}
-                  tick={{
-                    fontSize: 12,
-                    fill: '#6b7280',
-                  }}
-                  tickLine={false}
-                  axisLine={{ stroke: '#e5e7eb' }}
-                  interval={0} // Show all labels
-                />
-              )}
+              <XAxis
+                dataKey='displayName'
+                angle={0}
+                textAnchor='middle'
+                height={30}
+                tick={{
+                  fontSize: 12,
+                  fill: '#6b7280',
+                }}
+                tickLine={false}
+                axisLine={{ stroke: '#e5e7eb' }}
+                interval={0} // Show all labels
+              />
 
-              {data.length > 10 ? (
-                // Vertical layout
-                <YAxis
-                  dataKey='displayName'
-                  type='category'
-                  tickLine={false}
-                  axisLine={false}
-                  width={90}
-                  tick={{
-                    fontSize: 11,
-                    fill: '#6b7280',
-                  }}
-                />
-              ) : (
-                // Horizontal layout - FIXED Y-AXIS CONFIG
-                <>
-                  <YAxis
-                    yAxisId='left'
-                    orientation='left'
-                    stroke='#58C8DD'
-                    tickLine={false}
-                    axisLine={{ stroke: '#e5e7eb' }}
-                    domain={requestsDomain}
-                    ticks={requestsTicks}
-                    tick={{ fontSize: 11, fill: '#6b7280' }}
-                    allowDecimals={false}
-                    // label={{
-                    //   value: 'Requests',
-                    //   angle: -90,
-                    //   position: 'insideLeft',
-                    //   style: {
-                    //     textAnchor: 'middle',
-                    //     fill: '#58C8DD',
-                    //     fontSize: 12,
-                    //   },
-                    // }}
-                  />
-                  <YAxis
-                    yAxisId='right'
-                    orientation='right'
-                    stroke='#6366F1'
-                    tickLine={false}
-                    axisLine={{ stroke: '#e5e7eb' }}
-                    domain={usageTimeDomain}
-                    ticks={usageTimeTicks}
-                    tick={{ fontSize: 11, fill: '#6b7280' }}
-                    allowDecimals={false}
-                    // label={{
-                    //   value: 'Usage Time (min)',
-                    //   angle: 90,
-                    //   position: 'insideRight',
-                    //   style: {
-                    //     textAnchor: 'middle',
-                    //     fill: '#6366F1',
-                    //     fontSize: 12,
-                    //   },
-                    // }}
-                  />
-                </>
-              )}
+              <YAxis
+                yAxisId='left'
+                orientation='left'
+                stroke='#58C8DD'
+                tickLine={false}
+                axisLine={{ stroke: '#e5e7eb' }}
+                domain={requestsDomain}
+                ticks={requestsTicks}
+                tick={{ fontSize: 11, fill: '#6b7280' }}
+                allowDecimals={false}
+              />
+
+              <YAxis
+                yAxisId='right'
+                orientation='right'
+                stroke='#6366F1'
+                tickLine={false}
+                axisLine={{ stroke: '#e5e7eb' }}
+                domain={usageTimeDomain}
+                ticks={usageTimeTicks}
+                tick={{ fontSize: 11, fill: '#6b7280' }}
+                allowDecimals={false}
+              />
 
               <Tooltip
                 content={({ active, payload, label }) => {
@@ -406,8 +249,8 @@ const RequestsVsUsageChart: React.FC<RequestsVsUsageChartProps> = ({
                     const originalItem = data.find(
                       (item) =>
                         item.name === label ||
-                        chartData.find((c) => c.displayName === label)?.name ===
-                          item.name
+                        transformedData.find((c) => c.displayName === label)
+                          ?.name === item.name
                     );
 
                     return (
@@ -446,81 +289,50 @@ const RequestsVsUsageChart: React.FC<RequestsVsUsageChartProps> = ({
                 iconSize={8}
               />
 
-              {data.length > 10 ? (
-                // Vertical bars for many chatbots
-                <>
-                  <Bar
-                    dataKey='requests'
-                    name='Requests'
-                    fill='#58C8DD'
-                    radius={[0, 4, 4, 0]}
-                    animationDuration={1500}
-                    isAnimationActive={true}
-                    layout='vertical'
-                  />
-                  <Bar
-                    dataKey='usageTime'
-                    name='Usage Time (min)'
-                    fill='#6366F1'
-                    radius={[0, 4, 4, 0]}
-                    animationDuration={1500}
-                    animationBegin={300}
-                    isAnimationActive={true}
-                    layout='vertical'
-                  />
-                </>
-              ) : (
-                // Horizontal bars for fewer chatbots
-                <>
-                  <Bar
-                    yAxisId='left'
-                    dataKey='requests'
-                    name='Requests'
-                    fill='#58C8DD'
-                    radius={[4, 4, 0, 0] as [number, number, number, number]}
-                    animationDuration={1500}
-                    isAnimationActive={true}
-                  >
-                    {/* Add value labels on top of bars for better readability */}
-                    <LabelList
-                      dataKey='requests'
-                      position='top'
-                      style={
-                        {
-                          fontSize: '11px',
-                          fill: '#374151',
-                        } as React.CSSProperties
-                      }
-                      formatter={(value: number) => (value > 0 ? value : '')}
-                    />
-                  </Bar>
-                  <Bar
-                    yAxisId='right'
-                    dataKey='usageTime'
-                    name='Usage Time (min)'
-                    fill='#6366F1'
-                    radius={[4, 4, 0, 0] as [number, number, number, number]}
-                    animationDuration={1500}
-                    animationBegin={300}
-                    isAnimationActive={true}
-                  >
-                    {/* Add value labels on top of bars for better readability */}
-                    <LabelList
-                      dataKey='usageTime'
-                      position='top'
-                      style={
-                        {
-                          fontSize: '11px',
-                          fill: '#374151',
-                        } as React.CSSProperties
-                      }
-                      formatter={(value: number) =>
-                        value > 0 ? `${value}m` : ''
-                      }
-                    />
-                  </Bar>
-                </>
-              )}
+              <Bar
+                yAxisId='left'
+                dataKey='requests'
+                name='Requests'
+                fill='#58C8DD'
+                radius={[4, 4, 0, 0] as [number, number, number, number]}
+                animationDuration={1500}
+                isAnimationActive={true}
+              >
+                <LabelList
+                  dataKey='requests'
+                  position='top'
+                  style={
+                    {
+                      fontSize: '11px',
+                      fill: '#374151',
+                    } as React.CSSProperties
+                  }
+                  formatter={(value: number) => (value > 0 ? value : '')}
+                />
+              </Bar>
+
+              <Bar
+                yAxisId='right'
+                dataKey='usageTime'
+                name='Usage Time (min)'
+                fill='#6366F1'
+                radius={[4, 4, 0, 0] as [number, number, number, number]}
+                animationDuration={1500}
+                animationBegin={300}
+                isAnimationActive={true}
+              >
+                <LabelList
+                  dataKey='usageTime'
+                  position='top'
+                  style={
+                    {
+                      fontSize: '11px',
+                      fill: '#374151',
+                    } as React.CSSProperties
+                  }
+                  formatter={(value: number) => (value > 0 ? `${value}m` : '')}
+                />
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         )}

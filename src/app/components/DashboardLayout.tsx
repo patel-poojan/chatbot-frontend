@@ -70,7 +70,11 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const showUser =
     role === 'admin' ||
     (role !== 'user' &&
-      !(role === 'subadmin' && !permissions.includes('ACCESS_TO_USER_DATA')));
+      !(
+        role === 'subadmin' &&
+        !permissions.includes('MANAGE_USERS') &&
+        !permissions.includes('ADMIN_DASHBOARD')
+      ));
   const showBda =
     role === 'admin' ||
     (role !== 'user' &&

@@ -31,11 +31,13 @@ export default function middleware(request: NextRequest) {
     const decoded = jwtDecode<{ exp: number }>(token);
 
     // Check role-based access control
+    // Check role-based access control
     if (
       pathName === '/users' &&
       (role === 'user' ||
         (role === 'subadmin' &&
-          !parsedPermissions.includes('ACCESS_TO_USER_DATA')))
+          !parsedPermissions.includes('MANAGE_USERS') &&
+          !parsedPermissions.includes('ADMIN_DASHBOARD')))
     ) {
       toast.error('You do not have permission to access this resource');
       return NextResponse.redirect(new URL('/chatbotlist', request.url));
