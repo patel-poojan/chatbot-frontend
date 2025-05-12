@@ -1,12 +1,12 @@
-import { jwtDecode } from 'jwt-decode';
-import { NextResponse, NextRequest } from 'next/server';
-import { toast } from 'sonner';
+import { jwtDecode } from "jwt-decode";
+import { NextResponse, NextRequest } from "next/server";
+import { toast } from "sonner";
 
 export default function middleware(request: NextRequest) {
   const pathName = request.nextUrl.pathname;
 
   // Allow access to specific routes without authentication
-  const publicPaths = ['/privacy-policy.pdf', '/terms-of-use.pdf'];
+  const publicPaths = ["/privacy-policy.pdf", "/terms-of-use.pdf"];
 
   if (publicPaths.includes(pathName)) {
     return NextResponse.next();
@@ -14,17 +14,17 @@ export default function middleware(request: NextRequest) {
 
   try {
     // Retrieve the token from cookies
-    const token = request.cookies.get('authToken')?.value || '';
-    const role = request.cookies.get('userRole')?.value || '';
-    const permissions = request.cookies.get('permissions')?.value || '[]';
+    const token = request.cookies.get("authToken")?.value || "";
+    const role = request.cookies.get("userRole")?.value || "";
+    const permissions = request.cookies.get("permissions")?.value || "[]";
     const parsedPermissions = JSON.parse(permissions);
     // If no token is found, redirect to the home page
-    if (pathName === '/login' && !token) {
+    if (pathName === "/login" && !token) {
       return NextResponse.next();
     }
 
     if (!token) {
-      return NextResponse.redirect(new URL('/', request.url));
+      return NextResponse.redirect(new URL("/", request.url));
     }
 
     // Decode the token and check its expiration
@@ -33,40 +33,33 @@ export default function middleware(request: NextRequest) {
     // Check role-based access control
     // Check role-based access control
     if (
-      pathName === '/users' &&
-      (role === 'user' ||
-        (role === 'subadmin' &&
-          !parsedPermissions.includes('MANAGE_USERS') &&
-          !parsedPermissions.includes('ADMIN_DASHBOARD')))
+      pathName === "/users" &&
+      (role === "user" || (role === "subadmin" && !parsedPermissions.includes("MANAGE_USERS")))
     ) {
-      toast.error('You do not have permission to access this resource');
-      return NextResponse.redirect(new URL('/chatbotlist', request.url));
+      toast.error("You do not have permission to access this resource");
+      return NextResponse.redirect(new URL("/chatbotlist", request.url));
     }
 
     // Check role-based access control for bda route
     if (
-      pathName === '/bda' &&
-      (role === 'user' ||
-        (role === 'subadmin' &&
-          !parsedPermissions.includes('BDA_QUESTION_MANAGEMENT')))
+      pathName === "/bda" &&
+      (role === "user" || (role === "subadmin" && !parsedPermissions.includes("BDA_QUESTION_MANAGEMENT")))
     ) {
-      toast.error('You do not have permission to access this resource');
-      return NextResponse.redirect(new URL('/chatbotlist', request.url));
+      toast.error("You do not have permission to access this resource");
+      return NextResponse.redirect(new URL("/chatbotlist", request.url));
     }
 
     if (
-      pathName === '/statistics-dashboard' &&
-      (role === 'user' ||
-        (role === 'subadmin' &&
-          !parsedPermissions.includes('STATISTICAL_DASHBOARD')))
+      pathName === "/statistics-dashboard" &&
+      (role === "user" || (role === "subadmin" && !parsedPermissions.includes("ADMIN_DASHBOARD")))
     ) {
-      toast.error('You do not have permission to access this resource');
-      return NextResponse.redirect(new URL('/chatbotlist', request.url));
+      toast.error("You do not have permission to access this resource");
+      return NextResponse.redirect(new URL("/chatbotlist", request.url));
     }
 
-    if (pathName === '/login' && token) {
+    if (pathName === "/login" && token) {
       if (decoded.exp * 1000 > new Date().getTime()) {
-        return NextResponse.redirect(new URL('/chatbotlist', request.url));
+        return NextResponse.redirect(new URL("/chatbotlist", request.url));
       } else {
         return NextResponse.next();
       }
@@ -76,37 +69,37 @@ export default function middleware(request: NextRequest) {
         return NextResponse.next();
       } else {
         // If the token is expired, redirect to the home page
-        return NextResponse.redirect(new URL('/', request.url));
+        return NextResponse.redirect(new URL("/", request.url));
       }
     }
   } catch (error) {
     // If there's an error (e.g., invalid token), redirect to the home page
-    if (pathName === '/login') {
+    if (pathName === "/login") {
       return NextResponse.next();
     }
-    return NextResponse.redirect(new URL('/', request.url));
+    return NextResponse.redirect(new URL("/", request.url));
   }
 }
 
 export const config = {
   matcher: [
-    '/chatbotlist',
-    '/create',
-    '/create/document',
-    '/create/document/train',
-    '/create/website',
-    '/create/website/train',
-    '/users',
-    '/training',
-    '/login',
-    '/create/website/:path*',
-    '/create/document/:path*',
-    '/create/website/train/:path*',
-    '/create/document/train/:path*',
-    '/dashboard',
-    '/dashboard/:path*',
-    '/bda',
-    '/statistics-dashboard',
-    '/statistics-dashboard-user',
+    "/chatbotlist",
+    "/create",
+    "/create/document",
+    "/create/document/train",
+    "/create/website",
+    "/create/website/train",
+    "/users",
+    "/training",
+    "/login",
+    "/create/website/:path*",
+    "/create/document/:path*",
+    "/create/website/train/:path*",
+    "/create/document/train/:path*",
+    "/dashboard",
+    "/dashboard/:path*",
+    "/bda",
+    "/statistics-dashboard",
+    "/statistics-dashboard-user",
   ],
 };
