@@ -65,7 +65,7 @@ const Verify = () => {
           sameSite: 'Lax',
           secure: true,
         });
-        router.push('/chatbotlist');
+        router.push('/statistics-dashboard-user');
       } else {
         router.push('/login');
       }
