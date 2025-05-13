@@ -68,7 +68,13 @@ export default function middleware(request: NextRequest) {
       !parsedPermissions.includes('CREATE_CHATAGENTS')
     ) {
       toast.error('You do not have permission to access this resource');
-      return NextResponse.redirect(new URL('/', request.url));
+
+      const response = NextResponse.redirect(new URL('/', request.url));
+      request.cookies.getAll().forEach((cookie) => {
+        response.cookies.delete(cookie.name);
+      });
+
+      return response;
     }
 
     if (pathName === '/login' && token) {
