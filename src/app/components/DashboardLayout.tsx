@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { Loader } from "./Loader";
 import Cookies from "js-cookie";
 import { UserRoleProvider } from "./UserRoleProvider";
+import ChangeLlmModalDialog from "./ChangeLlmModalDialog";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const pathName = usePathname();
@@ -58,6 +59,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     role === "admin" || (role !== "user" && !(role === "subadmin" && !permissions.includes("BDA_QUESTION_MANAGEMENT")));
   const showStatistics =
     role === "admin" || (role !== "user" && !(role === "subadmin" && !permissions.includes("ADMIN_DASHBOARD")));
+  const showLlm = role === "admin";
 
   return (
     <UserRoleProvider>
@@ -208,6 +210,16 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                   </div>
                 }
               />
+
+              {showLlm && (
+                <ChangeLlmModalDialog
+                  trigger={
+                    <div className="text-black font-medium text-base flex gap-1 pt-1 px-4 pb-1 hover:bg-[#58C8DD4a] items-center cursor-pointer">
+                      <Image src={"/images/ai.svg"} alt="ai" priority height={20} width={20} /> Change LLM
+                    </div>
+                  }
+                />
+              )}
 
               <div
                 className="text-black font-medium text-base gap-1 hover:bg-[#58C8DD4a] pb-2 px-4 pt-1 flex items-center cursor-pointer"
@@ -384,6 +396,15 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                           </div>
                         }
                       />
+                      {showLlm && (
+                        <ChangeLlmModalDialog
+                          trigger={
+                            <div className="text-black font-medium text-base  flex gap-1 pt-2 px-6  items-center cursor-pointer">
+                              <Image src={"/images/ai.svg"} alt="ai" priority height={20} width={20} /> Change LLM
+                            </div>
+                          }
+                        />
+                      )}
                       <div className="border-b-2 border-[#EFEFEF] my-2 mx-3 "></div>
                       <div
                         className="text-[red] font-medium text-base gap-1  pb-2 px-6  flex items-center cursor-pointer"
