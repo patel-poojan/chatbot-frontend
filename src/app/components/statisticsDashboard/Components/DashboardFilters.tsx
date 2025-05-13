@@ -149,9 +149,9 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
   };
 
   const getDateRangeDisplay = () => {
-    if (dateFilter === 'custom' && dateRange.start && dateRange.end) {
-      return `${dateRange.start} - ${dateRange.end}`;
-    }
+    // if (dateFilter === 'custom' && dateRange.start && dateRange.end) {
+    //   return `${dateRange.start} - ${dateRange.end}`;
+    // }
     switch (dateFilter) {
       case '30days':
         return 'Last 30 days';
