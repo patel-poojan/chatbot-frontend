@@ -8,7 +8,11 @@ import { FiAlignJustify } from 'react-icons/fi';
 import { IoClose } from 'react-icons/io5';
 import { RiArrowDropDownLine } from 'react-icons/ri';
 import { motion } from 'framer-motion';
-const TopBar = ({ content }: { content: React.ReactNode }) => {
+const TopBar = ({
+  content,
+}: {
+  content: React.ReactNode | ((toggleDrawer: () => void) => React.ReactNode);
+}) => {
   const router = useRouter();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -80,7 +84,7 @@ const TopBar = ({ content }: { content: React.ReactNode }) => {
               className='fixed top-[62px] md:top-[64px] right-0 h-[calc(100dvh-62px)] md:h-[calc(100dvh-64px)] w-full bg-white drop-shadow-xl border-t-2 z-50 px-3 pb-3'
               onClick={(e) => e.stopPropagation()}
             >
-              {content}
+              {typeof content === 'function' ? content(toggleDrawer) : content}
             </motion.div>
           </>
         )}

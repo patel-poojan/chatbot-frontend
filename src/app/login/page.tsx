@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { Loader } from '../components/Loader';
 import { axiosError } from '../../types/axiosTypes';
 import Cookies from 'js-cookie';
+import { getRouteByRoleAndPermissions } from '@/utils/returnHomeRoutes';
 
 const Page = () => {
   const router = useRouter();
@@ -68,26 +69,15 @@ const Page = () => {
           secure: true,
         });
 
-        if (userRole === 'user') {
-          router.push('/statistics-dashboard-user');
-        } else if (userRole === 'admin') {
-          router.push('/statistics-dashboard');
-        } else if (userRole === 'subadmin') {
-          // Cascading permission checks for subadmin
-          if (permissions.includes('ADMIN_DASHBOARD')) {
-            router.push('/statistics-dashboard');
-          } else if (permissions.includes('CREATE_CHATAGENTS')) {
-            router.push('/statistics-dashboard-user');
-          } else if (permissions.includes('MANAGE_USERS')) {
-            router.push('/users');
-          } else if (permissions.includes('BDA_QUESTION_MANAGEMENT')) {
-            router.push('/bda');
-          } else {
-            // No permitted roles, show toast and don't navigate
-            toast.error('You do not have any permission');
-            isLogout(); // Logout the user
-            return; // Exit early to prevent success toast and navigation
-          }
+        const route = getRouteByRoleAndPermissions(userRole, permissions);
+
+        if (route) {
+          router.push(route);
+        } else {
+          // No permitted roles, show toast and don't navigate
+          toast.error('You do not have any permission');
+          isLogout(); // Logout the user
+          return; // Exit early to prevent success toast and navigation
         }
       }
       toast.success(data?.message);

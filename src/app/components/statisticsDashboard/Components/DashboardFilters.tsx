@@ -342,7 +342,7 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
             side='bottom'
             className='rounded-t-2xl pb-6 px-4 h-fit overflow-y-auto'
           >
-            <div className='flex items-center justify-between pb-4 pt-2'>
+            <div className='flex items-center justify-between '>
               <div className='flex items-center gap-2'>
                 <SheetTitle className='text-gray-900 font-semibold'>
                   Filters

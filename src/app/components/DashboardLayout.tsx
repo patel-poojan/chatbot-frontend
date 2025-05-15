@@ -32,6 +32,7 @@ import { Loader } from './Loader';
 import Cookies from 'js-cookie';
 import { UserRoleProvider } from './UserRoleProvider';
 import ChangeLlmModalDialog from './ChangeLlmModalDialog';
+import { getRouteByRoleAndPermissions } from '@/utils/returnHomeRoutes';
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const pathName = usePathname();
@@ -95,16 +96,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           <div className='flex flex-col gap-3 items-center'>
             <Link
               href={(() => {
-                if (role === 'user') {
-                  return '/statistics-dashboard-user';
-                } else if (role === 'admin') {
-                  return '/statistics-dashboard';
-                } else if (role === 'subadmin') {
-                  if (permissions && permissions.includes('ADMIN_DASHBOARD')) {
-                    return '/statistics-dashboard';
-                  } else {
-                    return '/statistics-dashboard-user';
-                  }
+                const route = getRouteByRoleAndPermissions(role, permissions);
+                if (route) {
+                  return route;
                 } else {
                   return '/chatbotlist';
                 }
@@ -311,12 +305,13 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         >
           <div className='block min-[500px]:hidden'>
             <TopBar
-              content={
+              content={(toggleDrawer) => (
                 <div className='h-full flex flex-col w-full bg-white pt-3'>
                   <div className='w-full  flex-1'>
                     {showChatbotLisAndStatistics && (
                       <Link href={'/statistics-dashboard-user'}>
                         <div
+                          onClick={toggleDrawer}
                           className={`flex gap-3 items-center rounded-lg py-3 ${
                             pathName === '/statistics-dashboard-user'
                               ? 'px-3 blue-gradient'
@@ -353,6 +348,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     {showStatistics && (
                       <Link href={'/statistics-dashboard'}>
                         <div
+                          onClick={toggleDrawer}
                           className={`flex gap-3 items-center rounded-lg py-3 ${
                             pathName === '/statistics-dashboard'
                               ? 'px-3 blue-gradient'
@@ -389,6 +385,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     {showChatbotLisAndStatistics && (
                       <Link href={'/chatbotlist'}>
                         <div
+                          onClick={toggleDrawer}
                           className={`flex gap-3 items-center  rounded-lg py-3 ${
                             pathName === '/chatbotlist' ||
                             pathName === '/create' ||
@@ -425,7 +422,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                                 : 'text-[#1e255eb2]'
                             }  font-medium`}
                           >
-                            Dashboard
+                            ChatAgents
                           </p>
                         </div>
                       </Link>
@@ -433,6 +430,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     {showUser && (
                       <Link href={'/users'}>
                         <div
+                          onClick={toggleDrawer}
                           className={`flex gap-3 items-center   rounded-lg py-3 ${
                             pathName === '/users' ? 'px-3 blue-gradient' : ''
                           }`}
@@ -468,6 +466,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     {showBda && (
                       <Link href={'/bda'}>
                         <div
+                          onClick={toggleDrawer}
                           className={`flex gap-3 items-center   rounded-lg py-3 ${
                             pathName === '/bda' ? 'px-3 blue-gradient' : ''
                           }`}
@@ -554,7 +553,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     </PopoverContent>
                   </Popover>
                 </div>
-              }
+              )}
             />
           </div>
           {children}
