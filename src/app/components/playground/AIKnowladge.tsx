@@ -34,6 +34,13 @@ import {
 } from '@/utils/botCreation-api';
 import { axiosError } from '@/types/axiosTypes';
 import DomainChangeDialog from './DomainChangeDialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { AlertDialogHeader } from '@/components/ui/alert-dialog';
 
 interface IDocumentContent {
   active: boolean;
@@ -93,6 +100,14 @@ const AIKnowledge = ({
   const [newDomain, setNewDomain] = useState('');
 
   const [files, setFiles] = useState<File[]>([]);
+
+  // Add these states at the top of the AIKnowledge component after the existing state declarations
+  const [hasChanges, setHasChanges] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [pendingAction, setPendingAction] = useState<{
+    type: 'tab' | 'close';
+    value?: string;
+  }>({ type: 'close' });
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(event.target.files!);
     setFiles((prevFiles) => [...prevFiles, ...selectedFiles]); // Append new files to the existing ones
@@ -162,6 +177,7 @@ const AIKnowledge = ({
       },
     });
 
+  // Modify updateHandler to reset the hasChanges flag after saving
   const updateHandler = async () => {
     if (
       tab === 'documents' &&
@@ -182,9 +198,41 @@ const AIKnowledge = ({
             : { websiteContent: listOfWebsites },
       };
       onUpdate(data);
+      setHasChanges(false); // Reset changes flag after update
     }
   };
 
+  // Create wrapper functions for tab change and close actions
+  const handleTabChange = (newTab: string) => {
+    if (hasChanges) {
+      setPendingAction({ type: 'tab', value: newTab });
+      setShowConfirmDialog(true);
+    } else {
+      setTab(newTab);
+    }
+  };
+
+  const handleClose = () => {
+    if (hasChanges) {
+      setPendingAction({ type: 'close' });
+      setShowConfirmDialog(true);
+    } else {
+      setAiSection(false);
+    }
+  };
+  // Add the confirmAction function to handle dialog actions
+  const confirmAction = () => {
+    // Reset data changes if the user chooses to continue without saving
+    if (pendingAction.type === 'tab') {
+      setTab(pendingAction.value || 'websites');
+      // Reset data to original state from last fetch
+      fetchTrainData();
+    } else if (pendingAction.type === 'close') {
+      setAiSection(false);
+    }
+    setHasChanges(false);
+    setShowConfirmDialog(false);
+  };
   const recrawlWebsiteHandler = async () => {
     const data = {
       chatbotId: chatbotId,
@@ -193,7 +241,7 @@ const AIKnowledge = ({
     onRecrawl(data);
   };
 
-  // Handle delete functionality
+  // Modify handleDelete function to track changes
   const handleDelete = (index: number) => {
     if (
       tab === 'documents' &&
@@ -212,9 +260,11 @@ const AIKnowledge = ({
     } else {
       setListOfWebsites((prev) => prev.filter((_, i) => i !== index));
     }
+
+    setHasChanges(true); // Mark that changes have been made
   };
 
-  // Handle toggle functionality
+  // Modify handleToggle function to track changes
   const handleToggle = (index: number) => {
     if (tab === 'documents') {
       // Check if trying to disable the last active document
@@ -260,6 +310,8 @@ const AIKnowledge = ({
         })
       );
     }
+
+    setHasChanges(true); // Mark that changes have been made
   };
 
   // Get current list based on selected tab
@@ -312,7 +364,6 @@ const AIKnowledge = ({
       }}
     >
       {(loadTrainData || isPendingToUpdate || isPendingToRecrawl) && <Loader />}
-
       <div className='flex mx-2 justify-between items-center'>
         <div className='flex gap-2 sm:gap-4'>
           <div
@@ -359,13 +410,12 @@ const AIKnowledge = ({
 
         <div
           className='p-2 bg-white rounded-xl cursor-pointer mt-2 sm:mt-0'
-          onClick={() => setAiSection(false)}
+          onClick={handleClose}
           style={{ boxShadow: '0px 0px 4px 0px #0000001F' }}
         >
           <IoCloseOutline className='text-lg' />
         </div>
       </div>
-
       <div
         className='flex-1 border bg-white flex flex-col md:flex-row overflow-hidden !rounded-xl'
         style={{ boxShadow: '0px 0px 4px 0px #0000001F' }}
@@ -388,7 +438,7 @@ const AIKnowledge = ({
                     className={`text-base sm:text-lg font-normal cursor-pointer ${
                       tab === item ? 'text-[#57C0DD]' : 'text-black'
                     }`}
-                    onClick={() => setTab(item)}
+                    onClick={() => handleTabChange(item)}
                   >
                     {item.charAt(0).toUpperCase() + item.slice(1)}
                   </div>
@@ -646,6 +696,76 @@ const AIKnowledge = ({
           )}
         </div>
       </div>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <DialogContent className='max-w-[87vw] gap-0 sm:max-w-[425px] rounded-lg'>
+          <AlertDialogHeader>
+            <DialogTitle className='sr-only'>Unsaved Changes</DialogTitle>
+            <DialogDescription id='dialog-description' className='sr-only'>
+              You may lose your changes
+            </DialogDescription>
+          </AlertDialogHeader>
+
+          <div className='gap-6 flex flex-col'>
+            <div className='flex items-center justify-between'>
+              <div></div>
+              <div className='text-primary text-xl font-medium'>
+                Unsaved Changes
+              </div>
+
+              <IoCloseOutline
+                className='text-lg cursor-pointer'
+                onClick={() => setShowConfirmDialog(false)}
+              />
+            </div>
+
+            <div className='space-y-2'>
+              <p className='text-center'>
+                You may lose your changes. Do you want to save before
+                proceeding?
+              </p>
+            </div>
+
+            <div className='grid grid-cols-2 gap-2 sm:gap-3 items-center w-full'>
+              <Button
+                className='border border-[#57C0DD] text-xs w-full text-[#57C0DD] py-2 bg-transparent rounded-full hover:bg-[#f0faff]'
+                onClick={() => {
+                  if (pendingAction.type === 'close') {
+                    setAiSection(false);
+                  } else {
+                    confirmAction();
+                  }
+                  setShowConfirmDialog(false);
+                }}
+              >
+                Continue
+              </Button>
+              <Button
+                className='bg-[#57C0DD] text-white text-xs py-2 w-full rounded-full hover:bg-[#4cb9d1]'
+                onClick={() => {
+                  updateHandler();
+                  // Wait for the update to complete before proceeding with the action
+                  // We can use the isPendingToUpdate flag to know when it's done
+                  const checkInterval = setInterval(() => {
+                    if (!isPendingToUpdate) {
+                      clearInterval(checkInterval);
+                      if (pendingAction.type === 'close') {
+                        setAiSection(false);
+                      } else if (pendingAction.type === 'tab') {
+                        setTab(pendingAction.value || 'websites');
+                      }
+                      setShowConfirmDialog(false);
+                    }
+                  }, 500);
+                }}
+              >
+                Save
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
