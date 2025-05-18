@@ -699,7 +699,7 @@ const AIKnowledge = ({
 
       {/* Confirmation Dialog */}
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-        <DialogContent className='max-w-[87vw] gap-0 sm:max-w-[425px] rounded-lg'>
+        <DialogContent className='max-w-[93dvw] gap-0 sm:max-w-[425px] rounded-lg p-4 sm:p-6'>
           <AlertDialogHeader>
             <DialogTitle className='sr-only'>Unsaved Changes</DialogTitle>
             <DialogDescription id='dialog-description' className='sr-only'>
@@ -710,8 +710,8 @@ const AIKnowledge = ({
           <div className='gap-6 flex flex-col'>
             <div className='flex items-center justify-between'>
               <div></div>
-              <div className='text-primary text-xl font-medium'>
-                Unsaved Changes
+              <div className='text-primary text-lg sm:text-xl font-medium'>
+                Detected Unsaved Changes
               </div>
 
               <IoCloseOutline
@@ -722,14 +722,13 @@ const AIKnowledge = ({
 
             <div className='space-y-2'>
               <p className='text-center'>
-                You may lose your changes. Do you want to save before
-                proceeding?
+                You have unsaved changes. What would you like to do?
               </p>
             </div>
 
             <div className='grid grid-cols-2 gap-2 sm:gap-3 items-center w-full'>
               <Button
-                className='border border-[#57C0DD] text-xs w-full text-[#57C0DD] py-2 bg-transparent rounded-full hover:bg-[#f0faff]'
+                className='border border-[#57C0DD] flex shrink-0 text-[11px] sm:text-xs w-full px-1 text-[#57C0DD] py-2 bg-transparent rounded-full hover:bg-[#f0faff]'
                 onClick={() => {
                   if (pendingAction.type === 'close') {
                     setAiSection(false);
@@ -739,10 +738,10 @@ const AIKnowledge = ({
                   setShowConfirmDialog(false);
                 }}
               >
-                Continue
+                Continue Without Saving
               </Button>
               <Button
-                className='bg-[#57C0DD] text-white text-xs py-2 w-full rounded-full hover:bg-[#4cb9d1]'
+                className='bg-[#57C0DD] text-white flex shrink-0 text-[11px] sm:text-xs py-2 px-1 w-full rounded-full hover:bg-[#4cb9d1]'
                 onClick={() => {
                   updateHandler();
                   // Wait for the update to complete before proceeding with the action
@@ -760,7 +759,7 @@ const AIKnowledge = ({
                   }, 500);
                 }}
               >
-                Save
+                Save and Proceed
               </Button>
             </div>
           </div>
