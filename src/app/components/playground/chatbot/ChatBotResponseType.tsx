@@ -2,11 +2,27 @@ import { ResponseInfo, TypeBotResponse, TypeButton } from '@/types/node';
 import { ChevronDown } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export const TextResponse = ({ info }: { info: ResponseInfo }) => {
   return (
-    <div className='resize-none w-10/12 border border-transparent text-sm bg-white p-3  rounded-md shadow-none focus:outline-none  focus-visible:ring-0 overflow-y-auto'>
-      {info.description}
+    <div className='resize-none w-10/12 border border-transparent text-sm bg-white p-3 rounded-md shadow-none focus:outline-none focus-visible:ring-0 overflow-y-auto'>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          a: (props) => (
+            <a
+              {...props}
+              className='text-blue-600 underline hover:text-blue-800'
+              target='_blank'
+              rel='noopener noreferrer'
+            />
+          ),
+        }}
+      >
+        {info.description}
+      </ReactMarkdown>
     </div>
   );
 };
@@ -26,7 +42,21 @@ export const LlmResponse = ({ info }: { info: ResponseInfo }) => {
         fontFamily: 'var(--font-poppins)',
       }}
     >
-      {info.description}
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          a: (props) => (
+            <a
+              {...props}
+              className='text-blue-600 underline hover:text-blue-800'
+              target='_blank'
+              rel='noopener noreferrer'
+            />
+          ),
+        }}
+      >
+        {info.description}
+      </ReactMarkdown>
     </pre>
   );
 };

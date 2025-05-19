@@ -69,8 +69,30 @@ const PermissionDialog = ({
       },
     });
   const OnChangePermission = (id: string) => {
+    // Constants for permission IDs
+    const CREATE_USERS_ID = '66f976fda5b821f637e6e5de';
+    const MANAGE_USERS_ID = '66fc0285fe41bcac253e598f';
+
     const find = selectedPermission.find((item) => item._id === id);
     let prevSelectedPermission = selectedPermission;
+
+    // If trying to enable "Create Users" permission
+    if (id === CREATE_USERS_ID && !find) {
+      // Check if "Manage Users" permission is already enabled
+      const hasManageUsersPermission = selectedPermission.some(
+        (item) => item._id === MANAGE_USERS_ID
+      );
+
+      // If "Manage Users" is not enabled, show toast and return
+      if (!hasManageUsersPermission) {
+        toast.warning(
+          'Manage Users permission is required to enable Create Users permission'
+        );
+        return;
+      }
+    }
+
+    // Normal permission toggle logic
     if (find) {
       prevSelectedPermission = selectedPermission.filter(
         (item) => item._id !== id
@@ -81,6 +103,7 @@ const PermissionDialog = ({
         permissionList!.find((item) => item._id === id)!,
       ];
     }
+
     onUpdatePermission({
       adminId: adminId,
       permissionList: {
@@ -88,7 +111,7 @@ const PermissionDialog = ({
       },
     });
   };
-
+  console.log('selectedPermission', permissionList);
   return (
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
