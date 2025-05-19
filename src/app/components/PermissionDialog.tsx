@@ -85,9 +85,34 @@ const PermissionDialog = ({
 
       // If "Manage Users" is not enabled, show toast and return
       if (!hasManageUsersPermission) {
-        toast.warning(
+        toast.error(
           'Manage Users permission is required to enable Create Users permission'
         );
+        return;
+      }
+    }
+
+    // If trying to disable "Manage Users" permission
+    if (id === MANAGE_USERS_ID && find) {
+      // Check if "Create Users" permission is enabled
+      const hasCreateUsersPermission = selectedPermission.some(
+        (item) => item._id === CREATE_USERS_ID
+      );
+
+      // If "Create Users" is enabled, remove both permissions
+      if (hasCreateUsersPermission) {
+        prevSelectedPermission = selectedPermission.filter(
+          (item) => item._id !== MANAGE_USERS_ID && item._id !== CREATE_USERS_ID
+        );
+        toast.info(
+          'Create Users permission was also removed as it requires Manage Users permission'
+        );
+        onUpdatePermission({
+          adminId: adminId,
+          permissionList: {
+            permissionIds: prevSelectedPermission.map((item) => item._id),
+          },
+        });
         return;
       }
     }
@@ -111,7 +136,6 @@ const PermissionDialog = ({
       },
     });
   };
-  console.log('selectedPermission', permissionList);
   return (
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
