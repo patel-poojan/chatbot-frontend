@@ -54,9 +54,9 @@ const RecentSessions: React.FC<RecentSessionsProps> = ({ data }) => {
         <table className='min-w-full'>
           <thead>
             <tr className='bg-gray-50 border-b border-gray-100'>
-              <th className='px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-indigo-900/70 uppercase tracking-wider'>
+              {/* <th className='px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-indigo-900/70 uppercase tracking-wider'>
                 User ID
-              </th>
+              </th> */}
               <th className='px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-indigo-900/70 uppercase tracking-wider'>
                 ChatAgent
               </th>
@@ -86,9 +86,9 @@ const RecentSessions: React.FC<RecentSessionsProps> = ({ data }) => {
                     index % 2 === 0 ? 'bg-gray-50/30' : 'bg-white'
                   }`}
                 >
-                  <td className='px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm font-medium text-indigo-900'>
+                  {/* <td className='px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm font-medium text-indigo-900'>
                     {session.id.substring(0, 8)}...
-                  </td>
+                  </td> */}
                   <td className='px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-indigo-900/70'>
                     {session.chatbotName}
                   </td>
@@ -123,7 +123,7 @@ const RecentSessions: React.FC<RecentSessionsProps> = ({ data }) => {
             ) : (
               <tr className='border-b border-gray-100'>
                 <td
-                  colSpan={7}
+                  colSpan={6}
                   className='px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-indigo-900/70 text-center'
                 >
                   No data available
