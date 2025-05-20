@@ -23,10 +23,7 @@ import {
 import { CiImageOn } from 'react-icons/ci';
 import Image from 'next/image';
 import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
-import {
-  useGetNodeInformation,
-  useUpdateNodeInformation,
-} from '@/utils/nodeIntrection-api';
+import { useUpdateNodeInformation } from '@/utils/nodeIntrection-api';
 import { toast } from 'sonner';
 import { axiosError } from '@/types/axiosTypes';
 import { TypeNodeInfo, TypeResponseList } from '@/types/node';
@@ -35,6 +32,7 @@ import { useParams } from 'next/navigation';
 import AWS from 'aws-sdk';
 import { initializeAWS } from './S3Operation';
 import { Attribute } from '../AttributesDialog';
+import { axiosInstance } from '@/utils/axiosInstance';
 
 type ValidationError = {
   field: string;
@@ -72,32 +70,13 @@ const BotResponseDialog = ({
   const [deletingIndices, setDeletingIndices] = useState<number[]>([]);
   const [pendingDeletions, setPendingDeletions] = useState<string[]>([]);
   const [isPendingS3Delete, setIsPendingS3Delete] = useState(false);
-
+  const [fetchPending, setFetchPending] = useState(false);
   const [attributeList, setAttributeList] = useState<Attribute[]>([]);
-
   useEffect(() => {
     if (attributeState.attributesData) {
       setAttributeList(attributeState.attributesData);
     }
   }, [attributeState]);
-
-  // const fetchAttributesHandler = async () => {
-  //   const response: FetchAttributesResponse = await axiosInstance.get(
-  //     `/chatbot/${chatbotId}/attributes`
-  //   );
-  //   if (response.success) {
-  //     setAttributeList(response.data);
-  //     return response.data;
-  //   } else {
-  //     setAttributeList([]);
-  //     return [];
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchAttributesHandler();
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
 
   const renderNodeResponse = (item: TypeResponseList, index: number) => {
     const type = item.type;
@@ -185,31 +164,73 @@ const BotResponseDialog = ({
     scroll();
   }, [responseList.length]);
 
-  const { mutate: fetchNodeInformation, isPending: fetchPending } =
-    useGetNodeInformation({
-      onSuccess(data) {
-        if (data.data.node) {
-          setNodeInfo(data.data.node);
-          if (
-            data.data.node.response &&
-            Array.isArray(data.data.node.response)
-          ) {
-            const response = data.data.node.response as TypeResponseList[];
-            setResponseList(response);
+  // const { mutate: fetchNodeInformation, isPending: fetchPending } =
+  //   useGetNodeInformation({
+  //     onSuccess(data) {
+  //       if (data.data.node) {
+  //         setNodeInfo(data.data.node);
+  //         if (
+  //           data.data.node.response &&
+  //           Array.isArray(data.data.node.response)
+  //         ) {
+  //           const response = data.data.node.response as TypeResponseList[];
+  //           setResponseList(response);
+  //         }
+  //       }
+  //       // toast.success(data?.message);
+  //     },
+
+  //     onError(error: axiosError) {
+  //       const errorMessage =
+  //         error?.response?.data?.errors?.message ||
+  //         error?.response?.data?.message ||
+  //         'failed to fetch node information';
+  //       toast.error(errorMessage);
+  //     },
+  //   });
+
+  const fetchNodeInformation = React.useCallback(
+    async (data: { nodeId: string; chatbotId: string }) => {
+      try {
+        setFetchPending(true);
+        const res = await axiosInstance.get(
+          `/playground/${data.chatbotId}/node/${data.nodeId}`
+        );
+
+        const nodeData = res.data.node;
+
+        if (nodeData) {
+          setNodeInfo(nodeData);
+
+          if (nodeData.response && Array.isArray(nodeData.response)) {
+            // Create a new array with properly structured objects
+            const safeResponses = JSON.parse(JSON.stringify(nodeData.response));
+            setResponseList(safeResponses);
           }
         }
-        // toast.success(data?.message);
-      },
-
-      onError(error: axiosError) {
-        const errorMessage =
-          error?.response?.data?.errors?.message ||
-          error?.response?.data?.message ||
-          'failed to fetch node information';
+        setFetchPending(false);
+      } catch (error) {
+        setFetchPending(false);
+        const errorMessage = 'failed to fetch node information';
         toast.error(errorMessage);
-      },
-    });
-
+        console.error('fetchNodeInformation - error:', error);
+      }
+    },
+    []
+  );
+  useEffect(() => {
+    if (
+      responseList.length > 0 &&
+      responseList[0] &&
+      responseList[0]?.info &&
+      !responseList[0]?.info?.description
+    ) {
+      fetchNodeInformation({
+        nodeId,
+        chatbotId: chatbotId as string,
+      });
+    }
+  }, [responseList, fetchNodeInformation, nodeId, chatbotId]);
   const { mutate: updateNodeInformation, isPending: updatePending } =
     useUpdateNodeInformation({
       onSuccess(data) {
@@ -594,7 +615,7 @@ const BotResponseDialog = ({
             >
               <div className='flex flex-col gap-4 bg-[#F1F1F1] p-4 min-h-[153px]'>
                 {responseList.length > 0 ? (
-                  responseList.map((item, index) => (
+                  responseList?.map((item, index) => (
                     <div
                       className={`flex flex-col gap-4 ${
                         errorComponents.includes(index)
