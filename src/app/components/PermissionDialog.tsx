@@ -57,7 +57,7 @@ const PermissionDialog = ({
     useUpdatePermission({
       onSuccess(data) {
         setSelectedPermission(data.data.permissions);
-        toast.success(data?.message);
+        toast.success("Updated permissions successfully");
       },
 
       onError(error: axiosError) {

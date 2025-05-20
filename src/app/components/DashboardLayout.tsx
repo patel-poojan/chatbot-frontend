@@ -43,8 +43,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   // const [isOpenPopup, setIsOpenPopup] = useState<boolean>(false);
   const router = useRouter();
   const { mutate, isPending } = useLogout({
-    onSuccess(data) {
-      toast.success(data?.message);
+    onSuccess() {
+      toast.success('Logout successful');
       router.push('/');
     },
   });
