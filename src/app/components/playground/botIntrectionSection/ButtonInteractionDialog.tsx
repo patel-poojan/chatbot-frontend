@@ -148,11 +148,6 @@ const ButtonInteractionDialog = ({
         sideOffset={screenWidth > 890 ? 12 : 12}
         className='relative bg-white rounded-xl w-fit p-2 shadow-[0px_0px_12px_4px_rgba(0,0,0,0.08)]'
       >
-        {screenWidth > 890 ? (
-          <div className='absolute -right-2 top-1/2 transform -translate-y-1/2 w-4 h-3 bg-white rotate-45 shadow-[0px_0px_12px_rgba(0,0,0,0.08)]'></div>
-        ) : (
-          <div className='absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-white rotate-45 shadow-[0px_0px_12px_rgba(0,0,0,0.08)]'></div>
-        )}
         <div className='p-3 bg-white flex flex-col gap-2'>
           <div className='w-full'>
             <label htmlFor='title' className='text-black font-normal text-sm'>

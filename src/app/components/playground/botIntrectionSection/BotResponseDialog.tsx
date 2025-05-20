@@ -23,7 +23,10 @@ import {
 import { CiImageOn } from 'react-icons/ci';
 import Image from 'next/image';
 import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
-import { useUpdateNodeInformation } from '@/utils/nodeIntrection-api';
+import {
+  useGetNodeInformation,
+  useUpdateNodeInformation,
+} from '@/utils/nodeIntrection-api';
 import { toast } from 'sonner';
 import { axiosError } from '@/types/axiosTypes';
 import { TypeNodeInfo, TypeResponseList } from '@/types/node';
@@ -32,7 +35,6 @@ import { useParams } from 'next/navigation';
 import AWS from 'aws-sdk';
 import { initializeAWS } from './S3Operation';
 import { Attribute } from '../AttributesDialog';
-import { axiosInstance } from '@/utils/axiosInstance';
 
 type ValidationError = {
   field: string;
@@ -70,7 +72,7 @@ const BotResponseDialog = ({
   const [deletingIndices, setDeletingIndices] = useState<number[]>([]);
   const [pendingDeletions, setPendingDeletions] = useState<string[]>([]);
   const [isPendingS3Delete, setIsPendingS3Delete] = useState(false);
-  const [fetchPending, setFetchPending] = useState(false);
+  // const [fetchPending, setFetchPending] = useState(false);
   const [attributeList, setAttributeList] = useState<Attribute[]>([]);
   useEffect(() => {
     if (attributeState.attributesData) {
@@ -164,73 +166,31 @@ const BotResponseDialog = ({
     scroll();
   }, [responseList.length]);
 
-  // const { mutate: fetchNodeInformation, isPending: fetchPending } =
-  //   useGetNodeInformation({
-  //     onSuccess(data) {
-  //       if (data.data.node) {
-  //         setNodeInfo(data.data.node);
-  //         if (
-  //           data.data.node.response &&
-  //           Array.isArray(data.data.node.response)
-  //         ) {
-  //           const response = data.data.node.response as TypeResponseList[];
-  //           setResponseList(response);
-  //         }
-  //       }
-  //       // toast.success(data?.message);
-  //     },
-
-  //     onError(error: axiosError) {
-  //       const errorMessage =
-  //         error?.response?.data?.errors?.message ||
-  //         error?.response?.data?.message ||
-  //         'failed to fetch node information';
-  //       toast.error(errorMessage);
-  //     },
-  //   });
-
-  const fetchNodeInformation = React.useCallback(
-    async (data: { nodeId: string; chatbotId: string }) => {
-      try {
-        setFetchPending(true);
-        const res = await axiosInstance.get(
-          `/playground/${data.chatbotId}/node/${data.nodeId}`
-        );
-
-        const nodeData = res.data.node;
-
-        if (nodeData) {
-          setNodeInfo(nodeData);
-
-          if (nodeData.response && Array.isArray(nodeData.response)) {
-            // Create a new array with properly structured objects
-            const safeResponses = JSON.parse(JSON.stringify(nodeData.response));
-            setResponseList(safeResponses);
+  const { mutate: fetchNodeInformation, isPending: fetchPending } =
+    useGetNodeInformation({
+      onSuccess(data) {
+        if (data.data.node) {
+          setNodeInfo(data.data.node);
+          if (
+            data.data.node.response &&
+            Array.isArray(data.data.node.response)
+          ) {
+            const response = data.data.node.response as TypeResponseList[];
+            setResponseList(response);
           }
         }
-        setFetchPending(false);
-      } catch (error) {
-        setFetchPending(false);
-        const errorMessage = 'failed to fetch node information';
+        // toast.success(data?.message);
+      },
+
+      onError(error: axiosError) {
+        const errorMessage =
+          error?.response?.data?.errors?.message ||
+          error?.response?.data?.message ||
+          'failed to fetch node information';
         toast.error(errorMessage);
-        console.error('fetchNodeInformation - error:', error);
-      }
-    },
-    []
-  );
-  useEffect(() => {
-    if (
-      responseList.length > 0 &&
-      responseList[0] &&
-      responseList[0]?.info &&
-      !responseList[0]?.info?.description
-    ) {
-      fetchNodeInformation({
-        nodeId,
-        chatbotId: chatbotId as string,
-      });
-    }
-  }, [responseList, fetchNodeInformation, nodeId, chatbotId]);
+      },
+    });
+
   const { mutate: updateNodeInformation, isPending: updatePending } =
     useUpdateNodeInformation({
       onSuccess(data) {
@@ -250,6 +210,10 @@ const BotResponseDialog = ({
 
   useEffect(() => {
     if (nodeId && chatbotId && isDialog) {
+      fetchNodeInformation({
+        nodeId,
+        chatbotId: chatbotId as string,
+      });
       fetchNodeInformation({
         nodeId,
         chatbotId: chatbotId as string,
