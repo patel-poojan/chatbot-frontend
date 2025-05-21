@@ -569,7 +569,7 @@ const BotResponseDialog = ({
                   });
                 }}
                 className='px-4 py-3 mt-1 mb-2 rounded text-black  hover:border-[#57C0DD] focus-visible:ring-0 focus-visible:border-[#57C0DD] placeholder:text-sm placeholder:font-light w-full'
-                placeholder='Enter Your Message'
+                placeholder='Enter Title'
               />
             </div>
 

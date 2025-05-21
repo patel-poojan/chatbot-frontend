@@ -194,7 +194,7 @@ const UserInputDialog = ({
                 });
               }}
               className='p-3 mt-1 mb-2 border border-gray-200 bg-white hover:ring-1 hover:ring-[#57C0DD] rounded-md focus:outline-none focus-visible:border-[#57C0DD] focus-visible:ring-1 focus-visible:ring-[#57C0DD] shadow-sm transition duration-200'
-              placeholder='Enter Your Message'
+              placeholder='Enter Title'
             />
           </div>
           <div

@@ -173,7 +173,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
         setEdges(eee);
       }
 
-      toast.success(data?.message);
+      toast.success('Node updated successfully');
     },
 
     onError(error: axiosError) {
