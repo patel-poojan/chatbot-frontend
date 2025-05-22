@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { useAddNode } from '@/utils/playground-api';
 import { axiosError } from '@/types/axiosTypes';
 import { usePlayground } from './PlaygroundContext';
+import * as PopoverPrimitive from '@radix-ui/react-popover';
 const AddNodePopup = ({
   isPopupVisible,
   setIsPopupVisible,
@@ -120,78 +121,79 @@ const AddNodePopup = ({
           {/* Button content (icon or plus sign) goes here */}
         </button>
       </PopoverTrigger>
-
-      <PopoverContent
-        onClick={(e) => e.stopPropagation()}
-        className='p-3 ms-2 mt-1 w-fit bg-white flex flex-col gap-1 rounded-lg shadow-md'
-      >
-        <div
-          className='flex items-center gap-2 hover:bg-gray-100 p-2 rounded-md cursor-pointer'
-          onClick={() => onClickHandler('userInputNode')}
+      <PopoverPrimitive.Portal>
+        <PopoverContent
+          onClick={(e) => e.stopPropagation()}
+          className='p-3 ms-2 mt-1 w-fit bg-white flex flex-col gap-1 rounded-lg shadow-md'
         >
-          <Image
-            src='/images/user_input.svg'
-            alt='User Input Icon'
-            width={16}
-            height={16}
-            quality={100}
-          />
-          <span className='text-black text-sm font-medium'>User Input</span>
-        </div>
-        <div
-          className='flex items-center gap-2 hover:bg-gray-100 p-2 rounded-md cursor-pointer'
-          onClick={() => onClickHandler('botResponseNode')}
-        >
-          <IoIosSend className='text-black text-lg' />
-          <span className='text-black text-sm font-medium'>Bot Response</span>
-        </div>
-        <div
-          className='flex items-center gap-2 hover:bg-gray-100 p-2 rounded-md cursor-pointer'
-          onClick={() => onClickHandler('goToStepNode')}
-        >
-          <Image
-            src='/images/go_to_step.svg'
-            alt='Go to Step Icon'
-            width={18}
-            height={16}
-            quality={100}
-          />
-          <span className='text-black text-sm font-medium'>Go To Step</span>
-        </div>
-        <div
-          className='flex items-center gap-2 hover:bg-gray-100 p-2 rounded-md cursor-pointer'
-          onClick={() => onClickHandler('faqNode')}
-        >
-          <Image
-            src='/images/faq.svg'
-            alt='FAQ Icon'
-            width={18}
-            height={16}
-            quality={100}
-          />
-          <span className='text-black text-sm font-medium'>FAQ</span>
-        </div>
-        {/* <div
+          <div
+            className='flex items-center gap-2 hover:bg-gray-100 p-2 rounded-md cursor-pointer'
+            onClick={() => onClickHandler('userInputNode')}
+          >
+            <Image
+              src='/images/user_input.svg'
+              alt='User Input Icon'
+              width={16}
+              height={16}
+              quality={100}
+            />
+            <span className='text-black text-sm font-medium'>User Input</span>
+          </div>
+          <div
+            className='flex items-center gap-2 hover:bg-gray-100 p-2 rounded-md cursor-pointer'
+            onClick={() => onClickHandler('botResponseNode')}
+          >
+            <IoIosSend className='text-black text-lg' />
+            <span className='text-black text-sm font-medium'>Bot Response</span>
+          </div>
+          <div
+            className='flex items-center gap-2 hover:bg-gray-100 p-2 rounded-md cursor-pointer'
+            onClick={() => onClickHandler('goToStepNode')}
+          >
+            <Image
+              src='/images/go_to_step.svg'
+              alt='Go to Step Icon'
+              width={18}
+              height={16}
+              quality={100}
+            />
+            <span className='text-black text-sm font-medium'>Go To Step</span>
+          </div>
+          <div
+            className='flex items-center gap-2 hover:bg-gray-100 p-2 rounded-md cursor-pointer'
+            onClick={() => onClickHandler('faqNode')}
+          >
+            <Image
+              src='/images/faq.svg'
+              alt='FAQ Icon'
+              width={18}
+              height={16}
+              quality={100}
+            />
+            <span className='text-black text-sm font-medium'>FAQ</span>
+          </div>
+          {/* <div
           className="flex items-center gap-2 hover:bg-gray-100 p-2 rounded-md cursor-pointer"
           onClick={() => onClickHandler("questionNode")}
         >
           <MdOutlineQuestionMark className="text-black text-lg" />
           <span className="text-black text-sm font-medium">Question</span>
         </div> */}
-        <div
-          className='flex items-center gap-2 hover:bg-gray-100 p-2 rounded-md cursor-pointer'
-          onClick={() => onClickHandler('closeChatNode')}
-        >
-          <Image
-            src='/images/close_chat.svg'
-            alt='Close Chat Icon'
-            width={18}
-            height={16}
-            quality={100}
-          />
-          <span className='text-black text-sm font-medium'>Close Chat</span>
-        </div>
-      </PopoverContent>
+          <div
+            className='flex items-center gap-2 hover:bg-gray-100 p-2 rounded-md cursor-pointer'
+            onClick={() => onClickHandler('closeChatNode')}
+          >
+            <Image
+              src='/images/close_chat.svg'
+              alt='Close Chat Icon'
+              width={18}
+              height={16}
+              quality={100}
+            />
+            <span className='text-black text-sm font-medium'>Close Chat</span>
+          </div>
+        </PopoverContent>
+      </PopoverPrimitive.Portal>
     </Popover>
   );
 };
