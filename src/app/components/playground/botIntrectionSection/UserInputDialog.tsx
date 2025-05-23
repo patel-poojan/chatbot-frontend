@@ -136,7 +136,12 @@ const UserInputDialog = ({
   return (
     <Dialog open={isDialog} onOpenChange={setIsDialog}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className='sm:-right-[10rem] shadow-none !bg-transparent fixed translate-y-0 !top-[4.9dvh] sm:left-[unset] gap-0 rounded-lg transform w-[90vw] max-w-[25.5rem] border-none p-0'>
+      <DialogContent
+        onInteractOutside={(e) => {
+          e.preventDefault();
+        }}
+        className='sm:-right-[10rem] shadow-none !bg-transparent fixed translate-y-0 !top-[4.9dvh] sm:left-[unset] gap-0 rounded-lg transform w-[90vw] max-w-[25.5rem] border-none p-0'
+      >
         <DialogHeader>
           <DialogTitle className='sr-only text-lg font-semibold text-gray-800'>
             User Input Node
@@ -194,7 +199,7 @@ const UserInputDialog = ({
                 });
               }}
               className='p-3 mt-1 mb-2 border border-gray-200 bg-white hover:ring-1 hover:ring-[#57C0DD] rounded-md focus:outline-none focus-visible:border-[#57C0DD] focus-visible:ring-1 focus-visible:ring-[#57C0DD] shadow-sm transition duration-200'
-              placeholder='Enter Your Message'
+              placeholder='Enter Title'
             />
           </div>
           <div
