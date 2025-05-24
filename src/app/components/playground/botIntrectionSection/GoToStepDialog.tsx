@@ -185,6 +185,7 @@ const GoToStepDialog = ({
             <Input
               id='message'
               value={nodeInfo?.data?.message ?? ''}
+              maxLength={16}
               onChange={(e) => {
                 setNodeInfo((prev) => {
                   if (prev === null) {
@@ -200,7 +201,7 @@ const GoToStepDialog = ({
                 });
               }}
               className='p-3 mt-1 mb-2 border border-gray-200 bg-white hover:ring-1 hover:ring-[#57C0DD] rounded-md focus:outline-none focus-visible:border-[#57C0DD] focus-visible:ring-1 focus-visible:ring-[#57C0DD] shadow-sm transition duration-200'
-              placeholder='Enter your title'
+              placeholder='Enter title'
             />
           </div>
           <div className='bg-[#F1F1F1] p-4 rounded-b-lg  overflow-y-auto'>

@@ -559,6 +559,7 @@ const BotResponseDialog = ({
               <Input
                 id='Message'
                 value={nodeInfo?.data?.message ?? ''}
+                maxLength={16}
                 onChange={(e) => {
                   setNodeInfo((prev) => {
                     if (prev === null) {

@@ -310,18 +310,18 @@ export const UserInputNode = ({
           <PopoverTrigger>
             {data.isDelete ? (
               <>
-                <div className='text-red-500 text-xs w-14  hidden group-hover:block  text-center cursor-pointer absolute -top-[22px] left-0'>
+                <div className='text-red-500 text-xs w-[145px]  hidden group-hover:block  text-center cursor-pointer absolute -top-[22px] -left-[45px]'>
                   Delete
                 </div>
                 {data.message && (
-                  <span className='text-black text-xs  opacity-70 block group-hover:hidden w-14  text-center absolute -top-6 left-0'>
+                  <span className='text-black text-xs  opacity-70 block group-hover:hidden w-[145px]  text-center absolute -top-6 -left-[45px]'>
                     {data.message}
                   </span>
                 )}
               </>
             ) : (
               data.message && (
-                <span className='text-black text-xs  opacity-70  w-14  text-center absolute -top-6 left-0'>
+                <span className='text-black text-xs  opacity-70  w-[145px]  text-center absolute -top-6 -left-[45px]'>
                   {data.message}
                 </span>
               )
@@ -888,16 +888,16 @@ export const FaqNode = ({
           <PopoverTrigger>
             {data.isDelete ? (
               <>
-                <div className='text-red-500 text-xs w-14 hidden group-hover:block   text-center cursor-pointer absolute -top-[22px] left-0'>
+                <div className='text-red-500 text-xs w-[145px] hidden group-hover:block   text-center cursor-pointer absolute -top-[22px] -left-[45px]'>
                   Delete
                 </div>
-                <span className='text-black text-xs  opacity-70 block group-hover:hidden  w-14  text-center absolute -top-6 left-0'>
+                <span className='text-black text-xs  opacity-70 block group-hover:hidden  w-[145px]  text-center absolute -top-6 -left-[45px]'>
                   {data.message}
                 </span>
               </>
             ) : (
               data.message && (
-                <span className='text-black text-xs  opacity-70  w-14  text-center absolute -top-6 left-0'>
+                <span className='text-black text-xs  opacity-70  w-[145px]  text-center absolute -top-6 -left-[45px]'>
                   {data.message}
                 </span>
               )
