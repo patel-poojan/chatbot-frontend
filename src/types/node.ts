@@ -78,4 +78,5 @@ export interface TypePlaygroundNode {
 export interface TypeSimpleNode {
   id: string;
   label: string;
+  type: string;
 }

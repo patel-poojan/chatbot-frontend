@@ -42,7 +42,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
   const [botIcon, setBotIcon] = useState('');
   const [AboutUs, setAboutUs] = useState(true);
   const [welcomeMessage, setWelcomeMessage] = useState(
-    `👋 Welcome! I'm ChatAgent, your AI assistant 🤖. What can I do for you?`
+    `👋 Welcome! I'm ChatAgent, your AI assistant 🤖. What can I do for you?`
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
 

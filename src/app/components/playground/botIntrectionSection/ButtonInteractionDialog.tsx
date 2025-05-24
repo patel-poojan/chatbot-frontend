@@ -18,6 +18,8 @@ import { TypeResponseList, TypeSimpleNode } from '@/types/node';
 import { usePlayground } from '../playgroundArea/PlaygroundContext';
 import { toast } from 'sonner';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
+import { IoIosSend } from 'react-icons/io';
 
 const ButtonInteractionDialog = ({
   trigger,
@@ -109,9 +111,11 @@ const ButtonInteractionDialog = ({
               node.type == 'faqNode' ||
               node.type == 'closeChatNode'
           )
+          .filter((node) => node.data?.message)
           .map((node) => ({
             id: node.id,
-            label: node.data.message || node.data.label,
+            label: node.data.message,
+            type: node.type,
           }))
       : [];
   const handleTempUpdate = (field: string, value: string) => {
@@ -246,7 +250,30 @@ const ButtonInteractionDialog = ({
                   <SelectContent className='max-h-[200px] overflow-y-scroll'>
                     {goToOptions.map((option) => (
                       <SelectItem key={option.id} value={option.id}>
-                        {option.label}
+                        <div className='flex items-center gap-2 p-2 '>
+                          {option.type === 'closeChatNode' ? (
+                            <Image
+                              src='/images/close_chat.svg'
+                              alt='close chat logo'
+                              width={20}
+                              height={20}
+                              quality={100}
+                            />
+                          ) : option.type === 'faqNode' ? (
+                            <Image
+                              src='/images/faq.svg'
+                              alt='faq logo'
+                              width={20}
+                              height={20}
+                              quality={100}
+                            />
+                          ) : option.type === 'botResponseNode' ? (
+                            <IoIosSend className='text-black text-xl' />
+                          ) : (
+                            ''
+                          )}
+                          {option.label}
+                        </div>
                       </SelectItem>
                     ))}
                   </SelectContent>

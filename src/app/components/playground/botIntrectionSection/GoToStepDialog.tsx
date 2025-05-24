@@ -9,7 +9,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import Image from 'next/image';
-import { IoMdCheckmark, IoMdClose } from 'react-icons/io';
+import { IoIosSend, IoMdCheckmark, IoMdClose } from 'react-icons/io';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -54,11 +54,14 @@ const GoToStepDialog = ({
               node.type == 'faqNode' ||
               node.type == 'closeChatNode'
           )
+          .filter((node) => node.data?.message)
           .map((node) => ({
             id: node.id,
-            label: node.data.message || node.data.label,
+            label: node.data.message,
+            type: node.type,
           }))
       : [];
+
   const { mutate: fetchNodeInformation, isPending: fetchPending } =
     useGetNodeInformation({
       onSuccess(data) {
@@ -224,10 +227,33 @@ const GoToStepDialog = ({
                     placeholder='Choose target block'
                   />
                 </SelectTrigger>
-                <SelectContent className='max-h-[200px] overflow-y-scroll'>
+                <SelectContent className='max-h-[200px]  overflow-y-scroll'>
                   {goToOptions.map((option) => (
                     <SelectItem key={option.id} value={option.id}>
-                      {option.label}
+                      <div className='flex items-center gap-2 p-2 '>
+                        {option.type === 'closeChatNode' ? (
+                          <Image
+                            src='/images/close_chat.svg'
+                            alt='close chat logo'
+                            width={20}
+                            height={20}
+                            quality={100}
+                          />
+                        ) : option.type === 'faqNode' ? (
+                          <Image
+                            src='/images/faq.svg'
+                            alt='faq logo'
+                            width={20}
+                            height={20}
+                            quality={100}
+                          />
+                        ) : option.type === 'botResponseNode' ? (
+                          <IoIosSend className='text-black text-xl' />
+                        ) : (
+                          ''
+                        )}
+                        {option.label}
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
