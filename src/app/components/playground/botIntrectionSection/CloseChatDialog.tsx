@@ -9,16 +9,9 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import Image from 'next/image';
-import { IoIosSend, IoMdCheckmark, IoMdClose } from 'react-icons/io';
+import { IoMdCheckmark, IoMdClose } from 'react-icons/io';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { TypeNodeInfo, TypeSimpleNode } from '@/types/node';
+import { TypeNodeInfo } from '@/types/node';
 import { useParams } from 'next/navigation';
 import { usePlayground } from '../playgroundArea/PlaygroundContext';
 import {
@@ -29,61 +22,23 @@ import { axiosError } from '@/types/axiosTypes';
 import { toast } from 'sonner';
 import { Loader } from '../../Loader';
 
-const GoToStepDialog = ({
+const CloseChatDialog = ({
   trigger,
   nodeId,
 }: {
   trigger: React.ReactNode;
   nodeId: string;
 }) => {
-  const { refetchHandler, listOfPlayGroundNode, setSelectedGotoNode } =
-    usePlayground();
+  const { refetchHandler, setSelectedGotoNode } = usePlayground();
   const [isDialog, setIsDialog] = useState(false);
   const [nodeInfo, setNodeInfo] = useState<TypeNodeInfo | null>(null);
-  const [response, setResponse] = useState({
-    gotoNodeId: '',
-  });
   const params = useParams();
   const chatbotId = params.id;
-  const goToOptions: TypeSimpleNode[] =
-    listOfPlayGroundNode && listOfPlayGroundNode.length > 0
-      ? listOfPlayGroundNode
-          ?.filter(
-            (node) =>
-              node.type == 'botResponseNode' ||
-              node.type == 'faqNode' ||
-              node.type == 'closeChatNode' ||
-              node.type == 'defaultBotResponseNode'
-          )
-          .filter((node) => node.data?.message)
-          .map((node) => ({
-            id: node.id,
-            label: node.data.message,
-            type: node.type,
-          }))
-      : [];
-
   const { mutate: fetchNodeInformation, isPending: fetchPending } =
     useGetNodeInformation({
       onSuccess(data) {
         if (data.data.node) {
           setNodeInfo(data.data.node);
-        }
-        if (data.data.node.response && Array.isArray(data.data.node.response)) {
-          const typedResponse = data.data.node.response as {
-            gotoNodeId: string;
-          }[];
-          setResponse(typedResponse[0]);
-        } else {
-          setResponse(
-            goToOptions && goToOptions.length > 0
-              ? {
-                  gotoNodeId: goToOptions[0]?.id as string,
-                }
-              : {
-                  gotoNodeId: '',
-                }
-          );
         }
         // toast.success(data?.message);
       },
@@ -124,7 +79,6 @@ const GoToStepDialog = ({
     if (nodeInfo && nodeId && chatbotId && isDialog) {
       const updatedNodeInfo: TypeNodeInfo = {
         ...nodeInfo,
-        response: [response],
       };
       updateNodeInformation({
         nodeId,
@@ -149,13 +103,13 @@ const GoToStepDialog = ({
       >
         <DialogHeader>
           <DialogTitle className='sr-only text-lg font-semibold text-gray-800'>
-            Go to step Node
+            close chat Node
           </DialogTitle>
           <DialogDescription
             id='dialog-description'
             className='text-sm sr-only text-gray-600'
           >
-            Information related to the go to step node.
+            Information related to the close chat node.
           </DialogDescription>
         </DialogHeader>
         <div className='flex flex-col max-h-[90.2dvh] sm:max-h-[84dvh] w-full'>
@@ -164,13 +118,13 @@ const GoToStepDialog = ({
             <div className='flex items-center justify-between mb-4 mt-2'>
               <div className='flex items-center gap-2'>
                 <Image
-                  src='/images/go_to_step.svg'
-                  alt='go to step logo'
+                  src='/images/close_chat.svg'
+                  alt='close chat logo'
                   width={20}
                   height={20}
                   quality={100}
                 />
-                <span className='text-[#7A7A7A] text-lg'>GO TO STEP</span>
+                <span className='text-[#7A7A7A] text-lg'>Close Chat</span>
               </div>
               <div className='flex items-center gap-2'>
                 <DialogClose>
@@ -208,61 +162,10 @@ const GoToStepDialog = ({
               placeholder='Enter title'
             />
           </div>
-          <div className='bg-[#F1F1F1] p-4 rounded-b-lg  overflow-y-auto'>
-            <div className='w-full'>
-              <label htmlFor='type' className='text-black font-normal text-sm '>
-                Block
-              </label>
-              <Select
-                value={response?.gotoNodeId ?? ''}
-                onValueChange={(value) => {
-                  setSelectedGotoNode(value);
-                  setResponse({
-                    gotoNodeId: value,
-                  });
-                }}
-              >
-                <SelectTrigger className='p-2 mt-2 border bg-white placeholder:!text-[#6F7288B2] rounded-md hover:border-[#57C0DD] focus:outline-none focus:ring-1 focus:ring-[#57C0DD]'>
-                  <SelectValue
-                    className='placeholder:text-xs placeholder:!text-[#6F7288B2]'
-                    placeholder='Choose target block'
-                  />
-                </SelectTrigger>
-                <SelectContent className='max-h-[200px]  overflow-y-scroll'>
-                  {goToOptions.map((option) => (
-                    <SelectItem key={option.id} value={option.id}>
-                      <div className='flex items-center gap-2 p-2 '>
-                        {option.type === 'closeChatNode' ? (
-                          <Image
-                            src='/images/close_chat.svg'
-                            alt='close chat logo'
-                            width={20}
-                            height={20}
-                            quality={100}
-                          />
-                        ) : option.type === 'faqNode' ? (
-                          <Image
-                            src='/images/faq.svg'
-                            alt='faq logo'
-                            width={20}
-                            height={20}
-                            quality={100}
-                          />
-                        ) : (
-                          <IoIosSend className='text-black text-xl' />
-                        )}
-                        {option.label}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
         </div>
       </DialogContent>
     </Dialog>
   );
 };
 
-export default GoToStepDialog;
+export default CloseChatDialog;

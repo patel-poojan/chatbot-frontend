@@ -135,6 +135,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
     isLoading: loadPlayground,
     isError: errorInPlayground,
     refetch: refetchPlayground,
+    isRefetching: isRefetchingPlayground,
   } = useQuery({
     queryKey: ['playGround'],
     queryFn: fetchInitialPlayground,
@@ -667,7 +668,10 @@ const MainComponent = ({ botId }: { botId: string }) => {
   };
   return (
     <DashboardLayout>
-      {(loadPlayground || pendingAddNode || isPageLoader) && <Loader />}
+      {(loadPlayground ||
+        pendingAddNode ||
+        isPageLoader ||
+        isRefetchingPlayground) && <Loader />}
       {aiSection ? (
         <div className='p-4 sm:p-6 flex flex-1 flex-col relative '>
           <AIKnowledge
@@ -874,7 +878,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
               nodeTypes={nodeTypes}
               edgeTypes={edgeTypes}
               nodesDraggable={false}
-              fitView={screenWidth < 768 ? true : false}
+              fitView={true}
               defaultViewport={{ x: 0, y: 200, zoom: 1 }}
               className='bg-[#F6F6F6]'
               proOptions={{ hideAttribution: true }}

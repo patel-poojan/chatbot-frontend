@@ -56,6 +56,7 @@ const TrainingTable = ({ type }: { type: string }) => {
     data: trainingDetails,
     isLoading: loadTrainingDetails,
     isError: errorInTrainingDetails,
+    isRefetching: isRefetchingTrainingDetails,
     refetch: refetchUsers,
   } = useQuery({
     queryKey: ['training', 'unmatchedPhrases'],
@@ -122,7 +123,11 @@ const TrainingTable = ({ type }: { type: string }) => {
   };
   return (
     <>
-      {loadTrainingDetails || isPendingTrainDelete ? <Loader /> : null}
+      {loadTrainingDetails ||
+      isPendingTrainDelete ||
+      isRefetchingTrainingDetails ? (
+        <Loader />
+      ) : null}
       <Table className='min-w-full table-fixed'>
         <TableHeader className='bg-[#57C0DD1A] backdrop-blur-3xl sticky top-0'>
           <TableRow>

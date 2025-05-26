@@ -109,7 +109,8 @@ const ButtonInteractionDialog = ({
             (node) =>
               node.type == 'botResponseNode' ||
               node.type == 'faqNode' ||
-              node.type == 'closeChatNode'
+              node.type == 'closeChatNode' ||
+              node.type == 'defaultBotResponseNode'
           )
           .filter((node) => node.data?.message)
           .map((node) => ({
@@ -267,10 +268,8 @@ const ButtonInteractionDialog = ({
                               height={20}
                               quality={100}
                             />
-                          ) : option.type === 'botResponseNode' ? (
-                            <IoIosSend className='text-black text-xl' />
                           ) : (
-                            ''
+                            <IoIosSend className='text-black text-xl' />
                           )}
                           {option.label}
                         </div>
@@ -283,7 +282,7 @@ const ButtonInteractionDialog = ({
           ) : null}
           <Button
             onClick={handleSave}
-            className='text-xs bg-gradient-to-r mt-2 !h-fit !p-1 md:!p-[1px] hover:from-[#53A7DD] hover:to-[#58C8DD] from-[#58C8DD] to-[#53A7DD] max-[500px]:h-8 md:text-lg text-white flex gap-2 items-center rounded'
+            className='text-xs bg-gradient-to-r mt-2 !h-fit !p-2 md:!p-[1px] hover:from-[#53A7DD] hover:to-[#58C8DD] from-[#58C8DD] to-[#53A7DD] max-[500px]:h-8 md:text-lg text-white flex gap-2 items-center rounded'
           >
             save
           </Button>

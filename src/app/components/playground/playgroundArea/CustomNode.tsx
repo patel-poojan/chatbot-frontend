@@ -17,6 +17,7 @@ import BotResponseDialog from '../botIntrectionSection/BotResponseDialog';
 import UserInputDialog from '../botIntrectionSection/UserInputDialog';
 import GoToStepDialog from '../botIntrectionSection/GoToStepDialog';
 import FAQDialog from '../botIntrectionSection/FAQDialog';
+import CloseChatDialog from '../botIntrectionSection/CloseChatDialog';
 const NodeContainer = ({
   children,
   nodeCss,
@@ -825,21 +826,28 @@ export const CloseChatNode = ({
             </span>
           </PopoverContent>
         </Popover>
-        <NodeContainer
+        <CloseChatDialog
           nodeId={id}
-          nodeCss='bg-white  w-[145px]'
-          shadow='0px 0px 12px 4px #00000014'
-        >
-          <Image
-            src='/images/close_chat.svg'
-            alt='close chat logo'
-            width={20}
-            height={20}
-            quality={100}
-          />
-          <span className='text-black text-sm'>{data.label}</span>
-          <CustomHandle type='target' position={Position.Left} />
-        </NodeContainer>
+          trigger={
+            <button>
+              <NodeContainer
+                nodeId={id}
+                nodeCss='bg-white  w-[145px]'
+                shadow='0px 0px 12px 4px #00000014'
+              >
+                <Image
+                  src='/images/close_chat.svg'
+                  alt='close chat logo'
+                  width={20}
+                  height={20}
+                  quality={100}
+                />
+                <span className='text-black text-sm'>{data.label}</span>
+                <CustomHandle type='target' position={Position.Left} />
+              </NodeContainer>
+            </button>
+          }
+        />
       </div>
 
       <IoMdAdd
