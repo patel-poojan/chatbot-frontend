@@ -318,7 +318,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
                   FAQ
                     ? 'opacity-100 hover:opacity-50'
                     : 'opacity-50 hover:opacity-100'
-                } border bg-transparent hover:bg-transparent border-[#57C0DD] py-2 px-4 md:px-8 rounded-xl text-[#57C0DD] text-sm md:text-base`}
+                } border bg-transparent hover:bg-transparent border-[#57C0DD] py-1 px-4 md:px-6 rounded-xl text-[#57C0DD] text-sm md:text-base`}
                 onClick={() => setFAQ(!FAQ)}
               >
                 FAQ
@@ -328,10 +328,10 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
                   AboutUs
                     ? 'opacity-100 hover:opacity-50'
                     : 'opacity-50 hover:opacity-100'
-                } border bg-transparent hover:bg-transparent border-[#57C0DD] py-2 px-4 md:px-8 rounded-xl text-[#57C0DD] text-sm md:text-base`}
+                } border bg-transparent hover:bg-transparent border-[#57C0DD] py-1 px-4 md:px-6 rounded-xl text-[#57C0DD] text-sm md:text-base`}
                 onClick={() => setAboutUs(!AboutUs)}
               >
-                About ChatAgent
+                About Us
               </Button>
             </div>
           </div>
@@ -424,7 +424,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
           <div className='flex gap-3'>
             <div className='relative h-12 w-12 rounded-full bg-transparent overflow-hidden'>
               <Image
-                src={botIcon || '/images/online_bot.svg'}
+                src={botIcon || '/images/bot-icon.svg'}
                 alt='bot'
                 fill
                 sizes='100px'
@@ -445,7 +445,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
           </div>
 
           <div className='flex flex-col gap-2'>
-            {FAQ && (
+            {/* {FAQ && (
               <div className='text-center px-6 py-2 border rounded-xl border-[#57C0DD] text-[#57C0DD]'>
                 FAQ
               </div>
@@ -454,7 +454,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
               <div className='text-center px-6 py-2 border rounded-xl border-[#57C0DD] text-[#57C0DD]'>
                 About ChatAgent
               </div>
-            )}
+            )} */}
           </div>
         </div>
       </div>
@@ -496,7 +496,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
                 <div className='flex gap-3'>
                   <div className='w-12 h-12 rounded-full bg-transparent flex items-center justify-center overflow-hidden'>
                     <Image
-                      src={botIcon || '/images/online_bot.svg'}
+                      src={botIcon || '/images/bot-icon.svg'}
                       alt='bot'
                       width={40}
                       height={40}
@@ -523,7 +523,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
                   {welcomeMessage}
                 </div>
                 <div className='flex flex-col gap-2 pb-4'>
-                  {FAQ && (
+                  {/* {FAQ && (
                     <div className='text-center px-6 py-2 border rounded-xl border-[#57C0DD] text-[#57C0DD]'>
                       FAQ
                     </div>
@@ -532,7 +532,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
                     <div className='text-center px-6 py-2 border rounded-xl border-[#57C0DD] text-[#57C0DD]'>
                       About ChatAgent
                     </div>
-                  )}
+                  )} */}
                 </div>
               </SheetDescription>
             </SheetHeader>

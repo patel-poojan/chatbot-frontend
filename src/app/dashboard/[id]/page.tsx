@@ -291,11 +291,15 @@ const MainComponent = ({ botId }: { botId: string }) => {
       }));
       setNodes(nodesss);
       setEdges(updatedEdges);
-      setTimeout(() => {
-        fitView();
-      }, 100);
+
+      // Only call fitView on initial load, not on refetch
+      if (!isRefetchingPlayground) {
+        setTimeout(() => {
+          fitView();
+        }, 100);
+      }
     }
-  }, [playgroundData, setEdges, setNodes]);
+  }, [playgroundData, setEdges, setNodes, fitView, isRefetchingPlayground]);
 
   useEffect(() => {
     if (nodes && nodes.length > 0) {
