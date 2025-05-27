@@ -86,10 +86,10 @@ const UserInputDialog = ({
 
   const { mutate: updateNodeInformation, isPending: updatePending } =
     useUpdateNodeInformation({
-      onSuccess(data) {
+      onSuccess() {
         setIsDialog(false);
         refetchHandler();
-        toast.success(data?.message);
+        toast.success('Node updated successfully');
       },
       onError(error: axiosError) {
         const errorMessage =

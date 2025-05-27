@@ -41,7 +41,6 @@ import {
   PlaygroundProvider,
   usePlayground,
 } from '@/app/components/playground/playgroundArea/PlaygroundContext';
-import useWindowDimensions from '@/utils/windowSize';
 import AIKnowledge from '@/app/components/playground/AIKnowladge';
 import DashboardLayout from '@/app/components/DashboardLayout';
 import CustomEdge from '@/app/components/playground/playgroundArea/CustomEdge';
@@ -251,7 +250,6 @@ const MainComponent = ({ botId }: { botId: string }) => {
   const { screenToFlowPosition } = useReactFlow();
   // const { type, label } = usePlayground();
 
-  const { width: screenWidth } = useWindowDimensions();
   const nodeTypes = useMemo(
     () => ({
       startNode: StartNode,
@@ -702,7 +700,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
                       style={{ boxShadow: '0px 0px 4px 0px #0000001F' }}
                       className=' mt-1  p-1 bg-[#57C0DD] text-white !z-50'
                     >
-                      Update ChatAgent
+                      ChatAgent Info
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>

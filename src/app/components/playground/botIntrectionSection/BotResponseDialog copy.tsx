@@ -35,6 +35,7 @@ import { useParams } from 'next/navigation';
 import AWS from 'aws-sdk';
 import { initializeAWS } from './S3Operation';
 import { Attribute } from '../AttributesDialog';
+import { axiosInstance } from '@/utils/axiosInstance';
 
 type ValidationError = {
   field: string;
@@ -72,8 +73,11 @@ const BotResponseDialog = ({
   const [deletingIndices, setDeletingIndices] = useState<number[]>([]);
   const [pendingDeletions, setPendingDeletions] = useState<string[]>([]);
   const [isPendingS3Delete, setIsPendingS3Delete] = useState(false);
-  // const [fetchPending, setFetchPending] = useState(false);
+  const [fetchPending, setFetchPending] = useState(false);
   const [attributeList, setAttributeList] = useState<Attribute[]>([]);
+  // const [firstApiCallComplete, setFirstApiCallComplete] = useState(false);
+  // const [bothApiCallsComplete, setBothApiCallsComplete] = useState(false);
+  const [test, setTest] = useState<TypeResponseList[] | []>([]);
   useEffect(() => {
     if (attributeState.attributesData) {
       setAttributeList(attributeState.attributesData);
@@ -166,37 +170,49 @@ const BotResponseDialog = ({
     scroll();
   }, [responseList.length]);
 
-  const { mutate: fetchNodeInformation, isPending: fetchPending } =
-    useGetNodeInformation({
-      onSuccess(data) {
-        if (data.data.node) {
-          setNodeInfo(data.data.node);
-          if (
-            data.data.node.response &&
-            Array.isArray(data.data.node.response)
-          ) {
-            const response = data.data.node.response as TypeResponseList[];
-            setResponseList(response);
-          }
-        }
-        // toast.success(data?.message);
-      },
+  // const { mutate: fetchNodeInformation, isPending: fetchPending } =
+  //   useGetNodeInformation({
+  //     onSuccess(data) {
+  //       if (data.data.node) {
+  //         setNodeInfo(data.data.node);
+  //         if (
+  //           data.data.node.response &&
+  //           Array.isArray(data.data.node.response)
+  //         ) {
+  //           const response = data.data.node.response as TypeResponseList[];
+  //           setResponseList(response);
+  //         }
+  //       }
+  //       // Also update state on error to avoid hanging loader
+  //       if (!firstApiCallComplete) {
+  //         setFirstApiCallComplete(true);
+  //       } else {
+  //         setBothApiCallsComplete(true);
+  //       }
+  //       // toast.success(data?.message);
+  //     },
 
-      onError(error: axiosError) {
-        const errorMessage =
-          error?.response?.data?.errors?.message ||
-          error?.response?.data?.message ||
-          'failed to fetch node information';
-        toast.error(errorMessage);
-      },
-    });
+  //     onError(error: axiosError) {
+  //       // Also update state on error to avoid hanging loader
+  //       if (!firstApiCallComplete) {
+  //         setFirstApiCallComplete(true);
+  //       } else {
+  //         setBothApiCallsComplete(true);
+  //       }
+  //       const errorMessage =
+  //         error?.response?.data?.errors?.message ||
+  //         error?.response?.data?.message ||
+  //         'failed to fetch node information';
+  //       toast.error(errorMessage);
+  //     },
+  //   });
 
   const { mutate: updateNodeInformation, isPending: updatePending } =
     useUpdateNodeInformation({
-      onSuccess() {
+      onSuccess(data) {
         setIsDialog(false);
         refetchHandler();
-        toast.success('Node updated successfully');
+        toast.success(data?.message);
       },
 
       onError(error: axiosError) {
@@ -207,6 +223,48 @@ const BotResponseDialog = ({
         toast.error(errorMessage);
       },
     });
+  const fetchNodeInformation = React.useCallback(
+    async (data: { nodeId: string; chatbotId: string }) => {
+      try {
+        setFetchPending(true);
+        const res = await axiosInstance.get(
+          `/playground/${data.chatbotId}/node/${data.nodeId}`
+        );
+
+        const nodeData = res.data.node;
+        setTest(nodeData?.response);
+        if (nodeData) {
+          setNodeInfo(nodeData);
+
+          if (nodeData.response && Array.isArray(nodeData.response)) {
+            // Directly map the response without stringifying and parsing
+            const processedResponse = nodeData.response.map(
+              (item: TypeResponseList) => ({
+                ...item,
+                info: {
+                  ...item.info,
+                  description: item.info.description || '',
+                  title: item.info.title || '',
+                  button: item.info.button || [],
+                  file: item.info.file || '',
+                },
+                delay: item.delay || 500,
+              })
+            );
+
+            // Set state directly with processed response
+            // setResponseList(processedResponse);
+          }
+        }
+
+        setFetchPending(false);
+      } catch (error) {
+        setFetchPending(false);
+        console.error('fetchNodeInformation - error:', error);
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     if (nodeId && chatbotId && isDialog) {
@@ -214,13 +272,21 @@ const BotResponseDialog = ({
         nodeId,
         chatbotId: chatbotId as string,
       });
-      fetchNodeInformation({
-        nodeId,
-        chatbotId: chatbotId as string,
-      });
+      // fetchNodeInformation({
+      //   nodeId,
+      //   chatbotId: chatbotId as string,
+      // });
     }
   }, [fetchNodeInformation, isDialog, nodeId, chatbotId]);
 
+  useEffect(() => {
+    if (test) {
+      if (test && Array.isArray(test)) {
+        setResponseList(test);
+      }
+    }
+  }, [test]);
+  console.log('test', test, responseList);
   const validateBeforeSave = (
     nodeInfo: TypeNodeInfo | null,
     responseList: TypeResponseList[]
@@ -502,12 +568,7 @@ const BotResponseDialog = ({
   return (
     <Dialog open={isDialog} onOpenChange={setIsDialog}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent
-        onInteractOutside={(e) => {
-          e.preventDefault();
-        }}
-        className='sm:-right-[17rem] shadow-none !bg-transparent fixed translate-y-0 !top-[4.9dvh] sm:left-[unset] gap-0 rounded-lg transform w-[90vw] max-w-[40rem] border-none p-0'
-      >
+      <DialogContent className='sm:-right-[17rem] shadow-none !bg-transparent fixed translate-y-0 !top-[4.9dvh] sm:left-[unset] gap-0 rounded-lg transform w-[90vw] max-w-[40rem] border-none p-0'>
         <DialogHeader>
           <DialogTitle className='sr-only text-lg font-semibold text-gray-800'>
             Bot Response Node
@@ -559,7 +620,6 @@ const BotResponseDialog = ({
               <Input
                 id='Message'
                 value={nodeInfo?.data?.message ?? ''}
-                maxLength={16}
                 onChange={(e) => {
                   setNodeInfo((prev) => {
                     if (prev === null) {
@@ -575,7 +635,7 @@ const BotResponseDialog = ({
                   });
                 }}
                 className='px-4 py-3 mt-1 mb-2 rounded text-black  hover:border-[#57C0DD] focus-visible:ring-0 focus-visible:border-[#57C0DD] placeholder:text-sm placeholder:font-light w-full'
-                placeholder='Enter Title'
+                placeholder='Enter Your Message'
               />
             </div>
 
