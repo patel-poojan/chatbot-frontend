@@ -878,7 +878,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
               nodesDraggable={false}
               fitView={true}
               defaultViewport={{ x: 0, y: 200, zoom: 1 }}
-              className='bg-[#F6F6F6]'
+              className='bg-[#F6F6F6] mt-28 min-[710px]:mt-12'
               proOptions={{ hideAttribution: true }}
               minZoom={0.1}
               maxZoom={1.5}
