@@ -247,7 +247,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
   const [attributesDialog, setAttributesDialog] = useState(false);
   const [updateChatbotDialog, setUpdateChatbotDialog] = useState(false);
   const [contactGatheringEnabled, setContactGatheringEnabled] = useState(false);
-  const { screenToFlowPosition } = useReactFlow();
+  const { screenToFlowPosition, fitView } = useReactFlow();
   // const { type, label } = usePlayground();
 
   const nodeTypes = useMemo(
@@ -291,6 +291,9 @@ const MainComponent = ({ botId }: { botId: string }) => {
       }));
       setNodes(nodesss);
       setEdges(updatedEdges);
+      setTimeout(() => {
+        fitView();
+      }, 100);
     }
   }, [playgroundData, setEdges, setNodes]);
 
@@ -878,7 +881,14 @@ const MainComponent = ({ botId }: { botId: string }) => {
               nodesDraggable={false}
               fitView={true}
               defaultViewport={{ x: 0, y: 200, zoom: 1 }}
-              className='bg-[#F6F6F6] mt-28 min-[710px]:mt-12'
+              onInit={(instance) => {
+                setTimeout(() => {
+                  instance.fitView({
+                    maxZoom: 1,
+                  });
+                }, 0);
+              }}
+              className='bg-[#F6F6F6]'
               proOptions={{ hideAttribution: true }}
               minZoom={0.1}
               maxZoom={1.5}
