@@ -1,5 +1,11 @@
 'use client';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import dynamic from 'next/dynamic';
 import {
   Controls,
@@ -121,11 +127,23 @@ const MainComponent = ({ botId }: { botId: string }) => {
     setAttributeState,
     reFetchAttributes,
   } = usePlayground();
+  const hasFitViewCalled = useRef(false);
   const fetchInitialPlayground = async () => {
     const response: FetchPlaygroundResponse = await axiosInstance.get(
       `/playground/${botId}`
     );
     if (response.success) {
+      console.log('hasFitViewCalled', hasFitViewCalled.current);
+      if (!hasFitViewCalled.current) {
+        console.log('fitView called');
+        setTimeout(() => {
+          fitView({
+            maxZoom: 1,
+          });
+        }, 400);
+        hasFitViewCalled.current = true;
+      }
+
       return response.data;
     }
   };
@@ -136,8 +154,9 @@ const MainComponent = ({ botId }: { botId: string }) => {
     refetch: refetchPlayground,
     isRefetching: isRefetchingPlayground,
   } = useQuery({
-    queryKey: ['playGround'],
+    queryKey: ['playGround', botId],
     queryFn: fetchInitialPlayground,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const {
@@ -292,12 +311,12 @@ const MainComponent = ({ botId }: { botId: string }) => {
       setNodes(nodesss);
       setEdges(updatedEdges);
 
-      // Only call fitView on initial load, not on refetch
-      if (!isRefetchingPlayground) {
-        setTimeout(() => {
-          fitView();
-        }, 100);
-      }
+      // // Only call fitView on initial load, not on refetch
+      // if (!isRefetchingPlayground) {
+      //   setTimeout(() => {
+      //     fitView();
+      //   }, 100);
+      // }
     }
   }, [playgroundData, setEdges, setNodes, fitView, isRefetchingPlayground]);
 
