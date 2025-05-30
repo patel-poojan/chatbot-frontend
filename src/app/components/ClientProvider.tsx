@@ -14,7 +14,7 @@ export default function ClientProvider({
     <UserRoleProvider>
       <QueryClientProvider client={queryClient}>
         {children}
-        <Toaster richColors position='top-right' duration={2000} />
+        <Toaster richColors position='top-right' duration={5000} />
       </QueryClientProvider>
     </UserRoleProvider>
   );
