@@ -128,6 +128,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
     reFetchAttributes,
   } = usePlayground();
   const hasFitViewCalled = useRef(false);
+  const [isInteractive, setIsInteractive] = useState(true);
   const fetchInitialPlayground = async () => {
     const response: FetchPlaygroundResponse = await axiosInstance.get(
       `/playground/${botId}`
@@ -690,6 +691,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
       setContactGatheringEnabled(true);
     }
   };
+
   return (
     <DashboardLayout>
       {(loadPlayground ||
@@ -901,7 +903,6 @@ const MainComponent = ({ botId }: { botId: string }) => {
               onConnect={onConnect}
               nodeTypes={nodeTypes}
               edgeTypes={edgeTypes}
-              nodesDraggable={false}
               fitView={true}
               defaultViewport={{ x: 0, y: 200, zoom: 1 }}
               onInit={(instance) => {
@@ -916,8 +917,25 @@ const MainComponent = ({ botId }: { botId: string }) => {
               minZoom={0.1}
               maxZoom={1.5}
               panOnScrollSpeed={0.5}
+              nodesDraggable={isInteractive}
+              nodesConnectable={isInteractive}
+              elementsSelectable={isInteractive}
+              panOnDrag={isInteractive}
+              zoomOnScroll={isInteractive}
+              zoomOnPinch={isInteractive}
+              zoomOnDoubleClick={isInteractive}
+              panOnScroll={isInteractive}
+              preventScrolling={!isInteractive}
+              nodesFocusable={isInteractive}
+              edgesFocusable={isInteractive}
+              draggable={isInteractive}
             >
-              <Controls showFitView />
+              <Controls
+                showZoom={true}
+                showFitView={true}
+                showInteractive={true}
+                onInteractiveChange={setIsInteractive}
+              />
             </ReactFlow>
           )}
           {updateChatbotDialog && (
