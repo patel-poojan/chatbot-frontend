@@ -76,8 +76,8 @@ const Page = () => {
                 Document
               </p>
               <p className='mt-2 sm:mt-3 font-normal text-black text-xs sm:text-sm'>
-                Lorem ipsum dolor sit amet consectetur. Nibh condimentum vel
-                ligula sagittis.
+                Upload your documents to get answers from your specific content
+                and resources
               </p>
             </div>
           </div>
