@@ -113,9 +113,7 @@ export const PlaygroundProvider: React.FC<PlaygroundProviderProps> = ({
     onSuccess(data) {
       setIsPageLoader(false);
       refetchHandler();
-      toast.success(data?.message, {
-        duration: 2000,
-      });
+      toast.success(data?.message);
     },
 
     onError(error: axiosError) {

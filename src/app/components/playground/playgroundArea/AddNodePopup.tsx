@@ -37,9 +37,7 @@ const AddNodePopup = ({
     onSuccess() {
       setIsPageLoader(false);
 
-      toast.success('Node updated successfully', {
-        duration: 2000,
-      });
+      toast.success('Node updated successfully');
       refetchHandler();
       setIsPopupVisible(false);
     },
