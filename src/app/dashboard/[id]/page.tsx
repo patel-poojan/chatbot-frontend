@@ -392,6 +392,23 @@ const MainComponent = ({ botId }: { botId: string }) => {
     },
     []
   );
+
+  const isWelcomeMessage = useCallback(
+    (node: Node): boolean => {
+      // Check if it's the first node (nodes[0])
+      const isFirstNode = nodes.length > 0 && nodes[1].id === node.id;
+      console.log(
+        '🚀 ~ file: page.tsx:429 ~ isWelcomeMessage ~ isFirstNode',
+        isFirstNode
+      );
+      // Check if message contains "Welcome message" (case insensitive)
+      const hasWelcomeMessage =
+        typeof node.data?.message === 'string' &&
+        node.data.message.toLowerCase().includes('welcome message');
+      return isFirstNode && hasWelcomeMessage;
+    },
+    [nodes]
+  );
   const onDragOver = useCallback(
     (event: React.DragEvent): void => {
       setActionDialog(false);
@@ -410,7 +427,28 @@ const MainComponent = ({ botId }: { botId: string }) => {
         );
 
         if (hasSourceHandle) {
+          // NEW: Check if it's a welcome message node
           if (
+            existingNode.type === 'botResponseNode' &&
+            isWelcomeMessage(existingNode)
+          ) {
+            // For welcome message nodes, only allow userInputNode
+            if (type === 'userInputNode') {
+              highlightDroppableArea(
+                existingNode.id || '',
+                isNear,
+                existingNode.type || ''
+              );
+            } else {
+              nonHighlightDroppableArea(
+                existingNode.id || '',
+                isNear,
+                existingNode.type || ''
+              );
+            }
+          }
+          // Existing validation logic for other nodes
+          else if (
             existingNode &&
             existingNode !== null &&
             existingNode!.type &&
@@ -462,6 +500,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
       type,
       highlightDroppableArea,
       nonHighlightDroppableArea,
+      isWelcomeMessage, // Add this dependency
     ]
   );
 
@@ -483,11 +522,16 @@ const MainComponent = ({ botId }: { botId: string }) => {
       if (
         connectedNode &&
         connectedNode.type &&
-        (((type === 'goToStepNode' ||
-          type === 'faqNode' ||
-          type === 'closeChatNode' ||
-          type === 'userInputNode') &&
-          connectedNode.type !== 'botResponseNode') ||
+        // NEW: Welcome message validation - only allow userInputNode after welcome message
+        ((connectedNode.type === 'botResponseNode' &&
+          isWelcomeMessage(connectedNode) &&
+          type !== 'userInputNode') ||
+          // Existing validation logic
+          ((type === 'goToStepNode' ||
+            type === 'faqNode' ||
+            type === 'closeChatNode' ||
+            type === 'userInputNode') &&
+            connectedNode.type !== 'botResponseNode') ||
           (type === 'questionNode' &&
             connectedNode.type !== 'botResponseNode' &&
             connectedNode.type !== 'userInputNode'))
@@ -497,15 +541,6 @@ const MainComponent = ({ botId }: { botId: string }) => {
       } else if (connectedNode) {
         const positionY = connectedNode?.position?.y ?? position.y;
 
-        // const newNode: Node = {
-        //   id: getId(),
-        //   type,
-        //   position: {
-        //     x: position.x + 100,
-        //     y: positionY,
-        //   },
-        //   data: { label, message: "" },
-        // };
         onAddNode({
           chatbotId: botId,
           parentNodeId: connectedNode.id,
@@ -526,85 +561,6 @@ const MainComponent = ({ botId }: { botId: string }) => {
             },
           },
         });
-
-        // const overlappingNode = nodes.find((node) => {
-        //   const distance = Math.hypot(
-        //     node.position.x - newNode.position.x,
-        //     node.position.y - newNode.position.y
-        //   );
-        //   return distance < 200;
-        // });
-
-        // if (overlappingNode) {
-        //   newNode.position.x += 10;
-        //   newNode.position.y += 100;
-        // }
-
-        // const newNodes = [newNode];
-
-        // if (type === "questionNode") {
-        //   const successNode: Node = {
-        //     id: getId(),
-        //     type: "successNode",
-        //     position: { x: position.x + 300, y: positionY - 100 },
-        //     data: { label: "Success", message: "" },
-        //   };
-
-        //   const failureNode: Node = {
-        //     id: getId(),
-        //     type: "failureNode",
-        //     position: { x: position.x + 300, y: positionY + 100 },
-        //     data: { label: "Failure", message: "" },
-        //   };
-
-        //   newNodes.push(successNode, failureNode);
-
-        //   setEdges((eds) => [
-        //     ...eds,
-        //     {
-        //       id: `${newNode.id}-${successNode.id}`,
-        //       source: newNode.id,
-        //       target: successNode.id,
-        //       type: "customEdge",
-        //     },
-        //     {
-        //       id: `edge-${newNode.id}-${failureNode.id}`,
-        //       source: newNode.id,
-        //       target: failureNode.id,
-        //       type: "customEdge",
-        //     },
-        //   ]);
-        // } else if (type === "userInputNode") {
-        //   const botResponseNode: Node = {
-        //     id: getId(),
-        //     type: "botResponseNode",
-        //     position: { x: position.x + 250, y: positionY },
-        //     data: { label: "Bot Response", message: "" },
-        //   };
-
-        //   newNodes.push(botResponseNode);
-
-        //   setEdges((eds) => [
-        //     ...eds,
-        //     {
-        //       id: `${newNode.id}-${botResponseNode.id}`,
-        //       source: newNode.id,
-        //       target: botResponseNode.id,
-        //       type: "customEdge",
-        //     },
-        //   ]);
-        // }
-        // setNodes((nds) => [...nds, ...newNodes]);
-
-        // setEdges((eds) => [
-        //   ...eds,
-        //   {
-        //     id: `${connectedNode.id}-${newNode.id}`,
-        //     source: connectedNode.id,
-        //     target: newNode.id,
-        //     type: "customEdge",
-        //   },
-        // ]);
       }
 
       nodes.forEach((node) => highlightDroppableArea(node.id, false, ''));
@@ -619,9 +575,9 @@ const MainComponent = ({ botId }: { botId: string }) => {
       highlightDroppableArea,
       onAddNode,
       botId,
+      isWelcomeMessage, // Add this dependency
     ]
   );
-
   const onConnect = useCallback(
     (connection: Connection) =>
       setEdges((prevEdges) =>
@@ -691,7 +647,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
       setContactGatheringEnabled(true);
     }
   };
-
+  console.log('nodes', nodes);
   return (
     <DashboardLayout>
       {(loadPlayground ||

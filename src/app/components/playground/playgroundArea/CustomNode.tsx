@@ -181,6 +181,7 @@ export const BotResponseNode = ({
 
         <BotResponseDialog
           nodeId={id}
+          isDisableRename={!data.isDelete}
           trigger={
             <button>
               <NodeContainer
@@ -237,6 +238,7 @@ export const DefaultBotResponseNode = ({
       )}
       <BotResponseDialog
         nodeId={id}
+        isDisableRename={true}
         trigger={
           <button>
             <NodeContainer

@@ -51,9 +51,11 @@ export interface FetchAttributesResponse {
 const BotResponseDialog = ({
   trigger,
   nodeId,
+  isDisableRename,
 }: {
   trigger: React.ReactNode;
   nodeId: string;
+  isDisableRename?: boolean;
 }) => {
   const [isAWSInitialized, setIsAWSInitialized] = useState(false);
   useEffect(() => {
@@ -498,7 +500,7 @@ const BotResponseDialog = ({
       setDeletingIndices((prev) => prev.filter((i) => i !== index));
     }
   };
-
+  console.log('isDisableRename', isDisableRename);
   return (
     <Dialog open={isDialog} onOpenChange={setIsDialog}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
@@ -560,6 +562,7 @@ const BotResponseDialog = ({
                 id='Message'
                 value={nodeInfo?.data?.message ?? ''}
                 maxLength={16}
+                disabled={isDisableRename}
                 onChange={(e) => {
                   setNodeInfo((prev) => {
                     if (prev === null) {
