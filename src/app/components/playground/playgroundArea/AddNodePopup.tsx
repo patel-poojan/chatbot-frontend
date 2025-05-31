@@ -12,18 +12,21 @@ import { useAddNode } from '@/utils/playground-api';
 import { axiosError } from '@/types/axiosTypes';
 import { usePlayground } from './PlaygroundContext';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
+
 const AddNodePopup = ({
   isPopupVisible,
   setIsPopupVisible,
   parentId,
   position,
   parentType,
+  isParentWelcomeMessage,
 }: {
   isPopupVisible: boolean;
   setIsPopupVisible: React.Dispatch<React.SetStateAction<boolean>>;
   parentId: string;
   position: { x: number; y: number };
   parentType: string;
+  isParentWelcomeMessage?: boolean;
 }) => {
   const pathname = usePathname();
   const { refetchHandler, notConnectableNode, setIsPageLoader } =
@@ -68,14 +71,21 @@ const AddNodePopup = ({
         parentType &&
         hasSourceHandle &&
         !(
-          ((type === 'goToStepNode' ||
-            type === 'faqNode' ||
-            type === 'closeChatNode' ||
-            type === 'userInputNode') &&
-            parentType !== 'botResponseNode') ||
-          (type === 'questionNode' &&
-            parentType !== 'botResponseNode' &&
-            parentType !== 'userInputNode')
+          // Welcome message validation - only allow userInputNode after welcome message
+          (
+            (parentType === 'botResponseNode' &&
+              isParentWelcomeMessage &&
+              type !== 'userInputNode') ||
+            // Existing validation logic
+            ((type === 'goToStepNode' ||
+              type === 'faqNode' ||
+              type === 'closeChatNode' ||
+              type === 'userInputNode') &&
+              parentType !== 'botResponseNode') ||
+            (type === 'questionNode' &&
+              parentType !== 'botResponseNode' &&
+              parentType !== 'userInputNode')
+          )
         )
       ) {
         setIsPageLoader(true);
@@ -105,6 +115,7 @@ const AddNodePopup = ({
       toast.error('something went wrong');
     }
   };
+
   return (
     <Popover
       open={isPopupVisible}

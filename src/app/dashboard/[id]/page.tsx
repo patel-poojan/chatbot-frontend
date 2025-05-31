@@ -65,6 +65,7 @@ import Image from 'next/image';
 import UpdateChatbotDialog from '@/app/components/playground/UpdateChatbotDialog';
 import { MdOutlineQuickreply } from 'react-icons/md';
 import Link from 'next/link';
+import { useWelcomeMessage } from '@/app/components/useWelcomeMessage';
 
 const ReactFlow = dynamic(
   () => import('@xyflow/react').then((mod) => mod.ReactFlow),
@@ -129,6 +130,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
   } = usePlayground();
   const hasFitViewCalled = useRef(false);
   const [isInteractive, setIsInteractive] = useState(true);
+  const isWelcomeMessage = useWelcomeMessage();
   const fetchInitialPlayground = async () => {
     const response: FetchPlaygroundResponse = await axiosInstance.get(
       `/playground/${botId}`
@@ -393,22 +395,22 @@ const MainComponent = ({ botId }: { botId: string }) => {
     []
   );
 
-  const isWelcomeMessage = useCallback(
-    (node: Node): boolean => {
-      // Check if it's the first node (nodes[0])
-      const isFirstNode = nodes.length > 0 && nodes[1].id === node.id;
-      console.log(
-        '🚀 ~ file: page.tsx:429 ~ isWelcomeMessage ~ isFirstNode',
-        isFirstNode
-      );
-      // Check if message contains "Welcome message" (case insensitive)
-      const hasWelcomeMessage =
-        typeof node.data?.message === 'string' &&
-        node.data.message.toLowerCase().includes('welcome message');
-      return isFirstNode && hasWelcomeMessage;
-    },
-    [nodes]
-  );
+  // const isWelcomeMessage = useCallback(
+  //   (node: Node): boolean => {
+  //     // Check if it's the first node (nodes[0])
+  //     const isFirstNode = nodes.length > 0 && nodes[1].id === node.id;
+  //     console.log(
+  //       '🚀 ~ file: page.tsx:429 ~ isWelcomeMessage ~ isFirstNode',
+  //       isFirstNode
+  //     );
+  //     // Check if message contains "Welcome message" (case insensitive)
+  //     const hasWelcomeMessage =
+  //       typeof node.data?.message === 'string' &&
+  //       node.data.message.toLowerCase().includes('welcome message');
+  //     return isFirstNode && hasWelcomeMessage;
+  //   },
+  //   [nodes]
+  // );
   const onDragOver = useCallback(
     (event: React.DragEvent): void => {
       setActionDialog(false);

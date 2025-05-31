@@ -18,6 +18,7 @@ import UserInputDialog from '../botIntrectionSection/UserInputDialog';
 import GoToStepDialog from '../botIntrectionSection/GoToStepDialog';
 import FAQDialog from '../botIntrectionSection/FAQDialog';
 import CloseChatDialog from '../botIntrectionSection/CloseChatDialog';
+import { useWelcomeMessage } from '../../useWelcomeMessage';
 const NodeContainer = ({
   children,
   nodeCss,
@@ -116,7 +117,7 @@ export const BotResponseNode = ({
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const { getEdges, getNodes } = useReactFlow();
   const { deleteNodeHandler } = usePlayground();
-
+  const isWelcomeMessage = useWelcomeMessage();
   const edges = getEdges();
   const outgoingEdge = edges.find((edge) => edge.source === id);
   const incomingEdge = edges.find((edge) => edge.target === id);
@@ -213,6 +214,7 @@ export const BotResponseNode = ({
           setIsPopupVisible={setIsPopupVisible}
           position={currentNode?.position || { x: 0, y: 0 }}
           parentType={currentNode?.type || ''}
+          isParentWelcomeMessage={isWelcomeMessage(parentNode!)}
         />
       )}
     </div>
@@ -411,6 +413,7 @@ export const UserInputNode = ({
           setIsPopupVisible={setIsPopupVisible}
           position={currentNode?.position || { x: 0, y: 0 }}
           parentType={currentNode?.type || ''}
+          // isParentWelcomeMessage={isWelcomeMessage(parentNode)}
         />
       )}
     </div>
@@ -523,6 +526,7 @@ export const QuestionNode = ({
           setIsPopupVisible={setIsPopupVisible}
           position={currentNode?.position || { x: 0, y: 0 }}
           parentType={currentNode?.type || ''}
+          // isParentWelcomeMessage={isWelcomeMessage(parentNode)}
         />
       )}
     </div>
@@ -634,6 +638,7 @@ export const SuccessNode = ({
           setIsPopupVisible={setIsPopupVisible}
           position={currentNode?.position || { x: 0, y: 0 }}
           parentType={currentNode?.type || ''}
+          // isParentWelcomeMessage={isWelcomeMessage(parentNode)}
         />
       )}
     </div>
@@ -745,6 +750,7 @@ export const FailureNode = ({
           setIsPopupVisible={setIsPopupVisible}
           position={currentNode?.position || { x: 0, y: 0 }}
           parentType={currentNode?.type || ''}
+          // isParentWelcomeMessage={isWelcomeMessage(parentNode)}
         />
       )}
     </div>
@@ -868,6 +874,7 @@ export const CloseChatNode = ({
           setIsPopupVisible={setIsPopupVisible}
           position={currentNode?.position || { x: 0, y: 0 }}
           parentType={currentNode?.type || ''}
+          // isParentWelcomeMessage={isWelcomeMessage(parentNode)}
         />
       )}
     </div>
@@ -992,6 +999,7 @@ export const FaqNode = ({
           setIsPopupVisible={setIsPopupVisible}
           position={currentNode?.position || { x: 0, y: 0 }}
           parentType={currentNode?.type || ''}
+          // isParentWelcomeMessage={isWelcomeMessage(parentNode)}
         />
       )}
     </div>
@@ -1114,6 +1122,7 @@ export const GoToStepNode = ({
           setIsPopupVisible={setIsPopupVisible}
           position={currentNode?.position || { x: 0, y: 0 }}
           parentType={currentNode?.type || ''}
+          // isParentWelcomeMessage={isWelcomeMessage(parentNode)}
         />
       )}
     </div>
