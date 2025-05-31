@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { Loader } from '../Loader';
 import { axiosInstance } from '@/utils/axiosInstance';
 import { isValidUrl } from '@/utils/validator';
+import { usePlayground } from './playgroundArea/PlaygroundContext';
 
 const DomainChangeDialog = ({
   isOpen,
@@ -30,7 +31,7 @@ const DomainChangeDialog = ({
 }) => {
   const [newDomain, setNewDomain] = useState('');
   const [loading, setLoading] = useState(false);
-
+  const { refetchAttributesHandler } = usePlayground();
   useEffect(() => {
     setNewDomain(initialDomain || '');
   }, [initialDomain]);
@@ -56,6 +57,7 @@ const DomainChangeDialog = ({
       );
       toast.success('Website domain updated successfully');
       onSuccess();
+      refetchAttributesHandler();
       onOpenChange(false);
     } catch (err) {
       toast.error('Error updating domain');
