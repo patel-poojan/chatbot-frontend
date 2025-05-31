@@ -324,6 +324,15 @@ const AIKnowledge = ({
       toast.warning('Please upload no more than 4 files');
       return false;
     }
+
+    // Check for duplicate file names
+    const fileNames = files.map((file) => file.name);
+    const uniqueFileNames = new Set(fileNames);
+    if (fileNames.length !== uniqueFileNames.size) {
+      toast.warning('Please ensure all files have unique names');
+      return false;
+    }
+
     for (const file of files) {
       if (!file.type.includes('pdf')) {
         toast.warning(`${file.name} must be a PDF file`);
