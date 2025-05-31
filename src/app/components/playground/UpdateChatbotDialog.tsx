@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { axiosError } from '@/types/axiosTypes';
 import { Loader } from '../Loader';
 import Image from 'next/image';
+import { usePlayground } from './playgroundArea/PlaygroundContext';
 
 const UpdateChatbotDialog = ({
   updateHandler,
@@ -36,11 +37,13 @@ const UpdateChatbotDialog = ({
   const [icon, setIcon] = React.useState<string | null>(null);
   const [imgError, setImgError] = React.useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { refetchAttributesHandler } = usePlayground();
   const { mutate: onUpdateBot, isPending: updatePending } = useUpdateChatbot({
     onSuccess(data) {
       toast.success(data?.message);
       updateHandler();
       refetchPlayground();
+      refetchAttributesHandler();
     },
     onError(error: axiosError) {
       const errorMessage =
