@@ -35,9 +35,17 @@ export const ErrorResponse = ({ info }: { info: ResponseInfo }) => {
 };
 
 export const LlmResponse = ({ info }: { info: ResponseInfo }) => {
+  const preservePhoneNumbers = (text: string) => {
+    return text.replace(/(\+?\d[\d\s-]+)/g, '`$1`');
+  };
+
+  const formatPhoneNumber = (phone: string) => {
+    return phone.replace(/[^\d+]/g, '');
+  };
+
   return (
     <pre
-      className='resize-none border border-transparent w-10/12  text-sm bg-white p-3  rounded-md shadow-none focus:outline-none  focus-visible:ring-0 overflow-y-auto whitespace-break-spaces'
+      className='resize-none border border-transparent w-10/12 text-sm bg-white p-3 rounded-md shadow-none focus:outline-none focus-visible:ring-0 overflow-y-auto whitespace-break-spaces'
       style={{
         fontFamily: 'var(--font-poppins)',
       }}
@@ -53,9 +61,36 @@ export const LlmResponse = ({ info }: { info: ResponseInfo }) => {
               rel='noopener noreferrer'
             />
           ),
+          code: (props) => {
+            let phoneContent = '';
+            if (typeof props.children === 'string') {
+              phoneContent = props.children;
+            } else if (
+              Array.isArray(props.children) &&
+              typeof props.children[0] === 'string'
+            ) {
+              phoneContent = props.children[0];
+            }
+
+            const isPhoneNumber = /^\+?\d[\d\s-]+$/.test(phoneContent);
+
+            if (isPhoneNumber) {
+              const formattedNumber = formatPhoneNumber(phoneContent);
+              return (
+                <a
+                  href={`tel:${formattedNumber}`}
+                  className='text-blue-600 hover:text-blue-800 underline cursor-pointer whitespace-nowrap font-normal'
+                >
+                  {phoneContent}
+                </a>
+              );
+            }
+
+            return <code {...props} />;
+          },
         }}
       >
-        {info.description}
+        {preservePhoneNumbers(info.description ?? '')}
       </ReactMarkdown>
     </pre>
   );
