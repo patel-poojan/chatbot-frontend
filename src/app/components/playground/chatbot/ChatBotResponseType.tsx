@@ -36,7 +36,14 @@ export const ErrorResponse = ({ info }: { info: ResponseInfo }) => {
 
 export const LlmResponse = ({ info }: { info: ResponseInfo }) => {
   const preservePhoneNumbers = (text: string) => {
-    return text.replace(/(\+?\d[\d\s-]+)/g, '`$1`');
+    // First preserve any existing markdown phone links by simplifying their format
+    const preserveMarkdownLinks = text.replace(
+      /\[(\+?\d[\d\s-]+)\]\(tel:[^)]+(?:\s+"[^"]+")?\)/g,
+      (match, number) => `[${number}](tel:${number.replace(/\s|-/g, '')})`
+    );
+
+    // Then wrap all remaining phone numbers with backticks
+    return preserveMarkdownLinks.replace(/(\+?\d[\d\s-]+)/g, '`$1`');
   };
 
   const formatPhoneNumber = (phone: string) => {
@@ -56,7 +63,7 @@ export const LlmResponse = ({ info }: { info: ResponseInfo }) => {
           a: (props) => (
             <a
               {...props}
-              className='text-blue-600 underline hover:text-blue-800'
+              className='text-blue-600 underline hover:text-blue-800 inline-block'
               target='_blank'
               rel='noopener noreferrer'
             />
@@ -64,12 +71,12 @@ export const LlmResponse = ({ info }: { info: ResponseInfo }) => {
           code: (props) => {
             let phoneContent = '';
             if (typeof props.children === 'string') {
-              phoneContent = props.children;
+              phoneContent = props.children.trim();
             } else if (
               Array.isArray(props.children) &&
               typeof props.children[0] === 'string'
             ) {
-              phoneContent = props.children[0];
+              phoneContent = props.children[0].trim();
             }
 
             const isPhoneNumber = /^\+?\d[\d\s-]+$/.test(phoneContent);
@@ -79,15 +86,17 @@ export const LlmResponse = ({ info }: { info: ResponseInfo }) => {
               return (
                 <a
                   href={`tel:${formattedNumber}`}
-                  className='text-blue-600 hover:text-blue-800 underline cursor-pointer whitespace-nowrap font-normal'
+                  className='text-blue-600 hover:text-blue-800 underline cursor-pointer whitespace-nowrap font-normal inline-block mr-2'
                 >
                   {phoneContent}
                 </a>
               );
             }
 
-            return <code {...props} />;
+            return <code {...props} className='inline-block' />;
           },
+          p: ({ children }) => <p className='mb-3'>{children}</p>,
+          li: ({ children }) => <li className='mb-2'>{children}</li>,
         }}
       >
         {preservePhoneNumbers(info.description ?? '')}
