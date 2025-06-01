@@ -16,7 +16,7 @@ import {
   MdSmartToy,
 } from 'react-icons/md';
 import { Input } from '@/components/ui/input';
-import { IoSearchSharp } from 'react-icons/io5';
+import { IoCloseOutline, IoSearchSharp } from 'react-icons/io5';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { VscSettings } from 'react-icons/vsc';
 import PermissionDialog from '../../components/PermissionDialog';
@@ -35,6 +35,15 @@ import {
 } from '@/components/ui/tooltip';
 import CreateUserDialog from '../../components/CreateUserDialog';
 import { useUserRole } from '../../components/UserRoleProvider';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 // Define types for API responses
 interface User {
@@ -107,6 +116,14 @@ const Details = ({
   const [userOrAdminDetails, setUserOrAdminDetails] = useState<
     User[] | SubAdmin[] | []
   >(details);
+
+  // Add these state variables in the Details component
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+
   useEffect(() => {
     setUserOrAdminDetails(details);
   }, [details]);
@@ -123,12 +140,23 @@ const Details = ({
       toast.error(errorMessage);
     },
   });
-  const handleDelete = (id: string) => {
-    if (type === 'user') {
-      onDelete({ id, userType: 'user' });
-    } else {
-      onDelete({ id, userType: 'subadmin' });
+
+  // Replace the existing handleDelete function with this
+  const handleDeleteClick = (id: string, name: string) => {
+    setUserToDelete({ id, name });
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (userToDelete) {
+      if (type === 'user') {
+        onDelete({ id: userToDelete.id, userType: 'user' });
+      } else {
+        onDelete({ id: userToDelete.id, userType: 'subadmin' });
+      }
     }
+    setIsDeleteDialogOpen(false);
+    setUserToDelete(null);
   };
   return (
     <div className='flex-1 flex flex-col overflow-auto'>
@@ -223,7 +251,12 @@ const Details = ({
                     )}
                     <RiDeleteBin6Line
                       className='text-lg cursor-pointer'
-                      onClick={() => handleDelete(detail._id ?? '')}
+                      onClick={() =>
+                        handleDeleteClick(
+                          detail._id ?? '',
+                          detail.username ?? ''
+                        )
+                      }
                     />
                   </div>
                 </TableCell>
@@ -241,6 +274,60 @@ const Details = ({
           )}
         </TableBody>
       </Table>
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className='max-w-[87vw] gap-0 sm:max-w-[425px] rounded-lg'>
+          <DialogHeader>
+            <DialogTitle className='sr-only'>Confirm Delete</DialogTitle>
+            <DialogDescription id='dialog-description' className='sr-only'>
+              Confirm deletion of user or admin
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className='gap-6 flex flex-col'>
+            <div className='flex items-center justify-between'>
+              <div></div>
+              <div className='text-primary text-xl font-medium'>
+                Confirm Delete
+              </div>
+              <IoCloseOutline
+                className='text-lg cursor-pointer'
+                onClick={() => setIsDeleteDialogOpen(false)}
+              />
+            </div>
+
+            <div className='space-y-2'>
+              <p className='text-sm text-gray-600 text-center'>
+                Are you sure you want to delete{' '}
+                <span className='font-medium'>{userToDelete?.name}</span>?
+              </p>
+              <p className='text-xs text-gray-500 text-center'>
+                This action cannot be undone.
+              </p>
+            </div>
+
+            <div className='grid grid-cols-2 gap-2 sm:gap-3 items-center w-full'>
+              <DialogClose>
+                <Button
+                  className='border border-[#57C0DD] text-xs w-full text-[#57C0DD] py-2 bg-transparent rounded-full hover:bg-[#f0faff]'
+                  onClick={() => {
+                    setIsDeleteDialogOpen(false);
+                    setUserToDelete(null);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button
+                className='bg-red-500 text-white text-xs py-2 w-full rounded-full hover:bg-red-600'
+                onClick={confirmDelete}
+                disabled={isPending}
+              >
+                {isPending ? 'Deleting...' : 'Continue'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

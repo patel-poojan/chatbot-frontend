@@ -500,7 +500,6 @@ const BotResponseDialog = ({
       setDeletingIndices((prev) => prev.filter((i) => i !== index));
     }
   };
-  console.log('isDisableRename', isDisableRename);
   return (
     <Dialog open={isDialog} onOpenChange={setIsDialog}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>

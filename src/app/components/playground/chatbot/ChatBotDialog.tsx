@@ -126,6 +126,7 @@ const ChatBotDialog = ({
       }
     },
     onError(error: axiosError) {
+      console.error('Error fetching bot response:', error);
       setPendingMessages((prev) => [
         ...prev,
         {
@@ -147,15 +148,27 @@ const ChatBotDialog = ({
   const initialCallMade = useRef(false);
   useEffect(() => {
     if (!initialCallMade.current && chatbotId) {
-      setApiLoading(true);
-      fetchBotResponse({
-        chatbotId: chatbotId as string,
-        type: 'welcome-action',
-        model: selectedModel,
-        history: JSON.parse(
-          localStorage.getItem(`${chatbotId}-history`) || '[]'
-        ) as IBotHistory[],
-      });
+      const existingHistory = localStorage.getItem(`${chatbotId}-chat-history`);
+      const parsedHistory = JSON.parse(existingHistory || '[]');
+
+      if (parsedHistory.length > 0) {
+        // If history exists, display both questions and answers
+        const historyMessages: TypeBotResponse[] = [];
+        parsedHistory.forEach((item: TypeBotResponse) => {
+          // Add user question
+          historyMessages.push(item);
+        });
+        setVisibleMessages(historyMessages);
+      } else {
+        // If no history, call welcome message
+        setApiLoading(true);
+        fetchBotResponse({
+          chatbotId: chatbotId as string,
+          type: 'welcome-action',
+          model: selectedModel,
+          history: parsedHistory,
+        });
+      }
       initialCallMade.current = true;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -191,6 +204,22 @@ const ChatBotDialog = ({
         { userInput: info.title, delay: 0, type: 'user' },
       ]);
       setApiLoading(true);
+
+      const existingHistory = localStorage.getItem(`${chatbotId}-chat-history`);
+      const parsedHistory = JSON.parse(existingHistory || '[]');
+      if (!Array.isArray(parsedHistory)) {
+        const newHistory: TypeBotResponse[] = [...parsedHistory];
+        newHistory.push({
+          type: 'user',
+          userInput: info.title,
+          delay: 0,
+        });
+        localStorage.setItem(
+          `${chatbotId}-chat-history`,
+          JSON.stringify([...newHistory])
+        );
+      }
+
       fetchBotResponse({
         chatbotId: chatbotId as string,
         type: 'button-action',
@@ -307,6 +336,9 @@ const ChatBotDialog = ({
                     onClick={() => {
                       // delete history localstorage
                       localStorage.removeItem(`${chatbotId}-history`);
+                      localStorage.removeItem(`${chatbotId}-chat-history`);
+                      setVisibleMessages([]);
+                      toast.success('Chat history cleared');
                     }}
                   >
                     <Trash2 className='h-4 w-4 !text-[#57C0DD]' />

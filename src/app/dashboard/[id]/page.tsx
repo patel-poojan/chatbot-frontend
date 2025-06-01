@@ -136,9 +136,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
       `/playground/${botId}`
     );
     if (response.success) {
-      console.log('hasFitViewCalled', hasFitViewCalled.current);
       if (!hasFitViewCalled.current) {
-        console.log('fitView called');
         setTimeout(() => {
           fitView({
             maxZoom: 1,
@@ -649,7 +647,6 @@ const MainComponent = ({ botId }: { botId: string }) => {
       setContactGatheringEnabled(true);
     }
   };
-  console.log('nodes', nodes);
   return (
     <DashboardLayout>
       {(loadPlayground ||
