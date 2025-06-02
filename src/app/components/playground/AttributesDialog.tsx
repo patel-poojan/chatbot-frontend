@@ -194,6 +194,7 @@ const AttributesDialog = ({
     'About Us',
     'Website URL',
   ];
+  const staticAttributes = ['ChatAgent Name', 'Website URL'];
   return (
     <div
       className='absolute md:right-6 top-32 min-[699px]:top-20 px-4 pb-4 sm:px-6 sm:pb-4 pt-2 sm:pt-3 w-[-webkit-fill-available] bg-[#F8F8F8] md:w-[600px] min-[870px]:w-[700px] h-auto md:h-[70vh] mx-6 md:mx-0 rounded-lg overflow-hidden'
@@ -306,6 +307,7 @@ const AttributesDialog = ({
                 <Input
                   id='value'
                   value={value}
+                  disabled={staticAttributes.includes(name)}
                   onChange={(e) => setValue(e.target.value)}
                   placeholder='Add value'
                   onBlur={() => handleUpdate(editId)}
