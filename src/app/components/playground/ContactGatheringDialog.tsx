@@ -22,6 +22,7 @@ import {
 import { Loader } from '../Loader';
 import { toast } from 'sonner';
 import { axiosError } from '@/types/axiosTypes';
+import { axiosInstance } from '@/utils/axiosInstance';
 
 const ContactGatheringDialog = ({
   contactGatheringHandler,
@@ -35,6 +36,7 @@ const ContactGatheringDialog = ({
   const [showContactPopup, setShowContactPopup] = useState(false);
   const [contactPopupTiming, setContactPopupTiming] = useState('before');
   const [apiCallCompleted, setApiCallCompleted] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const { mutate: onGetChatbotDetails, isPending } = useGetChatbotDetails({
     onSuccess(data) {
@@ -78,6 +80,90 @@ const ContactGatheringDialog = ({
       toast.error(errorMessage);
     },
   });
+  const handleDownloadContacts = useCallback(async () => {
+    try {
+      setIsDownloading(true);
+      const response = await axiosInstance.get(
+        `/contact/generate-report/${chatbotId}`,
+        {
+          responseType: 'blob',
+          validateStatus: () => true, // Don't throw on any status code
+        }
+      );
+
+      // Check if response is not successful
+      if (response.status < 200 || response.status >= 300) {
+        toast.error('Failed to download contact details');
+        return;
+      }
+
+      const contentType =
+        response.headers?.['content-type'] ||
+        response.headers?.['Content-Type'] ||
+        '';
+
+      // Handle JSON response (error cases)
+      if (contentType && contentType.includes('application/json')) {
+        try {
+          // Convert blob to text and parse JSON
+          const text = await response.data.text();
+          const data = JSON.parse(text);
+          toast.warning(data?.message || 'No contact details available');
+          return;
+        } catch (jsonError) {
+          console.error('Error parsing JSON response:', jsonError);
+          toast.error('Failed to process server response');
+          return;
+        }
+      }
+
+      // Validate that response.data is a proper Blob
+      if (!(response.data instanceof Blob)) {
+        console.error('Response data is not a valid Blob:', response.data);
+        toast.error('Invalid file data received from server');
+        return;
+      }
+
+      // Check if blob is empty
+      if (response.data.size === 0) {
+        toast.warning('No contact details available for download');
+        return;
+      }
+
+      // Handle file download
+      const blob = response.data;
+      let url;
+
+      try {
+        url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `contacts_${chatbotId}_${
+          new Date().toISOString().split('T')[0]
+        }.csv`;
+
+        // Temporarily add to DOM for download
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        toast.success('Contact details downloaded successfully');
+      } catch (urlError) {
+        console.error('Error creating object URL:', urlError);
+        toast.error('Failed to download file');
+      } finally {
+        // Clean up the object URL
+        if (url) {
+          window.URL.revokeObjectURL(url);
+        }
+      }
+    } catch (error) {
+      console.error('Download error:', error);
+      toast.error('Failed to download contact details');
+    } finally {
+      setIsDownloading(false);
+    }
+  }, [chatbotId]);
 
   const handleSave = useCallback(() => {
     const closeChat = showContactPopup
@@ -120,7 +206,7 @@ const ContactGatheringDialog = ({
       }}
     >
       <DialogContent className='sm:max-w-md w-full max-w-[90vw] mx-auto rounded-lg'>
-        {(isPending || isUpdatePending) && <Loader />}
+        {(isPending || isUpdatePending || isDownloading) && <Loader />}
         <DialogHeader>
           <DialogTitle className='text-xl font-medium'>
             Contact Gathering
@@ -191,20 +277,42 @@ const ContactGatheringDialog = ({
           )}
         </div>
 
-        <div className='flex flex-col-reverse sm:flex-row sm:justify-end gap-3 mt-4'>
+        <div className='flex flex-col gap-3'>
           <Button
+            onClick={handleDownloadContacts}
             variant='outline'
-            onClick={() => contactGatheringHandler()}
-            className='border border-[#57C0DD] text-xs px-5 text-[#57C0DD] rounded-full py-2 hover:bg-[#f0faff] hover:text-[#57C0DD] bg-transparent w-full sm:w-auto'
+            className='border border-gray-300 text-xs px-5 text-gray-700 rounded-full py-2 hover:bg-gray-50 hover:text-gray-700 bg-transparent w-full flex items-center justify-center gap-2'
           >
-            Cancel
+            <svg
+              className='w-4 h-4'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2z'
+              />
+            </svg>
+            Download Contact Details
           </Button>
-          <Button
-            onClick={handleSave}
-            className='bg-[#57C0DD] text-white text-xs hover:bg-[#4cb9d1] w-full py-2 rounded-full sm:w-auto'
-          >
-            Save Changes
-          </Button>
+          <div className='flex flex-col-reverse sm:flex-row sm:justify-end gap-3'>
+            <Button
+              variant='outline'
+              onClick={() => contactGatheringHandler()}
+              className='border border-[#57C0DD] text-xs px-5 text-[#57C0DD] rounded-full py-2 hover:bg-[#f0faff] hover:text-[#57C0DD] bg-transparent w-full sm:w-auto'
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSave}
+              className='bg-[#57C0DD] text-white text-xs hover:bg-[#4cb9d1] w-full py-2 rounded-full sm:w-auto'
+            >
+              Save Changes
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
