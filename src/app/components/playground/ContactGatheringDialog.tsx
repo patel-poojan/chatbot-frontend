@@ -83,79 +83,61 @@ const ContactGatheringDialog = ({
   const handleDownloadContacts = useCallback(async () => {
     try {
       setIsDownloading(true);
-      const response = await axiosInstance.get(
+
+      // Since responseInterceptor returns response.data,
+      // the 'data' here is actually the blob or error response
+      const data = await axiosInstance.get(
         `/contact/generate-report/${chatbotId}`,
         {
           responseType: 'blob',
-          validateStatus: () => true, // Don't throw on any status code
         }
       );
 
-      // Check if response is not successful
-      if (response.status < 200 || response.status >= 300) {
-        toast.error('Failed to download contact details');
-        return;
-      }
+      // Check if the response is actually a Blob (successful file download)
+      if (data instanceof Blob) {
+        // For successful blob responses, check if it's actually JSON (error case)
+        // Sometimes servers return JSON with blob responseType
+        const contentType = data.type;
 
-      const contentType =
-        response.headers?.['content-type'] ||
-        response.headers?.['Content-Type'] ||
-        '';
+        if (contentType && contentType.includes('application/json')) {
+          try {
+            toast.warning('No contact details available');
+            return;
+          } catch (jsonError) {
+            console.error('Error parsing JSON response:', jsonError);
+            toast.error('Failed to process server response');
+            return;
+          }
+        }
 
-      // Handle JSON response (error cases)
-      if (contentType && contentType.includes('application/json')) {
+        let url;
+
         try {
-          // Convert blob to text and parse JSON
-          const text = await response.data.text();
-          const data = JSON.parse(text);
-          toast.warning(data?.message || 'No contact details available');
-          return;
-        } catch (jsonError) {
-          console.error('Error parsing JSON response:', jsonError);
-          toast.error('Failed to process server response');
-          return;
+          url = window.URL.createObjectURL(data);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `contacts_${chatbotId}_${
+            new Date().toISOString().split('T')[0]
+          }.csv`;
+
+          // Temporarily add to DOM for download
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+
+          toast.success('Contact details downloaded successfully');
+        } catch (urlError) {
+          console.error('Error creating object URL:', urlError);
+          toast.error('Failed to download file');
+        } finally {
+          // Clean up the object URL
+          if (url) {
+            window.URL.revokeObjectURL(url);
+          }
         }
-      }
-
-      // Validate that response.data is a proper Blob
-      if (!(response.data instanceof Blob)) {
-        console.error('Response data is not a valid Blob:', response.data);
-        toast.error('Invalid file data received from server');
-        return;
-      }
-
-      // Check if blob is empty
-      if (response.data.size === 0) {
-        toast.warning('No contact details available for download');
-        return;
-      }
-
-      // Handle file download
-      const blob = response.data;
-      let url;
-
-      try {
-        url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `contacts_${chatbotId}_${
-          new Date().toISOString().split('T')[0]
-        }.csv`;
-
-        // Temporarily add to DOM for download
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-
-        toast.success('Contact details downloaded successfully');
-      } catch (urlError) {
-        console.error('Error creating object URL:', urlError);
-        toast.error('Failed to download file');
-      } finally {
-        // Clean up the object URL
-        if (url) {
-          window.URL.revokeObjectURL(url);
-        }
+      } else {
+        // If data is not a Blob, it might be a JSON error response
+        toast.warning('No contact details available');
       }
     } catch (error) {
       console.error('Download error:', error);
