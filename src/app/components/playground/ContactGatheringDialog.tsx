@@ -116,7 +116,7 @@ const ContactGatheringDialog = ({
           url = window.URL.createObjectURL(data);
           const a = document.createElement('a');
           a.href = url;
-          a.download = `contacts_${chatbotId}_${
+          a.download = `Submitted_Contacts_${chatbotId}_${
             new Date().toISOString().split('T')[0]
           }.csv`;
 
