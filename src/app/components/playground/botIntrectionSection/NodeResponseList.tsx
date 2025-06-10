@@ -21,12 +21,13 @@ export const TextNodeResponse = ({
   index: number;
   attributes: Attribute[];
 }) => {
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(info.description || "");
   const [suggestions, setSuggestions] = useState<Attribute[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [cursor, setCursor] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const highlightRef = useRef<HTMLDivElement>(null);
+  // const [value1, setValue1] = useState(info.description || "");
 
   const handleSelect = (item: string) => {
     const before = value.slice(0, cursor);
@@ -111,8 +112,7 @@ export const TextNodeResponse = ({
               <span
                 key={s._id}
                 onClick={() => handleSelect(s.name)}
-                className={`px-3 py-1 hover:bg-[#48a1ba] bg-[#57C0DD] text-white cursor-pointer w-fit whitespace-nowrap text-xs rounded-2xl`}
-              >
+                className={`px-3 py-1 hover:bg-[#48a1ba] bg-[#57C0DD] text-white cursor-pointer w-fit whitespace-nowrap text-xs rounded-2xl`}>
                 {s.name}
               </span>
             ))}
@@ -121,19 +121,16 @@ export const TextNodeResponse = ({
       )}
       <Textarea
         ref={textareaRef}
-        value={info.description}
+        value={value}
         onChange={handleInputChange}
-        placeholder="Entre bot response"
+        placeholder="Enter bot response"
         className="relative z-10 w-full p-3 resize-none bg-transparent border border-gray-300 rounded-md outline-none font-mono"
-        onKeyUp={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        onKeyUp={(e) => {
           const textarea = e.currentTarget;
           function calcHeight(value: string) {
             const numberOfLineBreaks = (value.match(/\n/g) || []).length;
-            // min-height + lines x line-height + padding + border
-            const newHeight = 20 + numberOfLineBreaks * 20 + 12 + 2;
-            return newHeight;
+            return 20 + numberOfLineBreaks * 20 + 12 + 2;
           }
-
           textarea.style.height = calcHeight(textarea.value) + "px";
         }}
       />
@@ -257,8 +254,7 @@ export const GalleryNodeResponse = ({
             {i !== 0 && (
               <div
                 className="absolute top-1/2 -translate-y-1/2 right-[-12px] md:hidden md:group-hover:flex items-center justify-center bg-white rounded-full p-1 cursor-pointer shadow-md"
-                onClick={() => handleDeleteButton(i)}
-              >
+                onClick={() => handleDeleteButton(i)}>
                 <RiDeleteBinLine className="text-red-500 h-4 w-4" />
               </div>
             )}
@@ -267,8 +263,7 @@ export const GalleryNodeResponse = ({
 
         <div
           className="flex items-center text-sm justify-center mt-2 p-2 border border-dashed border-black text-black cursor-pointer"
-          onClick={addNewButton}
-        >
+          onClick={addNewButton}>
           <span>+</span>
           <span className="ml-2">Add Button</span>
         </div>
@@ -353,8 +348,7 @@ export const ButtonNodeResponse = ({
           {i !== 0 && (
             <div
               className="absolute top-1/2 -translate-y-1/2 right-[-12px] md:hidden md:group-hover:flex items-center justify-center bg-white rounded-full p-1 cursor-pointer shadow-md"
-              onClick={() => handleDeleteButton(i)}
-            >
+              onClick={() => handleDeleteButton(i)}>
               <RiDeleteBinLine className="text-red-500 h-4 w-4" />
             </div>
           )}
@@ -362,8 +356,7 @@ export const ButtonNodeResponse = ({
       ))}
       <div
         className="flex items-center  justify-center mt-2 p-2 border border-dashed border-black text-sm text-black cursor-pointer"
-        onClick={addNewButton}
-      >
+        onClick={addNewButton}>
         <span>+</span>
         <span className="ml-2">Add Button</span>
       </div>
@@ -447,8 +440,7 @@ export const QuickNodeResponse = ({
             {i !== 0 && (
               <div
                 className="absolute top-1/2 -translate-y-1/2 right-[-12px] md:hidden md:group-hover:flex items-center justify-center bg-white rounded-full p-1 cursor-pointer shadow-md"
-                onClick={() => handleDeleteButton(i)}
-              >
+                onClick={() => handleDeleteButton(i)}>
                 <RiDeleteBinLine className="text-red-500 h-4 w-4" />
               </div>
             )}
@@ -457,8 +449,7 @@ export const QuickNodeResponse = ({
 
         <div
           onClick={addNewButton}
-          className="text-black cursor-pointer py-1 px-2 border text-sm border-black border-dashed w-fit text-center rounded-[30px]"
-        >
+          className="text-black cursor-pointer py-1 px-2 border text-sm border-black border-dashed w-fit text-center rounded-[30px]">
           + Add button
         </div>
       </div>
