@@ -19,9 +19,11 @@ const PublishDialog = ({
   trigger: React.ReactNode;
 }) => {
   const [copied, setCopied] = useState(false);
-
+  {
+    /* <script defer src='https://cdn.tailwindcss.com'></script> */
+  }
   // Properly format the script code with escaped characters
-  const scriptCode = `<script defer src='https://cdn.tailwindcss.com'></script>
+  const scriptCode = `
 <script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script defer src='${process.env.NEXT_PUBLIC_LOCAL_SERVER_END_POINT}/script/chatbot-embed.js'></script>
   <script
