@@ -25,28 +25,30 @@ const PublishDialog = ({
     useState<PlatformType>('nextjs');
 
   // Script code for Next.js/React.js
-  const nextjsScriptCode = `<script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script defer src='${process.env.NEXT_PUBLIC_LOCAL_SERVER_END_POINT}/script/chatbot-embed.js'></script>
-<script
-  defer
-  dangerouslySetInnerHTML={{
-    __html: \`
-      document.addEventListener('DOMContentLoaded', function() {
+  const nextjsScriptCode = `<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
+  <script src='${process.env.NEXT_PUBLIC_LOCAL_SERVER_END_POINT}/script/chatbot-embed.js' defer></script>
+  <script>
+    (function(botId) {
+      function init() {
         if (window.initializeChatbot) {
-          window.initializeChatbot("${chatbotId}");
+          window.initializeChatbot(botId);
           return;
         }
-        const checkInitialize = setInterval(function() {
+        var check = setInterval(function() {
           if (window.initializeChatbot) {
-            window.initializeChatbot("${chatbotId}");
-            clearInterval(checkInitialize);
+            window.initializeChatbot(botId);
+            clearInterval(check);
           }
         }, 100);
-        setTimeout(() => clearInterval(checkInitialize), 10000);
-      });
-    \`,
-  }}
-/>`;
+        setTimeout(function() { clearInterval(check); }, 10000);
+      }
+      if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        init();
+      } else {
+        document.addEventListener('DOMContentLoaded', init);
+      }
+    })('${chatbotId}');
+  </script>`;
 
   // Script code for PHP/HTML
   const htmlScriptCode = `<script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
