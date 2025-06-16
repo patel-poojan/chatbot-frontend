@@ -25,34 +25,47 @@ const PublishDialog = ({
     useState<PlatformType>('nextjs');
 
   // Script code for Next.js/React.js
-  const nextjsScriptCode = `<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
-  <script src='${process.env.NEXT_PUBLIC_LOCAL_SERVER_END_POINT}/script/chatbot-embed.js' defer></script>
-  <script>
-    (function(botId) {
-      function init() {
-        if (window.initializeChatbot) {
-          window.initializeChatbot(botId);
-          return;
-        }
-        var check = setInterval(function() {
-          if (window.initializeChatbot) {
-            window.initializeChatbot(botId);
-            clearInterval(check);
+  const nextjsScriptCode = `<Script
+          src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"
+          strategy="afterInteractive"
+        />
+        <Script
+        src="${process.env.NEXT_PUBLIC_LOCAL_SERVER_END_POINT}/script/chatbot-embed.js"
+          strategy="afterInteractive"
+        />
+  <Script
+    id="chatbot-init"
+    strategy="afterInteractive"
+    dangerouslySetInnerHTML={{
+      __html: \`
+        (function(botId) {
+          function init() {
+            if (window.initializeChatbot) {
+              window.initializeChatbot(botId);
+              return;
+            }
+            var check = setInterval(function() {
+              if (window.initializeChatbot) {
+                window.initializeChatbot(botId);
+                clearInterval(check);
+              }
+            }, 100);
+            setTimeout(function() { clearInterval(check); }, 10000);
           }
-        }, 100);
-        setTimeout(function() { clearInterval(check); }, 10000);
-      }
-      if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        init();
-      } else {
-        document.addEventListener('DOMContentLoaded', init);
-      }
-    })('${chatbotId}');
-  </script>`;
+          if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            init();
+          } else {
+            document.addEventListener('DOMContentLoaded', init);
+          }
+        })('${chatbotId}');
+      \`,
+    }}
+  />
+`;
 
   // Script code for PHP/HTML
-  const htmlScriptCode = `<script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script defer src='${process.env.NEXT_PUBLIC_LOCAL_SERVER_END_POINT}/script/chatbot-embed.js'></script>
+  const htmlScriptCode = `<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="${process.env.NEXT_PUBLIC_LOCAL_SERVER_END_POINT}/script/chatbot-embed.js"></script>
 <script>
   (function(botId) {
     function init() {
@@ -88,8 +101,8 @@ const PublishDialog = ({
   const platforms = [
     {
       id: 'nextjs' as PlatformType,
-      name: 'Next.js / React.js',
-      description: 'For React-based applications and Next.js projects',
+      name: 'Next.js',
+      description: 'For Next.js projects',
       icon: '⚛️',
     },
     {
@@ -104,6 +117,12 @@ const PublishDialog = ({
     if (selectedPlatform === 'nextjs') {
       return (
         <ol className='list-decimal pl-4 sm:pl-5 space-y-1.5 sm:space-y-2 text-gray-600 text-sm sm:text-base'>
+          <li>
+            Import Script component:{' '}
+            <code className='bg-gray-100 px-1.5 py-0.5 mx-1 rounded text-sm'>
+              {`import Script from "next/script"`}
+            </code>
+          </li>
           <li>Copy the code snippet below</li>
           <li>
             Add it to your React component or Next.js page where you want the
@@ -111,10 +130,6 @@ const PublishDialog = ({
           </li>
           <li>
             Alternatively, paste it in your{' '}
-            <code className='bg-gray-100 px-1.5 py-0.5 mx-1 rounded text-sm'>
-              _document.js
-            </code>{' '}
-            or{' '}
             <code className='bg-gray-100 px-1.5 py-0.5 mx-1 rounded text-sm'>
               layout.js
             </code>{' '}
