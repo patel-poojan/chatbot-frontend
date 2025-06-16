@@ -25,43 +25,43 @@ const PublishDialog = ({
     useState<PlatformType>('nextjs');
 
   // Script code for Next.js/React.js
-  const nextjsScriptCode = `<Script
-          src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"
-          strategy="afterInteractive"
-        />
-        <Script
-        src="${process.env.NEXT_PUBLIC_LOCAL_SERVER_END_POINT}/script/chatbot-embed.js"
-          strategy="afterInteractive"
-        />
+  const nextjsScriptCode = `
   <Script
-    id="chatbot-init"
-    strategy="afterInteractive"
-    dangerouslySetInnerHTML={{
-      __html: \`
-        (function(botId) {
-          function init() {
+  src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"
+  strategy="afterInteractive"
+/>
+<Script
+  src="${process.env.NEXT_PUBLIC_LOCAL_SERVER_END_POINT}/script/chatbot-embed.js"
+  strategy="afterInteractive"
+/>
+<Script
+  id="chatbot-init"
+  strategy="afterInteractive"
+  dangerouslySetInnerHTML={{
+    __html: \`
+      (function(botId) {
+        function init() {
+          if (window.initializeChatbot) {
+            window.initializeChatbot(botId);
+            return;
+          }
+          var check = setInterval(function() {
             if (window.initializeChatbot) {
               window.initializeChatbot(botId);
-              return;
+              clearInterval(check);
             }
-            var check = setInterval(function() {
-              if (window.initializeChatbot) {
-                window.initializeChatbot(botId);
-                clearInterval(check);
-              }
-            }, 100);
-            setTimeout(function() { clearInterval(check); }, 10000);
-          }
-          if (document.readyState === 'complete' || document.readyState === 'interactive') {
-            init();
-          } else {
-            document.addEventListener('DOMContentLoaded', init);
-          }
-        })('${chatbotId}');
-      \`,
-    }}
-  />
-`;
+          }, 100);
+          setTimeout(function() { clearInterval(check); }, 10000);
+        }
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+          init();
+        } else {
+          document.addEventListener('DOMContentLoaded', init);
+        }
+      })('${chatbotId}');
+    \`,
+  }}
+/>`;
 
   // Script code for PHP/HTML
   const htmlScriptCode = `<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -117,23 +117,35 @@ const PublishDialog = ({
     if (selectedPlatform === 'nextjs') {
       return (
         <ol className='list-decimal pl-4 sm:pl-5 space-y-1.5 sm:space-y-2 text-gray-600 text-sm sm:text-base'>
+          <li>Copy the code snippet below</li>
           <li>
-            Import Script component:{' '}
+            Paste the script into your application as if you were placing it
+            just before the closing{' '}
+            <code className='bg-gray-100 px-1.5 py-0.5 mx-1 rounded text-sm'>
+              &lt;/body&gt;
+            </code>{' '}
+            tag
+          </li>
+          <li>
+            Import the Script component from Next.js:{' '}
             <code className='bg-gray-100 px-1.5 py-0.5 mx-1 rounded text-sm'>
               {`import Script from "next/script"`}
             </code>
           </li>
-          <li>Copy the code snippet below</li>
           <li>
-            Add it to your React component or Next.js page where you want the
-            chatbot to appear
+            Add the script inside a specific page or component where you want
+            the ChatAgent to appear
           </li>
           <li>
-            Alternatively, paste it in your{' '}
+            Alternatively, add the script globally by placing it in your{' '}
             <code className='bg-gray-100 px-1.5 py-0.5 mx-1 rounded text-sm'>
               layout.js
             </code>{' '}
-            file
+            (App Router) or{' '}
+            <code className='bg-gray-100 px-1.5 py-0.5 mx-1 rounded text-sm'>
+              _app.js
+            </code>{' '}
+            (Pages Router) to make the ChatAgent available across all pages
           </li>
         </ol>
       );
@@ -152,7 +164,6 @@ const PublishDialog = ({
       );
     }
   };
-
   return (
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
