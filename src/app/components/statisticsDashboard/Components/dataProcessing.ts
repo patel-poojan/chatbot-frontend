@@ -336,7 +336,7 @@ export const processStatisticsData = (
   const chatbotDistributionData: ChartData[] = chatbotStats.map((chatbot) => {
     const percentage =
       totalRequests > 0
-        ? Math.round((chatbot.requests / totalRequests) * 100)
+        ? Math.round((chatbot.requests / totalRequests) * 10000) / 100
         : 0;
 
     return {

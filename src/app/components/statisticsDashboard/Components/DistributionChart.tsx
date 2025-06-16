@@ -22,6 +22,7 @@ const DistributionChart: React.FC<DistributionChartProps> = ({
   totalRequests,
   screenWidth,
 }) => {
+  console.log('DistributionChart data:', data);
   return (
     <div className='p-4 md:p-5 border border-gray-100 rounded-xl shadow-sm bg-white '>
       <h2 className='text-base md:text-lg font-semibold text-indigo-900 mb-3 md:mb-4 flex items-center'>
@@ -54,9 +55,8 @@ const DistributionChart: React.FC<DistributionChartProps> = ({
                       (sum, item) => sum + item.value,
                       0
                     );
-                    const othersPercentage = Math.round(
-                      (othersTotal / totalRequests) * 100
-                    );
+                    const othersPercentage =
+                      Math.round((othersTotal / totalRequests) * 10000) / 100;
 
                     processedData = [
                       ...topItems,
@@ -71,23 +71,56 @@ const DistributionChart: React.FC<DistributionChartProps> = ({
                   }
                 }
 
+                // Enhance visual representation for better visibility
+                const visualData = processedData.map((item, index) => {
+                  const percentage = (item.value / totalRequests) * 100;
+
+                  // For very small segments, ensure minimum visual representation
+                  if (percentage < 2 && percentage > 0) {
+                    return {
+                      ...item,
+                      visualValue: Math.max(item.value, totalRequests * 0.02),
+                      actualValue: item.value,
+                    };
+                  }
+
+                  // For dominant segments, slightly reduce to show others better
+                  if (index === 0 && percentage > 90) {
+                    return {
+                      ...item,
+                      visualValue: totalRequests * 0.88,
+                      actualValue: item.value,
+                    };
+                  }
+
+                  return {
+                    ...item,
+                    visualValue: item.value,
+                    actualValue: item.value,
+                  };
+                });
+
                 return (
                   <Pie
-                    data={processedData}
+                    data={visualData}
                     cx='50%'
                     cy='50%'
                     labelLine={false}
                     outerRadius={screenWidth < 768 ? 70 : 90}
                     innerRadius={screenWidth < 768 ? 40 : 60}
-                    paddingAngle={2}
+                    paddingAngle={3}
                     fill='#8884d8'
-                    dataKey='value'
+                    dataKey='visualValue'
                     nameKey='name'
-                    label={({ percent }) => {
-                      return `${(percent * 100).toFixed(0)}%`;
+                    label={({ payload }) => {
+                      const percent =
+                        ((payload.actualValue || payload.value) /
+                          totalRequests) *
+                        100;
+                      return `${percent.toFixed(2)}%`;
                     }}
                   >
-                    {processedData.map((entry, index) => (
+                    {visualData.map((entry, index) => (
                       <Cell
                         key={`cell-${index}`}
                         fill={
@@ -115,12 +148,20 @@ const DistributionChart: React.FC<DistributionChartProps> = ({
 
                         <p className='text-gray-600 text-sm '>
                           <span>
-                            Requests: <b>{data.value}</b>
+                            Requests: <b>{data.actualValue || data.value}</b>
                           </span>
                         </p>
                         <p className='text-gray-600 text-sm mt-1'>
                           <span>
-                            Share: <b>{data.percentage}%</b>
+                            Share:{' '}
+                            <b>
+                              {(
+                                ((data.actualValue || data.value) /
+                                  totalRequests) *
+                                100
+                              ).toFixed(2)}
+                              %
+                            </b>
                           </span>
                         </p>
 

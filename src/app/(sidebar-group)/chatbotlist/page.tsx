@@ -26,6 +26,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 type FetchChatbotListResponse = {
   statusCode: number;
@@ -156,7 +162,7 @@ const Page = () => {
     if (listFilter === 'not_Published') return !bot.published;
     return true; // for 'all'
   });
-
+  console.log('filteredChatbotList:', filteredChatbotList);
   return (
     <div className='flex-1 flex flex-col max-[500px]:p-4 overflow-auto'>
       {loadChatbotList || updatePending || deletePending ? <Loader /> : <></>}
@@ -229,9 +235,45 @@ const Page = () => {
                       autoFocus
                     />
                   ) : (
-                    <span className='text-lg truncate font-medium text-black'>
-                      {data.name}
-                    </span>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className='text-lg truncate font-medium text-black'>
+                            {data.name}
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent
+                          className='bg-white rounded-lg px-3 py-2 border border-[#53A7DD]/20 shadow-[0_4px_12px_rgb(0,0,0,0.1)] text-[#1E255E] text-sm font-medium transition-all duration-200'
+                          side='bottom'
+                          align='center'
+                          sideOffset={6}
+                        >
+                          <div className='flex flex-col gap-1'>
+                            <span className='font-semibold text-[#1E255E]'>
+                              {data.name}
+                            </span>
+                            <div className='flex items-center gap-1.5'>
+                              <div
+                                className={`w-2 h-2 rounded-full ${
+                                  data.published
+                                    ? 'bg-green-500'
+                                    : 'bg-gray-400'
+                                }`}
+                              />
+                              <span
+                                className={`text-xs ${
+                                  data.published
+                                    ? 'text-green-600'
+                                    : 'text-gray-500'
+                                }`}
+                              >
+                                {data.published ? 'Published' : 'Not Published'}
+                              </span>
+                            </div>
+                          </div>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   )}
                   <Popover>
                     <PopoverTrigger
