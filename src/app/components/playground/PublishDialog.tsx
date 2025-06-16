@@ -25,18 +25,10 @@ const PublishDialog = ({
     useState<PlatformType>('nextjs');
 
   // Script code for Next.js/React.js
-  const nextjsScriptCode = `
-  <Script
-  src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"
-  strategy="afterInteractive"
-/>
-<Script
-  src="${process.env.NEXT_PUBLIC_LOCAL_SERVER_END_POINT}/script/chatbot-embed.js"
-  strategy="afterInteractive"
-/>
-<Script
+  const nextjsScriptCode = `<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" />
+<script src="${process.env.NEXT_PUBLIC_LOCAL_SERVER_END_POINT}/script/chatbot-embed.js"/>
+<script
   id="chatbot-init"
-  strategy="afterInteractive"
   dangerouslySetInnerHTML={{
     __html: \`
       (function(botId) {
@@ -64,8 +56,8 @@ const PublishDialog = ({
 />`;
 
   // Script code for PHP/HTML
-  const htmlScriptCode = `<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="${process.env.NEXT_PUBLIC_LOCAL_SERVER_END_POINT}/script/chatbot-embed.js"></script>
+  const htmlScriptCode = `<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"/>
+<script src="${process.env.NEXT_PUBLIC_LOCAL_SERVER_END_POINT}/script/chatbot-embed.js"/>
 <script>
   (function(botId) {
     function init() {
@@ -101,8 +93,8 @@ const PublishDialog = ({
   const platforms = [
     {
       id: 'nextjs' as PlatformType,
-      name: 'Next.js',
-      description: 'For Next.js projects',
+      name: 'Next.js / React.js',
+      description: 'For React-based applications and Next.js projects',
       icon: '⚛️',
     },
     {
@@ -125,12 +117,6 @@ const PublishDialog = ({
               &lt;/body&gt;
             </code>{' '}
             tag
-          </li>
-          <li>
-            Import the Script component from Next.js:{' '}
-            <code className='bg-gray-100 px-1.5 py-0.5 mx-1 rounded text-sm'>
-              {`import Script from "next/script"`}
-            </code>
           </li>
           <li>
             Add the script inside a specific page or component where you want
