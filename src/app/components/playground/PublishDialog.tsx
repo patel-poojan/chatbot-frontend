@@ -56,8 +56,8 @@ const PublishDialog = ({
 />`;
 
   // Script code for PHP/HTML
-  const htmlScriptCode = `<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"/>
-<script src="${process.env.NEXT_PUBLIC_LOCAL_SERVER_END_POINT}/script/chatbot-embed.js"/>
+  const htmlScriptCode = `<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="${process.env.NEXT_PUBLIC_LOCAL_SERVER_END_POINT}/script/chatbot-embed.js"></script>
 <script>
   (function(botId) {
     function init() {
@@ -71,7 +71,9 @@ const PublishDialog = ({
           clearInterval(check);
         }
       }, 100);
-      setTimeout(function() { clearInterval(check); }, 10000);
+      setTimeout(function() {
+        clearInterval(check);
+      }, 10000);
     }
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
       init();
