@@ -872,7 +872,7 @@ const MainComponent = ({ botId }: { botId: string }) => {
               minZoom={0.1}
               maxZoom={1.5}
               panOnScrollSpeed={0.5}
-              nodesDraggable={isInteractive}
+              nodesDraggable={false}
               nodesConnectable={isInteractive}
               elementsSelectable={isInteractive}
               panOnDrag={isInteractive}
