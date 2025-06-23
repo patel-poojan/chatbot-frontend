@@ -27,6 +27,8 @@ import { BiSolidEditAlt } from 'react-icons/bi';
 import { isValidUrl } from '@/utils/validator';
 import { ChatBotState } from './constant';
 import { FiUploadCloud } from 'react-icons/fi';
+import AWS from 'aws-sdk';
+import { initializeAWS } from './playground/botIntrectionSection/S3Operation';
 
 const TuneChatbot = ({ botId }: { botId: string }) => {
   const router = useRouter();
@@ -37,14 +39,30 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
     { title: 'Company Name', value: '' },
     { title: 'Company Address', value: '' },
     { title: 'About Us', value: '' },
-    { title: 'Website URL', value: '' },
+    { title: 'Website URL', value: '' },
   ]);
-  const [botIcon, setBotIcon] = useState('');
+  const [botIconFile, setBotIconFile] = useState<File | null>(null);
+  const [botIconPreview, setBotIconPreview] = useState<string>('');
   const [AboutUs, setAboutUs] = useState(true);
   const [welcomeMessage, setWelcomeMessage] = useState(
-    `👋 Welcome! I'm ChatAgent, your AI assistant 🤖. What can I do for you?`
+    `👋 Welcome! I'm ChatAgent, your AI assistant 🤖. What can I do for you?`
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isAWSInitialized, setIsAWSInitialized] = useState(false);
+
+  useEffect(() => {
+    const awsInitialized = initializeAWS();
+    setIsAWSInitialized(awsInitialized);
+  }, []);
+
+  // Cleanup preview URL when component unmounts or file changes
+  useEffect(() => {
+    return () => {
+      if (botIconPreview && botIconPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(botIconPreview);
+      }
+    };
+  }, [botIconPreview]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -75,14 +93,49 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
         return;
       }
 
-      // If validation passes, read and set the file
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          setBotIcon(event.target.result as string);
-        }
-      };
-      reader.readAsDataURL(file);
+      // Clean up previous preview URL
+      if (botIconPreview && botIconPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(botIconPreview);
+      }
+
+      // Store file and create preview
+      setBotIconFile(file);
+      setBotIconPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const uploadBotIconToS3 = async (file: File): Promise<string | null> => {
+    if (!isAWSInitialized) {
+      toast.error('AWS is not properly configured');
+      return null;
+    }
+
+    try {
+      const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
+      const bucket = process.env.NEXT_PUBLIC_AWS_BUCKET as string;
+
+      // Generate filename
+      const fileExtension =
+        file.name.split('.').pop() || file.type.split('/')[1];
+      const fileName = `chat_icon_${Date.now()}.${fileExtension}`;
+      const key = `chatagentAssets/${botId}/icon/${fileName}`;
+
+      // Upload to S3
+      const uploadResult = await s3
+        .upload({
+          Bucket: bucket,
+          Key: key,
+          Body: file,
+          ContentType: file.type,
+          ACL: 'public-read',
+        })
+        .promise();
+
+      return uploadResult.Location;
+    } catch (error) {
+      console.error('Error uploading bot icon to S3:', error);
+      toast.error('Failed to upload bot icon');
+      return null;
     }
   };
 
@@ -90,6 +143,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
   const triggerFileUpload = () => {
     fileInputRef.current?.click();
   };
+
   const {
     mutate: onAddAttributes,
     isPending: isPendingAddProcess,
@@ -106,6 +160,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
       toast.error(errorMessage);
     },
   });
+
   const {
     mutate: onSetupPlayground,
     isPending: isPendingSetupPlayground,
@@ -122,6 +177,7 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
       toast.error(errorMessage);
     },
   });
+
   const {
     mutate: onUpdateBot,
     isPending,
@@ -193,7 +249,19 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
     } else if (!botId) {
       toast.warning('something went wrong');
     } else {
-      const formData = new FormData();
+      let iconUrl: string = '';
+
+      // Upload bot icon to S3 first if exists
+      if (botIconFile) {
+        const uploadedUrl = await uploadBotIconToS3(botIconFile);
+        if (!uploadedUrl) {
+          // If upload failed, stop the process
+          return;
+        }
+        iconUrl = uploadedUrl;
+      }
+
+      // const formData = new FormData();
       const dataObject = {
         name: attributes[0].value ?? 'ChatAgent',
         aboutAs: attributes[3].value,
@@ -210,48 +278,19 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
             isEnabled: AboutUs,
           },
         ],
+        ...(iconUrl ? { iconUrl } : {}), // Add iconUrl to dataObject if it exists
       };
-      formData.append('data', JSON.stringify(dataObject));
-      if (botIcon && botIcon.startsWith('data:image')) {
-        // Extract mime type and base64 data
-        const matches = botIcon.match(/^data:(.+);base64,(.+)$/);
-        if (matches && matches.length === 3) {
-          const mimeType = matches[1];
-          const base64Data = matches[2];
+      // console.log('dataObject', dataObject);
+      // formData.append('data', JSON.stringify(dataObject));
 
-          // Convert base64 to binary
-          const binaryData = atob(base64Data);
-
-          // Create array buffer from binary
-          const arrayBuffer = new ArrayBuffer(binaryData.length);
-          const uint8Array = new Uint8Array(arrayBuffer);
-
-          for (let i = 0; i < binaryData.length; i++) {
-            uint8Array[i] = binaryData.charCodeAt(i);
-          }
-
-          // Create blob with correct mime type
-          const blob = new Blob([arrayBuffer], { type: mimeType });
-
-          // Create File from blob
-          const iconFile = new File(
-            [blob],
-            `chat_icon_${Date.now()}.${mimeType.split('/')[1]}`,
-            { type: mimeType }
-          );
-
-          // Add the file to FormData with key 'icon'
-          formData.append('icon', iconFile);
-        }
-      }
       onUpdateBot({
         chatbotId: botId,
-        details: formData,
+        details: dataObject,
       });
     }
   };
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const handleDivClick = (index: number) => {
@@ -261,18 +300,13 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
     }
   };
 
-  // useEffect(() => {
-  //   const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-  //     router.push("/create"); // Navigate to the /create page before the page is refreshed
-  //     event.preventDefault(); // Prevent the default reload
-  //   };
-
-  //   window.addEventListener("beforeunload", handleBeforeUnload);
-
-  //   return () => {
-  //     window.removeEventListener("beforeunload", handleBeforeUnload);
-  //   };
-  // }, [router]);
+  // Get the appropriate icon source for display
+  const getIconSource = () => {
+    if (botIconPreview) {
+      return botIconPreview;
+    }
+    return '/images/bot-icon.svg';
+  };
 
   return (
     <div
@@ -348,19 +382,19 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
                 type='file'
                 ref={fileInputRef}
                 className='hidden'
-                accept='image/*'
+                accept='image/png,image/jpeg,image/jpg'
                 onChange={handleFileUpload}
               />
-              {botIcon ? (
+              {botIconPreview ? (
                 <div className='flex items-center gap-3'>
                   <div className='relative w-12 h-12 rounded-full overflow-hidden'>
                     <Image
-                      src={botIcon}
+                      src={botIconPreview}
                       alt='Bot Icon'
                       className='w-full h-full object-cover'
-                      width={48} // Adjust width as needed
-                      height={48} // Adjust height as needed
-                      quality={100} // Optional: Adjust quality as needed
+                      width={48}
+                      height={48}
+                      quality={100}
                     />
                   </div>
                   <p className='text-[#1E255EB2] text-sm'>
@@ -424,11 +458,11 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
           <div className='flex gap-3'>
             <div className='relative h-12 w-12 rounded-full bg-transparent overflow-hidden'>
               <Image
-                src={botIcon || '/images/bot-icon.svg'}
+                src={getIconSource()}
                 alt='bot'
                 fill
                 sizes='100px'
-                className='object-contain p-1'
+                className='object-cover p-1 rounded-full'
                 quality={100}
               />
             </div>
@@ -496,11 +530,11 @@ const TuneChatbot = ({ botId }: { botId: string }) => {
                 <div className='flex gap-3'>
                   <div className='w-12 h-12 rounded-full bg-transparent flex items-center justify-center overflow-hidden'>
                     <Image
-                      src={botIcon || '/images/bot-icon.svg'}
+                      src={getIconSource()}
                       alt='bot'
                       width={40}
                       height={40}
-                      className='object-contain'
+                      className='object-cover rounded-full'
                       quality={100}
                     />
                   </div>

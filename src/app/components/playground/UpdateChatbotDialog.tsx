@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { useUpdateChatbot } from '@/utils/botCreation-api';
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { IoCloseOutline } from 'react-icons/io5';
 import { UploadCloud } from 'lucide-react';
 import { toast } from 'sonner';
@@ -17,6 +17,8 @@ import { axiosError } from '@/types/axiosTypes';
 import { Loader } from '../Loader';
 import Image from 'next/image';
 import { usePlayground } from './playgroundArea/PlaygroundContext';
+import AWS from 'aws-sdk';
+import { initializeAWS } from './botIntrectionSection/S3Operation';
 
 const UpdateChatbotDialog = ({
   updateHandler,
@@ -34,10 +36,27 @@ const UpdateChatbotDialog = ({
   refetchPlayground: () => void;
 }) => {
   const [name, setName] = React.useState<string>(chatbotName ?? '');
-  const [icon, setIcon] = React.useState<string | null>(null);
+  const [iconFile, setIconFile] = useState<File | null>(null);
+  const [iconPreview, setIconPreview] = useState<string>('');
   const [imgError, setImgError] = React.useState(false);
+  const [isAWSInitialized, setIsAWSInitialized] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { refetchAttributesHandler } = usePlayground();
+
+  useEffect(() => {
+    const awsInitialized = initializeAWS();
+    setIsAWSInitialized(awsInitialized);
+  }, []);
+
+  // Cleanup preview URL when component unmounts or file changes
+  useEffect(() => {
+    return () => {
+      if (iconPreview && iconPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(iconPreview);
+      }
+    };
+  }, [iconPreview]);
+
   const { mutate: onUpdateBot, isPending: updatePending } = useUpdateChatbot({
     onSuccess(data) {
       toast.success(data?.message);
@@ -84,14 +103,49 @@ const UpdateChatbotDialog = ({
         return;
       }
 
-      // If validation passes, read and set the file
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          setIcon(event.target.result as string);
-        }
-      };
-      reader.readAsDataURL(file);
+      // Clean up previous preview URL
+      if (iconPreview && iconPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(iconPreview);
+      }
+
+      // Store file and create preview
+      setIconFile(file);
+      setIconPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const uploadBotIconToS3 = async (file: File): Promise<string | null> => {
+    if (!isAWSInitialized) {
+      toast.error('AWS is not properly configured');
+      return null;
+    }
+
+    try {
+      const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
+      const bucket = process.env.NEXT_PUBLIC_AWS_BUCKET as string;
+
+      // Generate filename
+      const fileExtension =
+        file.name.split('.').pop() || file.type.split('/')[1];
+      const fileName = `chat_icon_${Date.now()}.${fileExtension}`;
+      const key = `chatagentAssets/${chatbotId}/icon/${fileName}`;
+
+      // Upload to S3
+      const uploadResult = await s3
+        .upload({
+          Bucket: bucket,
+          Key: key,
+          Body: file,
+          ContentType: file.type,
+          ACL: 'public-read',
+        })
+        .promise();
+
+      return uploadResult.Location;
+    } catch (error) {
+      console.error('Error uploading bot icon to S3:', error);
+      toast.error('Failed to upload bot icon');
+      return null;
     }
   };
 
@@ -100,7 +154,15 @@ const UpdateChatbotDialog = ({
     fileInputRef.current?.click();
   };
 
-  const handleSubmit = () => {
+  // Get the appropriate icon source for display
+  const getDisplayIcon = () => {
+    if (iconPreview) {
+      return iconPreview;
+    }
+    return botIcon;
+  };
+
+  const handleSubmit = async () => {
     if (!chatbotId) {
       toast.error('Chatbot ID is missing, something went wrong');
       return;
@@ -110,50 +172,26 @@ const UpdateChatbotDialog = ({
       return;
     }
 
-    const formData = new FormData();
+    let iconUrl: string = '';
+
+    // Upload bot icon to S3 first if a new file exists
+    if (iconFile) {
+      const uploadedUrl = await uploadBotIconToS3(iconFile);
+      if (!uploadedUrl) {
+        // If upload failed, stop the process
+        return;
+      }
+      iconUrl = uploadedUrl;
+    }
+
     const dataObject = {
       name: name ?? chatbotName,
+      ...(iconUrl ? { iconUrl } : {}), // Add iconUrl to dataObject if it exists
     };
-
-    formData.append('data', JSON.stringify(dataObject));
-    if (icon) {
-      if (icon.startsWith('data:image')) {
-        // Extract mime type and base64 data
-        const matches = icon.match(/^data:(.+);base64,(.+)$/);
-        if (matches && matches.length === 3) {
-          const mimeType = matches[1];
-          const base64Data = matches[2];
-
-          // Convert base64 to binary
-          const binaryData = atob(base64Data);
-
-          // Create array buffer from binary
-          const arrayBuffer = new ArrayBuffer(binaryData.length);
-          const uint8Array = new Uint8Array(arrayBuffer);
-
-          for (let i = 0; i < binaryData.length; i++) {
-            uint8Array[i] = binaryData.charCodeAt(i);
-          }
-
-          // Create blob with correct mime type
-          const blob = new Blob([arrayBuffer], { type: mimeType });
-
-          // Create File from blob
-          const iconFile = new File(
-            [blob],
-            `chat_icon_${Date.now()}.${mimeType.split('/')[1]}`,
-            { type: mimeType }
-          );
-
-          // Add the file to FormData with key 'icon'
-          formData.append('icon', iconFile);
-        }
-      }
-    }
 
     onUpdateBot({
       chatbotId: chatbotId,
-      details: formData,
+      details: dataObject,
     });
   };
 
@@ -211,11 +249,11 @@ const UpdateChatbotDialog = ({
                 onChange={handleFileUpload}
               />
 
-              {icon || (botIcon && !imgError) ? (
+              {getDisplayIcon() && !imgError ? (
                 <div className='flex items-center gap-3 w-full'>
                   <div className='w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border border-[#E0E0E0]'>
                     <Image
-                      src={icon || botIcon}
+                      src={getDisplayIcon()}
                       alt='Bot Icon'
                       width={48}
                       height={48}
