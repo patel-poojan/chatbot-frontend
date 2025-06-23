@@ -80,12 +80,10 @@ const Page = () => {
 
   const handleRenameSubmit = (chatbotId: string) => {
     if (updatedName.trim() && currentName !== updatedName) {
-      const formData = new FormData();
       const dataObject = { name: updatedName };
-      formData.append('data', JSON.stringify(dataObject));
       onUpdateBot({
         chatbotId,
-        details: formData,
+        details: dataObject,
       });
     } else if (!updatedName.trim()) {
       toast.error('Name cannot be empty.');
