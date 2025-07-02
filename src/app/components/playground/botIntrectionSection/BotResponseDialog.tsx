@@ -373,12 +373,18 @@ const BotResponseDialog = ({
         // If there's a new file to upload
         if (pendingFile) {
           try {
-            // Upload new file
+            // Generate filename with extension
+
             const fileName = `${Date.now()}-${pendingFile.name}`;
+
+            // Create structured path similar to the bot icon upload
+            const key = `chatagentAssets/${chatbotId}/playground/${fileName}`;
+
+            // Upload new file
             const uploadResult = await s3
               .upload({
                 Bucket: bucket,
-                Key: fileName,
+                Key: key, // Using structured path instead of just fileName
                 Body: pendingFile,
                 ContentType: pendingFile.type,
                 ACL: 'public-read',
@@ -387,7 +393,14 @@ const BotResponseDialog = ({
 
             // Delete previous file if exists
             if (previousFileUrl) {
-              const previousKey = previousFileUrl.split('/').pop() || '';
+              // Extract the full key from the previous URL
+              const urlParts = previousFileUrl.split('/');
+              const bucketIndex = urlParts.findIndex((part) => part === bucket);
+              const previousKey =
+                bucketIndex !== -1
+                  ? urlParts.slice(bucketIndex + 1).join('/')
+                  : previousFileUrl.split('/').pop() || '';
+
               await s3
                 .deleteObject({
                   Bucket: bucket,
