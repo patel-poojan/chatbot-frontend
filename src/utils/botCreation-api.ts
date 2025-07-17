@@ -106,7 +106,7 @@ export const useSaveBDAQuestion = ({
 type TrainBotRequest = {
   chatbotId: string;
   details: {
-    document?: File[];
+    document?: string[];
     type: string;
     websiteUrl?: string;
     scanType?: string;
@@ -139,25 +139,6 @@ type trainBotResponse = {
   message: string;
   success: boolean;
 };
-const createFormData = (details: TrainBotRequest['details']) => {
-  const formData = new FormData();
-
-  if (details.document) {
-    details.document.forEach((file) => {
-      formData.append(`document`, file);
-    });
-  }
-
-  formData.append('type', details.type);
-  if (details.websiteUrl) formData.append('websiteUrl', details.websiteUrl);
-  if (details.scanType) formData.append('scanType', details.scanType);
-  if (details.urls_to_scrape)
-    formData.append('urls_to_scrape', JSON.stringify(details.urls_to_scrape));
-  if (details.urls_to_ignore)
-    formData.append('urls_to_ignore', JSON.stringify(details.urls_to_ignore));
-
-  return formData;
-};
 
 export const useTrainBot = ({
   onSuccess,
@@ -169,15 +150,11 @@ export const useTrainBot = ({
   useMutation({
     mutationKey: ['train', 'Bot'],
     mutationFn: (data: TrainBotRequest): Promise<trainBotResponse> => {
-      const formData = createFormData(data.details);
+      // Remove FormData, send as JSON
       return axiosInstance.post(
         `/chatbot/${data.chatbotId}/chatbotDoc`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
+        data.details // Send details directly as JSON
+        // Remove Content-Type header, let axios set it automatically
       );
     },
     onError,

@@ -160,7 +160,7 @@ const ChooseDocumentTemplate: React.FC<DocumentTemplateProps> = ({
   const { width: screenWidth } = useWindowDimensions();
   const [step, setStep] = useState(0);
   const [activeTrainingURLS, setActiveTrainingURLS] = useState<string[]>([]);
-
+  const [isUploadingFiles, setIsUploadingFiles] = useState(false);
   const validateFiles = (files: File[]) => {
     if (files.length > 4) {
       toast.warning('Please upload no more than 4 files');
@@ -252,20 +252,55 @@ const ChooseDocumentTemplate: React.FC<DocumentTemplateProps> = ({
     return true;
   };
 
-  const continueHandler = () => {
+  const uploadFileToS3 = async (file: File, botId: string) => {
+    const fileName = `${Date.now()}-${file.name}`;
+    const key = `chatagentAssets/${botId}/documents/${fileName}`;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('key', key);
+    formData.append('botId', botId);
+
+    // Replace with your actual S3 upload endpoint
+    const response = await fetch('/api/upload-to-s3', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to upload file to S3');
+    }
+
+    const result = await response.json();
+    return result.url; // S3 URL
+  };
+  const continueHandler = async () => {
     if (type === 'document' && botId) {
       if (files.length === 0) {
         toast.warning('Please select document');
       } else if (!validateFiles(files) || !validateFileNames(files)) {
         return;
       } else {
-        onTrainBot({
-          chatbotId: botId,
-          details: {
-            document: files,
-            type: 'document',
-          },
-        });
+        setIsUploadingFiles(true);
+        try {
+          // Upload files to S3 first
+          const uploadPromises = files.map((file) =>
+            uploadFileToS3(file, botId)
+          );
+          const s3Urls = await Promise.all(uploadPromises);
+
+          onTrainBot({
+            chatbotId: botId,
+            details: {
+              document: s3Urls, // Pass S3 URLs instead of files
+              type: 'document',
+            },
+          });
+        } catch (error) {
+          toast.error('Failed to upload documents. Please try again.');
+        } finally {
+          setIsUploadingFiles(false);
+        }
       }
     } else if (type === 'website' && botId) {
       if (scanType && websiteUrl) {
@@ -275,23 +310,38 @@ const ChooseDocumentTemplate: React.FC<DocumentTemplateProps> = ({
         ) {
           return;
         }
-        const notSelectedURLs = collectionOfURL?.data?.urls
-          ?.filter((url) => !activeTrainingURLS.includes(url.url))
-          .map((url) => url.url);
-        const details = {
-          websiteUrl,
-          scanType,
-          urls_to_scrape: activeTrainingURLS,
-          urls_to_ignore: notSelectedURLs,
 
-          type: 'website' as const,
-          ...(files.length > 0 && { document: files }),
-        };
+        try {
+          const notSelectedURLs = collectionOfURL?.data?.urls
+            ?.filter((url) => !activeTrainingURLS.includes(url.url))
+            .map((url) => url.url);
 
-        onTrainBot({
-          chatbotId: botId,
-          details,
-        });
+          let s3DocumentUrls: string[] = [];
+
+          // Upload files to S3 if any
+          if (files.length > 0) {
+            const uploadPromises = files.map((file) =>
+              uploadFileToS3(file, botId)
+            );
+            s3DocumentUrls = await Promise.all(uploadPromises);
+          }
+
+          const details = {
+            websiteUrl,
+            scanType,
+            urls_to_scrape: activeTrainingURLS,
+            urls_to_ignore: notSelectedURLs,
+            type: 'website' as const,
+            ...(s3DocumentUrls.length > 0 && { document: s3DocumentUrls }),
+          };
+
+          onTrainBot({
+            chatbotId: botId,
+            details,
+          });
+        } catch (error) {
+          toast.error('Failed to upload documents. Please try again.');
+        }
       } else {
         toast.error('please select scan type and website url');
       }
@@ -313,7 +363,7 @@ const ChooseDocumentTemplate: React.FC<DocumentTemplateProps> = ({
         height: containerHeight,
       }}
     >
-      {(isPending || isPendingToFetchURLs) && <Loader />}
+      {(isPending || isPendingToFetchURLs || isUploadingFiles) && <Loader />}
 
       {step === 0 ? (
         <div className='flex overflow-hidden gap-6 flex-col flex-1'>
@@ -335,11 +385,17 @@ const ChooseDocumentTemplate: React.FC<DocumentTemplateProps> = ({
             {optional && (
               <div
                 className='flex items-center gap-1 md:gap-2 cursor-pointer'
-                onClick={() => {
+                onClick={async () => {
                   if (step === 0 && type === 'website') {
-                    setStep(1);
+                    if (files.length === 0) {
+                      toast.warning('Please select document');
+                    } else if (!validateFiles(files)) {
+                      return;
+                    } else {
+                      setStep(1);
+                    }
                   } else {
-                    continueHandler();
+                    await continueHandler(); // Make it async
                   }
                 }}
               >
