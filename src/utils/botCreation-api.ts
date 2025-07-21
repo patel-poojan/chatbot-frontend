@@ -163,7 +163,7 @@ export const useTrainBot = ({
 type UpdateTrainBotRequest = {
   chatbotId: string;
   details: {
-    document?: File[];
+    document?: string[];
     type?: string;
     websiteUrl?: string;
     scanType?: string;
@@ -180,36 +180,6 @@ type UpdateTrainBotRequest = {
     }[];
   };
 };
-const createFormDataForUpdate = (details: UpdateTrainBotRequest['details']) => {
-  const formData = new FormData();
-
-  if (details.document) {
-    details.document.forEach((file) => {
-      formData.append(`document`, file);
-    });
-  }
-  if (details.type) {
-    formData.append('type', details.type);
-  }
-  if (details.documentContent) {
-    formData.append(`documentContent`, JSON.stringify(details.documentContent));
-    // details.documentContent.forEach((file) => {
-    //   formData.append(`documentContent`, JSON.stringify(file));
-    // });
-  }
-  if (details.websiteContent) {
-    formData.append(`websiteContent`, JSON.stringify(details.websiteContent));
-    // details.websiteContent.forEach((file) => {
-    //   formData.append(`websiteContent`, JSON.stringify(file));
-    // });
-  }
-  if (details.websiteUrl) formData.append('websiteUrl', details.websiteUrl);
-  if (details.scanType) formData.append('scanType', details.scanType);
-  if (details.urls_to_scrape)
-    formData.append('urls_to_scrape', JSON.stringify(details.urls_to_scrape));
-
-  return formData;
-};
 
 export const useUpdateTrainData = ({
   onSuccess,
@@ -221,15 +191,9 @@ export const useUpdateTrainData = ({
   useMutation({
     mutationKey: ['update', 'train', 'Bot'],
     mutationFn: (data: UpdateTrainBotRequest): Promise<trainBotResponse> => {
-      const formData = createFormDataForUpdate(data.details);
       return axiosInstance.put(
         `/chatbot/${data.chatbotId}/chatbotDoc`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
+        data.details // Send details directly as JSON
       );
     },
     onError,
@@ -246,21 +210,14 @@ export const useRecrawlWebsiteData = ({
   useMutation({
     mutationKey: ['update', 'train', 'Bot'],
     mutationFn: (data: UpdateTrainBotRequest): Promise<trainBotResponse> => {
-      const formData = createFormDataForUpdate(data.details);
       return axiosInstance.put(
         `/chatbot/${data.chatbotId}/chatbotDoc/recrawl`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
+        data.details // Send details directly as JSON
       );
     },
     onError,
     onSuccess,
   });
-
 type DeleteBotRequest = {
   chatbotId: string;
 };

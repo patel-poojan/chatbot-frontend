@@ -12,12 +12,14 @@ import { Loader } from './Loader';
 import useWindowDimensions from '@/utils/windowSize';
 import { useFetchURLForTraining, useTrainBot } from '@/utils/botCreation-api';
 import { axiosError } from '../../types/axiosTypes';
+import AWS from 'aws-sdk';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { initializeAWS } from './playground/botIntrectionSection/S3Operation';
 
 // Types
 interface DocumentTemplateProps {
@@ -161,6 +163,7 @@ const ChooseDocumentTemplate: React.FC<DocumentTemplateProps> = ({
   const [step, setStep] = useState(0);
   const [activeTrainingURLS, setActiveTrainingURLS] = useState<string[]>([]);
   const [isUploadingFiles, setIsUploadingFiles] = useState(false);
+  const [isAWSInitialized, setIsAWSInitialized] = useState(false);
   const validateFiles = (files: File[]) => {
     if (files.length > 4) {
       toast.warning('Please upload no more than 4 files');
@@ -251,99 +254,141 @@ const ChooseDocumentTemplate: React.FC<DocumentTemplateProps> = ({
     }
     return true;
   };
-
+  // Initialize AWS when component mounts
+  useEffect(() => {
+    const awsInitialized = initializeAWS();
+    setIsAWSInitialized(awsInitialized);
+  }, []);
   const uploadFileToS3 = async (file: File, botId: string) => {
-    const fileName = `${Date.now()}-${file.name}`;
-    const key = `chatagentAssets/${botId}/documents/${fileName}`;
-
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('key', key);
-    formData.append('botId', botId);
-
-    // Replace with your actual S3 upload endpoint
-    const response = await fetch('/api/upload-to-s3', {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to upload file to S3');
+    if (!isAWSInitialized) {
+      throw new Error('AWS is not properly configured');
     }
 
-    const result = await response.json();
-    return result.url; // S3 URL
+    const fileName = `${Date.now()}-${file.name}`;
+    const key = `chatagentAssets/${botId}/documents/${fileName}`;
+    const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
+    const bucket = process.env.NEXT_PUBLIC_AWS_BUCKET as string;
+
+    if (!bucket) {
+      throw new Error('AWS bucket not configured');
+    }
+
+    try {
+      const uploadResult = await s3
+        .upload({
+          Bucket: bucket,
+          Key: key,
+          Body: file,
+          ContentType: file.type,
+          ACL: 'public-read',
+        })
+        .promise();
+
+      if (!uploadResult || !uploadResult.Location) {
+        throw new Error('Failed to upload file to S3');
+      }
+
+      return uploadResult.Location;
+    } catch (error) {
+      console.error('S3 upload error:', error);
+      const errorMessage =
+        typeof error === 'object' && error !== null && 'message' in error
+          ? (error as { message: string }).message
+          : String(error);
+      throw new Error(`Failed to upload ${file.name}: ${errorMessage}`);
+    }
   };
   const continueHandler = async () => {
+    if (!isAWSInitialized) {
+      toast.error('AWS is not properly configured');
+      return;
+    }
+
     if (type === 'document' && botId) {
       if (files.length === 0) {
         toast.warning('Please select document');
-      } else if (!validateFiles(files) || !validateFileNames(files)) {
         return;
-      } else {
-        setIsUploadingFiles(true);
-        try {
-          // Upload files to S3 first
+      }
+
+      if (!validateFiles(files) || !validateFileNames(files)) {
+        return;
+      }
+
+      setIsUploadingFiles(true);
+      try {
+        // Upload files to S3 first
+        const uploadPromises = files.map((file) => uploadFileToS3(file, botId));
+        const s3Urls = await Promise.all(uploadPromises);
+
+        onTrainBot({
+          chatbotId: botId,
+          details: {
+            document: s3Urls,
+            type: 'document',
+          },
+        });
+      } catch (error) {
+        console.error('Upload error:', error);
+        toast.error(
+          typeof error === 'object' && error !== null && 'message' in error
+            ? (error as { message: string }).message
+            : 'Failed to upload documents. Please try again.'
+        );
+      } finally {
+        setIsUploadingFiles(false);
+      }
+    } else if (type === 'website' && botId) {
+      if (!scanType || !websiteUrl) {
+        toast.error('please select scan type and website url');
+        return;
+      }
+
+      if (
+        files.length > 0 &&
+        (!validateFiles(files) || !validateFileNames(files))
+      ) {
+        return;
+      }
+
+      setIsUploadingFiles(true);
+      try {
+        const notSelectedURLs = collectionOfURL?.data?.urls
+          ?.filter((url) => !activeTrainingURLS.includes(url.url))
+          .map((url) => url.url);
+
+        let s3DocumentUrls: string[] = [];
+
+        // Upload files to S3 if any
+        if (files.length > 0) {
           const uploadPromises = files.map((file) =>
             uploadFileToS3(file, botId)
           );
-          const s3Urls = await Promise.all(uploadPromises);
-
-          onTrainBot({
-            chatbotId: botId,
-            details: {
-              document: s3Urls, // Pass S3 URLs instead of files
-              type: 'document',
-            },
-          });
-        } catch (error) {
-          toast.error('Failed to upload documents. Please try again.');
-        } finally {
-          setIsUploadingFiles(false);
-        }
-      }
-    } else if (type === 'website' && botId) {
-      if (scanType && websiteUrl) {
-        if (
-          files.length > 0 &&
-          (!validateFiles(files) || !validateFileNames(files))
-        ) {
-          return;
+          s3DocumentUrls = await Promise.all(uploadPromises);
         }
 
-        try {
-          const notSelectedURLs = collectionOfURL?.data?.urls
-            ?.filter((url) => !activeTrainingURLS.includes(url.url))
-            .map((url) => url.url);
+        const details = {
+          websiteUrl,
+          scanType,
+          urls_to_scrape: activeTrainingURLS,
+          urls_to_ignore: notSelectedURLs,
+          type: 'website' as const,
+          ...(s3DocumentUrls.length > 0 && { document: s3DocumentUrls }),
+        };
 
-          let s3DocumentUrls: string[] = [];
-
-          // Upload files to S3 if any
-          if (files.length > 0) {
-            const uploadPromises = files.map((file) =>
-              uploadFileToS3(file, botId)
-            );
-            s3DocumentUrls = await Promise.all(uploadPromises);
-          }
-
-          const details = {
-            websiteUrl,
-            scanType,
-            urls_to_scrape: activeTrainingURLS,
-            urls_to_ignore: notSelectedURLs,
-            type: 'website' as const,
-            ...(s3DocumentUrls.length > 0 && { document: s3DocumentUrls }),
-          };
-
-          onTrainBot({
-            chatbotId: botId,
-            details,
-          });
-        } catch (error) {
-          toast.error('Failed to upload documents. Please try again.');
-        }
-      } else {
-        toast.error('please select scan type and website url');
+        onTrainBot({
+          chatbotId: botId,
+          details,
+        });
+      } catch (error) {
+        console.error('Upload error:', error);
+        toast.error(
+          typeof error === 'object' && error !== null && 'message' in error
+            ? (error as { message?: string }).message ||
+                'Failed to upload documents. Please try again.'
+            : 'Failed to upload documents. Please try again.'
+        );
+      } finally {
+        setIsUploadingFiles(false);
       }
     }
   };
