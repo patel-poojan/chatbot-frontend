@@ -18,7 +18,7 @@ import { axiosInstance } from '@/utils/axiosInstance';
 import useWindowDimensions from '@/utils/windowSize';
 import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import {
   IoChevronBackOutline,
@@ -41,6 +41,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { AlertDialogHeader } from '@/components/ui/alert-dialog';
+import { initializeAWS } from './botIntrectionSection/S3Operation';
+import AWS from 'aws-sdk';
 
 interface IDocumentContent {
   active: boolean;
@@ -104,6 +106,8 @@ const AIKnowledge = ({
   // Add these states at the top of the AIKnowledge component after the existing state declarations
   const [hasChanges, setHasChanges] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [isAWSInitialized, setIsAWSInitialized] = useState(false);
+  const [isUploadingFiles, setIsUploadingFiles] = useState(false);
   const [pendingAction, setPendingAction] = useState<{
     type: 'tab' | 'close';
     value?: string;
@@ -115,7 +119,50 @@ const AIKnowledge = ({
   const handleRemoveFile = (index: number) => {
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
+  useEffect(() => {
+    const awsInitialized = initializeAWS();
+    setIsAWSInitialized(awsInitialized);
+  }, []);
 
+  const uploadFileToS3 = async (file: File, botId: string) => {
+    if (!isAWSInitialized) {
+      throw new Error('AWS is not properly configured');
+    }
+
+    const fileName = `${Date.now()}-${file.name}`;
+    const key = `chatagentAssets/${botId}/documents/${fileName}`;
+    const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
+    const bucket = process.env.NEXT_PUBLIC_AWS_BUCKET as string;
+
+    if (!bucket) {
+      throw new Error('AWS bucket not configured');
+    }
+
+    try {
+      const uploadResult = await s3
+        .upload({
+          Bucket: bucket,
+          Key: key,
+          Body: file,
+          ContentType: file.type,
+          ACL: 'public-read',
+        })
+        .promise();
+
+      if (!uploadResult || !uploadResult.Location) {
+        throw new Error('Failed to upload file to S3');
+      }
+
+      return uploadResult.Location;
+    } catch (error) {
+      console.error('S3 upload error:', error);
+      const errorMessage =
+        typeof error === 'object' && error !== null && 'message' in error
+          ? (error as { message: string }).message
+          : String(error);
+      throw new Error(`Failed to upload ${file.name}: ${errorMessage}`);
+    }
+  };
   const fetchTrainData = async () => {
     const response: TrainDataType = await axiosInstance.get(
       `/chatbot/${chatbotId}/chatbotDoc`
@@ -347,21 +394,48 @@ const AIKnowledge = ({
 
     return true;
   };
-  const handleTrainAgent = () => {
+  const handleTrainAgent = async () => {
+    if (!isAWSInitialized) {
+      toast.error('AWS is not properly configured');
+      return;
+    }
+
     if (files.length === 0) {
       toast.warning('Please select document');
-    } else if (!validateFiles(files)) {
       return;
-    } else {
+    }
+
+    if (!validateFiles(files)) {
+      return;
+    }
+
+    setIsUploadingFiles(true);
+    try {
+      // Upload files to S3 first
+      const uploadPromises = files.map((file) =>
+        uploadFileToS3(file, chatbotId)
+      );
+      const s3Urls = await Promise.all(uploadPromises);
+
+      // Send S3 URLs instead of files
       onUpdate({
         chatbotId: chatbotId,
         details: {
-          document: files,
+          document: s3Urls, // Now sending S3 URLs instead of files
           type: 'document',
           documentContent: listOfDocument,
           websiteContent: listOfWebsites,
         },
       });
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error(
+        typeof error === 'object' && error !== null && 'message' in error
+          ? (error as { message: string }).message
+          : 'Failed to upload documents. Please try again.'
+      );
+    } finally {
+      setIsUploadingFiles(false);
     }
   };
 
@@ -373,7 +447,10 @@ const AIKnowledge = ({
           screenWidth > 500 ? 'calc(100dvh - 72px)' : 'calc(100dvh - 96px)',
       }}
     >
-      {(loadTrainData || isPendingToUpdate || isPendingToRecrawl) && <Loader />}
+      {(loadTrainData ||
+        isPendingToUpdate ||
+        isPendingToRecrawl ||
+        isUploadingFiles) && <Loader />}
       <div className='flex mx-2 justify-between items-center'>
         <div className='flex gap-2 sm:gap-4'>
           <div

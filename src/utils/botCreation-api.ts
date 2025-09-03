@@ -1,6 +1,6 @@
-import { axiosError } from '@/types/axiosTypes';
-import { useMutation } from '@tanstack/react-query';
-import { axiosInstance } from './axiosInstance';
+import { axiosError } from "@/types/axiosTypes";
+import { useMutation } from "@tanstack/react-query";
+import { axiosInstance } from "./axiosInstance";
 
 type DefaultResponse = {
   statusCode: number;
@@ -51,7 +51,7 @@ export const useCreateChatbot = ({
   onError: (error: axiosError) => void;
 }) =>
   useMutation({
-    mutationKey: ['create', 'chatbot'],
+    mutationKey: ["create", "chatbot"],
     mutationFn: (
       data: CreateChatbotRequest
     ): Promise<CreateChatbotResponse> => {
@@ -89,7 +89,7 @@ export const useSaveBDAQuestion = ({
   onError: (error: axiosError) => void;
 }) =>
   useMutation({
-    mutationKey: ['save', 'BDA'],
+    mutationKey: ["save", "BDA"],
     mutationFn: (
       data: SaveBDAQuestionRequest
     ): Promise<SaveBDAQuestionResponse> => {
@@ -106,12 +106,12 @@ export const useSaveBDAQuestion = ({
 type TrainBotRequest = {
   chatbotId: string;
   details: {
-    document?: File[];
+    document?: string[];
     type: string;
     websiteUrl?: string;
     scanType?: string;
-    urls_to_scrape?: string[];
-    urls_to_ignore?: string[];
+    websiteUrlToScrape?: string[];
+    websiteUrlToIgnore?: string[];
   };
 };
 
@@ -139,25 +139,6 @@ type trainBotResponse = {
   message: string;
   success: boolean;
 };
-const createFormData = (details: TrainBotRequest['details']) => {
-  const formData = new FormData();
-
-  if (details.document) {
-    details.document.forEach((file) => {
-      formData.append(`document`, file);
-    });
-  }
-
-  formData.append('type', details.type);
-  if (details.websiteUrl) formData.append('websiteUrl', details.websiteUrl);
-  if (details.scanType) formData.append('scanType', details.scanType);
-  if (details.urls_to_scrape)
-    formData.append('urls_to_scrape', JSON.stringify(details.urls_to_scrape));
-  if (details.urls_to_ignore)
-    formData.append('urls_to_ignore', JSON.stringify(details.urls_to_ignore));
-
-  return formData;
-};
 
 export const useTrainBot = ({
   onSuccess,
@@ -167,17 +148,13 @@ export const useTrainBot = ({
   onError: (error: axiosError) => void;
 }) =>
   useMutation({
-    mutationKey: ['train', 'Bot'],
+    mutationKey: ["train", "Bot"],
     mutationFn: (data: TrainBotRequest): Promise<trainBotResponse> => {
-      const formData = createFormData(data.details);
+      // Remove FormData, send as JSON
       return axiosInstance.post(
         `/chatbot/${data.chatbotId}/chatbotDoc`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
+        data.details // Send details directly as JSON
+        // Remove Content-Type header, let axios set it automatically
       );
     },
     onError,
@@ -186,11 +163,11 @@ export const useTrainBot = ({
 type UpdateTrainBotRequest = {
   chatbotId: string;
   details: {
-    document?: File[];
+    document?: string[];
     type?: string;
     websiteUrl?: string;
     scanType?: string;
-    urls_to_scrape?: string[];
+    websiteUrlToScrape?: string[];
     documentContent?: {
       active: boolean;
       url: string;
@@ -203,36 +180,6 @@ type UpdateTrainBotRequest = {
     }[];
   };
 };
-const createFormDataForUpdate = (details: UpdateTrainBotRequest['details']) => {
-  const formData = new FormData();
-
-  if (details.document) {
-    details.document.forEach((file) => {
-      formData.append(`document`, file);
-    });
-  }
-  if (details.type) {
-    formData.append('type', details.type);
-  }
-  if (details.documentContent) {
-    formData.append(`documentContent`, JSON.stringify(details.documentContent));
-    // details.documentContent.forEach((file) => {
-    //   formData.append(`documentContent`, JSON.stringify(file));
-    // });
-  }
-  if (details.websiteContent) {
-    formData.append(`websiteContent`, JSON.stringify(details.websiteContent));
-    // details.websiteContent.forEach((file) => {
-    //   formData.append(`websiteContent`, JSON.stringify(file));
-    // });
-  }
-  if (details.websiteUrl) formData.append('websiteUrl', details.websiteUrl);
-  if (details.scanType) formData.append('scanType', details.scanType);
-  if (details.urls_to_scrape)
-    formData.append('urls_to_scrape', JSON.stringify(details.urls_to_scrape));
-
-  return formData;
-};
 
 export const useUpdateTrainData = ({
   onSuccess,
@@ -242,17 +189,11 @@ export const useUpdateTrainData = ({
   onError: (error: axiosError) => void;
 }) =>
   useMutation({
-    mutationKey: ['update', 'train', 'Bot'],
+    mutationKey: ["update", "train", "Bot"],
     mutationFn: (data: UpdateTrainBotRequest): Promise<trainBotResponse> => {
-      const formData = createFormDataForUpdate(data.details);
       return axiosInstance.put(
         `/chatbot/${data.chatbotId}/chatbotDoc`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
+        data.details // Send details directly as JSON
       );
     },
     onError,
@@ -267,23 +208,16 @@ export const useRecrawlWebsiteData = ({
   onError: (error: axiosError) => void;
 }) =>
   useMutation({
-    mutationKey: ['update', 'train', 'Bot'],
+    mutationKey: ["update", "train", "Bot"],
     mutationFn: (data: UpdateTrainBotRequest): Promise<trainBotResponse> => {
-      const formData = createFormDataForUpdate(data.details);
       return axiosInstance.put(
         `/chatbot/${data.chatbotId}/chatbotDoc/recrawl`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
+        data.details // Send details directly as JSON
       );
     },
     onError,
     onSuccess,
   });
-
 type DeleteBotRequest = {
   chatbotId: string;
 };
@@ -295,7 +229,7 @@ export const useDeleteBot = ({
   onError: (error: axiosError) => void;
 }) =>
   useMutation({
-    mutationKey: ['delete', 'bot'],
+    mutationKey: ["delete", "bot"],
     mutationFn: (data: DeleteBotRequest): Promise<CreateChatbotResponse> =>
       axiosInstance.delete(`/chatbot/${data.chatbotId}`),
     onSuccess,
@@ -339,7 +273,7 @@ type UpdateChatbotRequest = {
     version?: number;
     language?: string;
     analyticsEnabled?: boolean;
-    state?: 'active' | 'draft';
+    state?: "active" | "draft";
     configuredButtons?: {
       type: string;
       isEnabled: boolean;
@@ -362,7 +296,7 @@ export const useUpdateChatbot = ({
   onError: (error: axiosError) => void;
 }) =>
   useMutation({
-    mutationKey: ['update', 'bot'],
+    mutationKey: ["update", "bot"],
     mutationFn: (data: UpdateChatbotRequest): Promise<DefaultResponse> =>
       axiosInstance.put(`/chatbot/${data.chatbotId}`, data.details),
     onSuccess,
@@ -382,7 +316,7 @@ type getChatbotResponse = {
         url: string;
         localPath: string;
       };
-      closeChat: 'OFF' | 'END' | 'START';
+      closeChat: "OFF" | "END" | "START";
     };
     _id: string;
     type: string;
@@ -416,7 +350,7 @@ export const useGetChatbotDetails = ({
   onError: (error: axiosError) => void;
 }) =>
   useMutation({
-    mutationKey: ['get', 'bot'],
+    mutationKey: ["get", "bot"],
     mutationFn: (data: getChatbotRequest): Promise<getChatbotResponse> =>
       axiosInstance.get(`/chatbot/${data.chatbotId}`),
     onSuccess,
@@ -441,7 +375,7 @@ export const useSetupPlayground = ({
   onError: (error: axiosError) => void;
 }) =>
   useMutation({
-    mutationKey: ['setup', 'playground'],
+    mutationKey: ["setup", "playground"],
     mutationFn: (data: SetupPlaygroundRequest): Promise<DefaultResponse> => {
       return axiosInstance.post(
         `/playground/setup/${data.chatbotId}`,
@@ -469,7 +403,7 @@ type fetchURLResponse = {
   success: boolean;
 };
 
-function sortByUrlLevels(jsonArray: fetchURLResponse['data']['urls']) {
+function sortByUrlLevels(jsonArray: fetchURLResponse["data"]["urls"]) {
   return jsonArray.sort((a, b) => {
     const levelA = (a.url.match(/\//g) || []).length;
     const levelB = (b.url.match(/\//g) || []).length;
@@ -492,7 +426,7 @@ export const useFetchURLForTraining = ({
   onError: (error: axiosError) => void;
 }) =>
   useMutation({
-    mutationKey: ['fetch', 'urls', 'training'],
+    mutationKey: ["fetch", "urls", "training"],
     mutationFn: async (data: fetchURLRequest): Promise<fetchURLResponse> => {
       const response: fetchURLResponse = await axiosInstance.post(
         `/chatbot/getURLs`,
