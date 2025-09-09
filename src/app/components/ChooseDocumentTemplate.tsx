@@ -432,15 +432,9 @@ const ChooseDocumentTemplate: React.FC<DocumentTemplateProps> = ({
                 className="flex items-center gap-1 md:gap-2 cursor-pointer"
                 onClick={async () => {
                   if (step === 0 && type === "website") {
-                    if (files.length === 0) {
-                      toast.warning("Please select document");
-                    } else if (!validateFiles(files)) {
-                      return;
-                    } else {
-                      setStep(1);
-                    }
+                    setStep(1);
                   } else {
-                    await continueHandler(); // Make it async
+                    continueHandler();
                   }
                 }}
               >
