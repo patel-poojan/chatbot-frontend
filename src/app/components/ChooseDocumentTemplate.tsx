@@ -372,7 +372,7 @@ const ChooseDocumentTemplate: React.FC<DocumentTemplateProps> = ({
           websiteUrlToScrape: activeTrainingURLS,
           websiteUrlToIgnore: notSelectedURLs,
           type: "website" as const,
-          ...(s3DocumentUrls.length > 0 && { document: s3DocumentUrls }),
+          document: s3DocumentUrls,
         };
 
         onTrainBot({
